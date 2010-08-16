@@ -1,0 +1,1 @@
+|a:12:{s:11:"description";s:0:"";s:7:"orderBy";s:0:"";s:14:"orderDirection";s:0:"";s:5:"split";s:2:";,";s:12:"summaryLinks";s:3:"all";s:7:"themeId";s:0:"";s:15:"themeSettingsId";s:2:"11";s:10:"_callbacks";s:34:"getSiteAdminViews|getItemSummaries";s:16:"_requiredCoreApi";s:4:"7,27";s:18:"_requiredModuleApi";s:3:"3,6";s:16:"_templateVersion";s:1:"1";s:8:"_version";s:5:"1.0.6";}

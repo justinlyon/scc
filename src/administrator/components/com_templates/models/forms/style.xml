@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<!-- $Id: style.xml 17126 2010-05-17 05:38:58Z eddieajau $ -->
+<form>
+	<fieldset>
+		<field
+			name="id"
+			label="JGLOBAL_FIELD_ID_LABEL"
+			description ="JGLOBAL_FIELD_ID_DESC"
+			type="hidden"
+			default="0"
+			required="true"
+			readonly="true" />
+
+		<field
+			name="template"
+			type="text"
+			label="COM_TEMPLATES_FIELD_TEMPLATE_LABEL"
+			description="COM_TEMPLATES_FIELD_TEMPLATE_DESC"
+			class="readonly"
+			size="30"
+			readonly="true" />
+
+		<field
+			name="client_id"
+			type="hidden"
+			label="COM_TEMPLATES_FIELD_CLIENT_LABEL"
+			description="COM_TEMPLATES_FIELD_CLIENT_DESC"
+			class="readonly"
+			default="0"
+			readonly="true" />
+
+		<field
+			name="home"
+			type="list"
+			label="COM_TEMPLATES_FIELD_HOME_LABEL"
+			description="COM_TEMPLATES_FIELD_HOME_DESC"
+			class="inputbox"
+			default="0">
+			<option
+				value="1">
+				JYes</option>
+			<option
+				value="0">
+				JNo</option>
+		</field>
+
+		<field
+			name="title"
+			type="text"
+			class="inputbox"
+			size="50"
+			label="COM_TEMPLATES_FIELD_TITLE_LABEL"
+			description="COM_TEMPLATES_FIELD_TITLE_DESC"
+			required="true" />
+
+		<field
+			name="params"
+			type="hidden" />
+		<field name="assigned" type="hidden" />
+
+	</fieldset>
+</form>

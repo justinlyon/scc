@@ -1,0 +1,1 @@
+<?php die("Access Denied"); ?>#x#a:2:{s:6:"output";s:0:"";s:6:"result";O:8:"stdClass":4:{s:2:"id";s:1:"4";s:6:"option";s:11:"com_banners";s:6:"params";s:84:"{"purchase_type":"3","track_impressions":"0","track_clicks":"0","metakey_prefix":""}";s:7:"enabled";s:1:"1";}}

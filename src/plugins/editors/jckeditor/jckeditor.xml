@@ -1,0 +1,88 @@
+<install version="1.6" type="plugin" group="editors" method="upgrade">
+	<name>Editor - JoomlaCK</name>
+	<version>3.3.1</version>
+	<creationDate>July 2010 </creationDate>
+	<author>WebxSolution Ltd</author>
+	<authorurl>http://www.webxsolution.com</authorurl>
+	<license>GPL</license>
+	<description>JoomlaCK  3.3.1 is a platform independent web based JavaScript HTML WYSIWYG Editor control.</description>
+	<files>
+		<filename plugin="jckeditor">jckeditor.php</filename>
+		<folder>jckeditor</folder>
+	</files>
+	<languages>
+	<language tag="en-GB">language/en-GB.plg_editors_jckeditor.ini</language>
+	</languages>
+	<fields name="params">
+		<fieldset name="basic">
+			<field name="toolbar" type="list" default="Full" label="Administrator End Toolbar Mode" description="FUNCTIONBK">
+				<option value="Full">Full</option>
+				<option value="Publisher">Publisher</option>
+				<option value="Basic">Basic</option>
+				<option value="Blog">Blog</option>
+				<option value="Image">Image</option>
+			</field>
+			<field name="toolbar_ft" type="list" default="Full" label="FrontEnd Toolbar Mode" description="FUNCTIONFT">
+				<option value="Full">Full</option>
+				<option value="Publisher">Publisher</option>
+				<option value="Basic">Basic</option>
+				<option value="Blog">Blog</option>
+				<option value="Image">Image</option>
+			</field>
+			<field name="uicolor" type="text" default="#D6E6F4" label="Toolbar Color" description="The Toolbar Color" />
+			<field name="skin" type="list" default="office2007" label="Skin" description="EDITORSKIN">
+				<option value="office2007">Office2007</option>
+				<option value="kama">Kama</option>
+			</field>
+			<field name="content_css" type="radio" default="1" label="Use Template CSS classes?" description="LOADCSSTMPT">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="editor_css" type="radio" default="0" label="Use Editor CSS classes?" description="LOADCSSED">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="content_css_custom" type="text" default="" label="Use Custom CSS Classes?" description="CUSLOADCSS" />
+			<field name="imagePath" type="text" default="images" label="Location of the Images?" description="IMGPATH" />
+			<field name="flashPath" type="text" default="images/flash" label="Location of the flash files?" description="FLAPATH" />
+			<field name="filePath" type="text" default="files" label="Location of the Documents?" description="FILEPATH" />
+			<field name="entermode" type="list" default="1" label="Enter Mode" description="DESCENTERMODE">
+				<option value="1">P Elements</option>
+				<option value="2">BR Elements</option>
+				<option value="3">Div Elements</option>
+			</field>
+			<field name="shiftentermode" type="list" default="0" label="Shift Enter Mode" description="DESCSHIFTENTERMODE">
+				<option value="1">P Elements</option>
+				<option value="2">BR Elements</option>
+				<option value="3">Div Elements</option>
+			</field>
+			<field name="wwidth" type="text" default="100%" label="width" description="The width of Editor" />
+			<field name="hheight" type="text" default="480" label="height" description="The height of Editor" />
+		</fieldset>
+		<fieldset name="advanced">
+			<field name="showerrors" type="radio" default="1" label="Display Errors" description="DESCSHOWERROR">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="lang_mode" type="radio" default="1" label="Language Selection Mode" description="DESCLANGMODE">
+				<option value="0">Manual</option>
+				<option value="1">Joomla! Default</option>
+				<option value="2">Browser Default</option>
+			</field>
+			<field name="lang_code" type="text" default="en" label="Language Code" description="DESCLANGCODE" />
+			<field name="@spacer" type="spacer" default="" label="" description="" />
+			<field name="returnScript" type="radio" default="1" label="Auto Load" description="Option determines if editor autoloads at startup" >
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="useUserFolders" type="radio" default="0" label="Use user folders" description="DESCUSERFOLDER">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="userFolderType" type="list" default="username" label="User Folder Type(ID Or Username)" description="Options determinse if editor uses IDs or usernames for user folders">
+				<option value="username">UserName</option>
+				<option value="id">ID</option>
+			</field>
+		</fieldset>
+	</fields>
+</install>

@@ -1,0 +1,1 @@
+|a:5:{s:10:"_callbacks";s:30:"getItemLinks|getItemAdminViews";s:16:"_requiredCoreApi";s:4:"7,27";s:18:"_requiredModuleApi";s:3:"3,9";s:16:"_templateVersion";s:1:"1";s:8:"_version";s:5:"1.0.9";}

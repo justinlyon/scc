@@ -1,0 +1,1 @@
+|a:6:{s:15:"piclens.version";s:11:"1.3.1.14221";s:10:"_callbacks";s:30:"getItemLinks|getSiteAdminViews";s:16:"_requiredCoreApi";s:4:"7,49";s:18:"_requiredModuleApi";s:3:"3,9";s:16:"_templateVersion";s:1:"1";s:8:"_version";s:5:"2.0.0";}

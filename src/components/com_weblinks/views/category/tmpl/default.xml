@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	<layout title="com_weblinks_category_view_default_title">
+		<help
+			key="JHELP_MENUS_MENU_ITEM_WEBLINK_CATEGORY"
+		/>
+		<message>
+			<![CDATA[com_weblinks_category_view_default_desc]]>
+		</message>
+	</layout>
+
+	<!-- Add fields to the request variables for the layout. -->
+	<fields name="request">
+		<fieldset name="request">
+
+			<field name="id" type="category"
+				default="0"
+				description="COM_WEBLINKS_FIELD_SELECT_CATEGORY_DESC"
+				extension="com_weblinks"
+				label="COM_WEBLINKS_FIELD_SELECT_CATEGORY_LABEL"
+				required="true"
+			/>
+		</fieldset>
+	</fields>
+
+	<!-- Add fields to the parameters object for the layout. -->
+<fields name="params">
+<fieldset name="basic">
+			<field name="maxLevel" type="list"
+				description="JGLOBAL_MAXIMUM_CATEGORY_LEVELS_DESC"
+				label="JGLOBAL_MAXIMUM_CATEGORY_LEVELS_LABEL"
+			>
+				<option value="-1">JALL</option>
+				<option value="0">JNONE</option>
+				<option value="1">J1</option>
+				<option value="2">J2</option>
+				<option value="3">J3</option>
+				<option value="4">J4</option>
+				<option value="5">J5</option>
+			</field>
+
+			<field name="show_empty_categories" type="radio"
+				label="JGLOBAL_SHOW_EMPTY_CATEGORIES_LABEL"
+				description="JGLOBAL_SHOW_EMPTY_CATEGORIES_DESC"
+			>
+				<option value="">JGLOBAL_USE_GLOBAL</option>
+				<option value="0">JHIDE</option>
+				<option value="1">JSHOW</option>
+			</field>
+			<field name="show_description" type="list"
+				description="JGLOBAL_SHOW_CATEGORY_DESCRIPTION_DESC"
+				label="JGLOBAL_SHOW_CATEGORY_DESCRIPTION_LABEL"
+			>
+				<option value="">JGLOBAL_USE_GLOBAL</option>
+				<option value="0">JHIDE</option>
+				<option value="1">JSHOW</option>
+			</field>
+
+			<field name="show_description_image" type="list"
+				description="JGLOBAL_SHOW_CATEGORY_IMAGE_DESC"
+				label="JGLOBAL_SHOW_CATEGORY_IMAGE_LABEL"
+			>
+				<option value="">JGLOBAL_USE_GLOBAL</option>
+				<option value="0">JHIDE</option>
+				<option value="1">JSHOW</option>
+			</field>
+			<field name="show_cat_num_articles" type="radio"
+				label="JGLOBAL_FIELD_NUM_CATEGORY_ITEMS_LABEL"
+				description="JGLOBAL_FIELD_NUM_CATEGORY_ITEMS_DESC"
+			>
+				<option value="">JGLOBAL_USE_GLOBAL</option>
+				<option value="0">JHIDE</option>
+				<option value="1">JSHOW</option>
+			</field>
+</fieldset>
+<fieldset name="advanced">
+			<field name="display_num" type="list"
+				description="COM_WEBLINKS_FIELD_DISPLAY_NUM_DESC"
+				label="COM_WEBLINKS_FIELD_DISPLAY_NUM_LABEL"
+			>
+				<option value="">JGLOBAL_USE_GLOBAL</option>
+				<option value="5">J5</option>
+				<option value="10">J10</option>
+				<option value="15">J15</option>
+				<option value="20">J20</option>
+				<option value="25">J25</option>
+				<option value="30">J30</option>
+				<option value="50">J50</option>
+				<option value="100">J100</option>
+				<option value="0">JALL</option>
+			</field>
+			<field name="show_headings" type="list"
+				description="JGLOBAL_SHOW_HEADINGS_DESC"
+				label="JGLOBAL_SHOW_HEADINGS_LABEL"
+			>
+				<option value="">JGLOBAL_USE_GLOBAL</option>
+				<option value="0">JHIDE</option>
+				<option value="1">JSHOW</option>
+			</field>
+
+			<field name="orderby_pri" type="list"
+				description="JGLOBAL_CATEGORY_ORDER_DESC"
+				label="JGLOBAL_CATEGORY_ORDER_LABEL"
+			>
+				<option value="">JGLOBAL_USE_GLOBAL</option>
+				<option value="none">JGLOBAL_No_Order</option>
+				<option value="alpha">JGLOBAL_Title_Alphabetical</option>
+				<option value="ralpha">JGLOBAL_Title_Reverse_Alphabetical</option>
+				<option value="order">JGLOBAL_CATEGORY_MANAGER_ORDER</option>
+			</field>
+
+			<field name="show_pagination" type="list"
+				description="JGLOBAL_PAGINATION_DESC"
+				label="JGLOBAL_PAGINATION_LABEL"
+			>
+				<option value="">JGLOBAL_USE_GLOBAL</option>
+				<option value="0">JHIDE</option>
+				<option value="1">JSHOW</option>
+				<option value="2">JGLOBAL_AUTO</option>
+			</field>
+
+			<field name="show_noauth" type="list"
+				description="JGLOBAL_SHOW_UNAUTH_LINKS_DESC"
+				label="JGLOBAL_SHOW_UNAUTH_LINKS_LABEL"
+			>
+				<option value="">JGLOBAL_USE_GLOBAL</option>
+				<option value="0">JNo</option>
+				<option value="1">JYes</option>
+			</field>
+</fieldset>
+
+		<fieldset name="integration"
+		>
+
+			<field name="show_feed_link" type="list"
+				description="JGLOBAL_SHOW_FEED_LINK_DESC"
+				label="JGLOBAL_SHOW_FEED_LINK_LABEL"
+			>
+				<option value="">JGLOBAL_USE_GLOBAL</option>
+				<option value="0">JHIDE</option>
+				<option value="1">JSHOW</option>
+			</field>
+
+			<field name="feed_summary" type="list"
+				description="JGLOBAL_Feed_Summary_Desc"
+				label="JGLOBAL_Feed_Summary_Label"
+			>
+				<option value="">JGLOBAL_USE_GLOBAL</option>
+				<option value="0">JGLOBAL_INTRO_TEXT</option>
+				<option value="1">JGLOBAL_FULL_TEXT</option>
+			</field>
+		</fieldset>
+</fields>
+</metadata>
