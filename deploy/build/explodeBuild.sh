@@ -1,7 +1,8 @@
 #!/bin/sh
 
-SQLUser=autry
-SQLPassword=n9fr3dr$
+SQLUser=sccuser
+SQLPassword=j@ck2olo
+SQLDB=scc
 
 BUILD=`pwd`
 ROOT=$BUILD/../..
@@ -39,9 +40,9 @@ fi
 # Back up old SQL database
 if [ "$verbose" = "1" ]
 then
-    mysqldump -v -u$SQLUser -p$SQLPassword autry > /tmp/autryBackup.sql
+    mysqldump -v -u$SQLUser -p$SQLPassword $SQLDB > /tmp/$SQLDB-Backup.sql
 else
-    mysqldump -u$SQLUser -p$SQLPassword autry > /tmp/autryBackup.sql
+    mysqldump -u$SQLUser -p$SQLPassword $SQLDB > /tmp/$SQLDB-Backup.sql
 fi
 
 # Tar/Zip old src
@@ -66,25 +67,25 @@ fi
 # Drop old SQL database
 if [ "$verbose" = "1" ]
 then
-    mysqladmin -v drop autry
+    mysqladmin -v drop $SQLDB
 else
-    mysqladmin drop autry
+    mysqladmin drop $SQLDB
 fi
 
 # Creat new SQL database
 if [ "$verbose" = "1" ]
 then
-    mysqladmin -v create autry
+    mysqladmin -v create $SQLDB
 else
-    mysqladmin create autry
+    mysqladmin create $SQLDB
 fi
 
 # Import new SQL database
 if [ "$verbose" = "1" ]
 then
-    mysql -v -u$SQLUser -p$SQLPassword autry < $DEPLOY/autry.sql
+    mysql -v -u$SQLUser -p$SQLPassword $SQLDB < $DEPLOY/$SQLDB.sql
 else
-    mysql -u$SQLUser -p$SQLPassword autry < $DEPLOY/autry.sql
+    mysql -u$SQLUser -p$SQLPassword $SQLDB < $DEPLOY/$SQLDB.sql
 fi
 
 # If a user is provided, copy user config files into place

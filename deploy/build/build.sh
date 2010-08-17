@@ -1,7 +1,8 @@
 #!/bin/bash
 
-SQLUser=autry
-SQLPassword=n9fr3dr$
+SQLUser=sccuser
+SQLPassword=j@ck2olo
+SQLDB=scc
 
 BUILD=`pwd`
 ROOT=$BUILD/../..
@@ -38,23 +39,23 @@ then
     cp $SRC/administrator/components/com_ccevents/WEB-INF/local.include.php $SRC/administrator/components/com_ccevents/WEB-INF/local.include.php.$user
 fi
 
-# Dump the contents of the autry SQL database into a file in the build directory
+# Dump the contents of the scc SQL database into a file in the build directory
 if [ "$verbose" = "1" ]
 then
-    mysqldump -v -u$SQLUser -p$SQLPassword autry > $DEPLOY/autry.sql
+    mysqldump -v -u$SQLUser -p$SQLPassword $SQLDB > $DEPLOY/$SQLDB.sql
 else
-    mysqldump -u$SQLUser -p$SQLPassword autry > $DEPLOY/autry.sql
+    mysqldump -u$SQLUser -p$SQLPassword $SQLDB > $DEPLOY/$SQLDB.sql
 fi
 
 # Package the contents of the src directory for deployment
 if [ "$verbose" = "1" ]
 then
-    tar czvf $DEPLOY/build.tgz -C $ROOT $SRC $DEPLOY/autry.sql
+    tar czvf $DEPLOY/build.tgz -C $ROOT $SRC $DEPLOY/$SQLDB.sql
 else
-    tar czf $DEPLOY/build.tgz -C $ROOT $SRC $DEPLOY/autry.sql
+    tar czf $DEPLOY/build.tgz -C $ROOT $SRC $DEPLOY/$SQLDB.sql
 fi
 
 # Send to deployment server
 echo "Build Complete"
 echo "Run the following command to transfer the build package to the deployment server:"
-echo "scp $DEPLOY/build.tgz tachometry@autry.kapow.com:/tmp/"
+echo "scp $DEPLOY/build.tgz tachometry@$SQLDB.kapow.com:/tmp/"
