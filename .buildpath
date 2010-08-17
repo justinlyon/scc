@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<buildpath>
+	<buildpathentry kind="src" path="g2data/cache/entity/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/_all/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/archiveupload/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/comment/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/core/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/exif/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/ffmpeg/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/gd/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/icons/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/imagemagick/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/keyalbum/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/netpbm/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/rating/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/rearrange/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/rewrite/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/search/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/shutterfly/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/module/slideshow/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/theme/_all/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/theme/ajaxian/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/theme/carbon/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/theme/classic/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/theme/floatrix/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/theme/hybrid/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/theme/matrix/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/theme/siriux/0/0"/>
+	<buildpathentry kind="src" path="g2data/cache/theme/slider/0/0"/>
+	<buildpathentry kind="src" path="g2data/smarty/templates_c/%%700500473/matrix"/>
+	<buildpathentry excluding="gallery2|tmp" kind="src" path="src"/>
+	<buildpathentry kind="con" path="org.eclipse.php.core.LANGUAGE"/>
+</buildpath>
