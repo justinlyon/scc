@@ -1,54 +1,101 @@
 <?php
 /**
- * @version		$Id: helper.php 17837 2010-06-22 22:49:50Z eddieajau $
- * @package		Joomla.Framework
- * @subpackage	Plugin
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
+* @version		$Id: helper.php 17261 2010-05-25 15:06:51Z ian $
+* @package		Joomla.Framework
+* @subpackage	Plugin
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
-// No direct access.
-defined('JPATH_BASE') or die;
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 /**
- * Plugin helper class
- *
- * @package		Joomla.Framework
- * @subpackage	Plugin
- * @since		1.5
- */
-abstract class JPluginHelper
+* Plugin helper class
+*
+* @static
+* @package		Joomla.Framework
+* @subpackage	Plugin
+* @since		1.5
+*/
+class JPluginHelper
 {
 	/**
 	 * Get the plugin data of a specific type if no specific plugin is specified
-	 * otherwise only the specific plugin data is returned.
+	 * otherwise only the specific plugin data is returned
 	 *
-	 * @param	string	$type	The plugin type, relates to the sub-directory in the plugins directory.
-	 * @param	string	$plugin	The plugin name.
-	 *
-	 * @return	mixed	An array of plugin data objects, or a plugin data object.
-	 * @since	1.5
+	 * @access public
+	 * @param string 	$type 	The plugin type, relates to the sub-directory in the plugins directory
+	 * @param string 	$plugin	The plugin name
+	 * @return mixed 	An array of plugin data objects, or a plugin data object
 	 */
-	public static function getPlugin($type, $plugin = null)
+	function &getPlugin($type, $plugin = null)
 	{
-		$result		= array();
-		$plugins	= self::_load();
+		$result = array();
 
-		// Find the correct plugin(s) to return.
-		if (!$plugin) {
-			foreach($plugins as $p) {
-				// Is this the right plugin?
-				if ($p->type == $type) {
-					$result[] = $p;
+		$plugins = JPluginHelper::_load();
+
+		$total = count($plugins);
+		for($i = 0; $i < $total; $i++)
+		{
+			if(is_null($plugin))
+			{
+				if($plugins[$i]->type == $type) {
+					$result[] = $plugins[$i];
 				}
 			}
-		} else {
-			foreach($plugins as $p) {
-				// Is this plugin in the right group?
-				if ($p->type == $type && $p->name == $plugin) {
-					$result = $p;
+			else
+			{
+				if($plugins[$i]->type == $type && $plugins[$i]->name == $plugin) {
+					$result = $plugins[$i];
 					break;
 				}
+			}
+
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Checks if a plugin is enabled
+	 *
+	 * @access	public
+	 * @param string 	$type 	The plugin type, relates to the sub-directory in the plugins directory
+	 * @param string 	$plugin	The plugin name
+	 * @return	boolean
+	 */
+	function isEnabled( $type, $plugin = null )
+	{
+		$result = &JPluginHelper::getPlugin( $type, $plugin);
+		return (!empty($result));
+	}
+
+	/**
+	* Loads all the plugin files for a particular type if no specific plugin is specified
+	* otherwise only the specific pugin is loaded.
+	*
+	* @access public
+	* @param string 	$type 	The plugin type, relates to the sub-directory in the plugins directory
+	* @param string 	$plugin	The plugin name
+	* @return boolean True if success
+	*/
+	function importPlugin($type, $plugin = null, $autocreate = true, $dispatcher = null)
+	{
+		$result = false;
+
+		$plugins = JPluginHelper::_load();
+
+		$total = count($plugins);
+		for($i = 0; $i < $total; $i++) {
+			if($plugins[$i]->type == $type && ($plugins[$i]->name == $plugin ||  $plugin === null)) {
+				JPluginHelper::_import( $plugins[$i], $autocreate, $dispatcher );
+				$result = true;
 			}
 		}
 
@@ -56,125 +103,67 @@ abstract class JPluginHelper
 	}
 
 	/**
-	 * Checks if a plugin is enabled.
+	 * Loads the plugin file
 	 *
-	 * @param	string	$type	The plugin type, relates to the sub-directory in the plugins directory.
-	 * @param	string	$plugin	The plugin name.
-	 *
-	 * @return	boolean
-	 * @since	1.5
+	 * @access private
+	 * @return boolean True if success
 	 */
-	public static function isEnabled($type, $plugin = null)
+	function _import( &$plugin, $autocreate = true, $dispatcher = null )
 	{
-		$result = self::getPlugin($type, $plugin);
-		return (!empty($result));
-	}
+		static $paths;
 
-	/**
-	 * Loads all the plugin files for a particular type if no specific plugin is specified
-	 * otherwise only the specific pugin is loaded.
-	 *
-	 * @param	string		$type	The plugin type, relates to the sub-directory in the plugins directory.
-	 * @param	string		$plugin	The plugin name.
-	 * @param	boolean		$autocreate
-	 * @param	JDispatcher	$dispatcher	Optionally allows the plugin to use a different dispatcher.
-	 *
-	 * @return	boolean		True on success.
-	 * @since	1.5
-	 */
-	public static function importPlugin($type, $plugin = null, $autocreate = true, $dispatcher = null)
-	{
-		static $loaded = Array();
-
-		// check for the default args, if so we can optimise cheaply
-		$defaults = false;
-		if (is_null($plugin) && $autocreate == true && is_null($dispatcher)) {
-			$defaults = true;
+		if (!$paths) {
+			$paths = array();
 		}
 
-		if (!isset($loaded[$type]) || !$defaults) {
-			$results = null;
-
-			// Load the plugins from the database.
-			$plugins = self::_load();
-
-			// Get the specified plugin(s).
-			for ($i = 0, $t = count($plugins); $i < $t; $i++) {
-				if ($plugins[$i]->type == $type && ($plugins[$i]->name == $plugin ||  $plugin === null)) {
-					self::_import($plugins[$i], $autocreate, $dispatcher);
-					$results = true;
-				}
- 			}
-
-			// bail out early if we're not using default args
-			if(!$defaults) {
-				return $results;
-			}
-			$loaded[$type] = $results;
-		}
-
-		return $loaded[$type];
-	}
-
-	/**
-	 * Loads the plugin file.
-	 *
-	 * @param	JPlugin		$plugin		The plugin.
-	 * @param	boolean		$autocreate
-	 * @param	JDispatcher	$dispatcher	Optionally allows the plugin to use a different dispatcher.
-	 *
-	 * @return	boolean		True on success.
-	 * @since	1.5
-	 */
-	protected static function _import(&$plugin, $autocreate = true, $dispatcher = null)
-	{
-		static $paths = array();
-
+		$result	= false;
 		$plugin->type = preg_replace('/[^A-Z0-9_\.-]/i', '', $plugin->type);
-		$plugin->name = preg_replace('/[^A-Z0-9_\.-]/i', '', $plugin->name);
+		$plugin->name  = preg_replace('/[^A-Z0-9_\.-]/i', '', $plugin->name);
 
-		$legacypath	= JPATH_PLUGINS.DS.$plugin->type.DS.$plugin->name.'.php';
-		$path = JPATH_PLUGINS.DS.$plugin->type.DS.$plugin->name.DS.$plugin->name.'.php';
+		$path	= JPATH_PLUGINS.DS.$plugin->type.DS.$plugin->name.'.php';
 
-		if (!isset( $paths[$path] ) || !isset($paths[$legacypath])) {
-			$pathExists = file_exists($path);
-			if ($pathExists || file_exists($legacypath)) {
-				$path = $pathExists ? $path : $legacypath;
+		if (!isset( $paths[$path] ))
+		{
+			if (file_exists( $path ))
+			{
+				//needed for backwards compatibility
+				global $_MAMBOTS, $mainframe;
 
 				jimport('joomla.plugin.plugin');
-				if (!isset($paths[$path])) {
-					require_once $path;
-				}
+				require_once( $path );
 				$paths[$path] = true;
 
-				if ($autocreate) {
+				if($autocreate)
+				{
 					// Makes sure we have an event dispatcher
-					if (!is_object($dispatcher)) {
-						$dispatcher = JDispatcher::getInstance();
+					if(!is_object($dispatcher)) {
+						$dispatcher = & JDispatcher::getInstance();
 					}
 
 					$className = 'plg'.$plugin->type.$plugin->name;
-					if (class_exists($className)) {
-						// Load the plugin from the database.
-						$plugin = self::getPlugin($plugin->type, $plugin->name);
+					if(class_exists($className))
+					{
+						// load plugin parameters
+						$plugin =& JPluginHelper::getPlugin($plugin->type, $plugin->name);
 
-						// Instantiate and register the plugin.
-						new $className($dispatcher, (array)($plugin));
+						// create the plugin
+						$instance = new $className($dispatcher, (array)($plugin));
 					}
 				}
-			} else {
+			}
+			else
+			{
 				$paths[$path] = false;
 			}
 		}
 	}
 
 	/**
-	 * Loads the published plugins.
+	 * Loads the published plugins
 	 *
-	 * @return	void
-	 * @since	1.5
+	 * @access private
 	 */
-	protected static function _load()
+	function _load()
 	{
 		static $plugins;
 
@@ -182,34 +171,35 @@ abstract class JPluginHelper
 			return $plugins;
 		}
 
-		$user	= JFactory::getUser();
-		$cache 	= JFactory::getCache('com_plugins', '');
+		$db		=& JFactory::getDBO();
+		$user	=& JFactory::getUser();
 
-		$levels = implode(',', $user->authorisedLevels());
+		if (isset($user))
+		{
+			$aid = $user->get('aid', 0);
 
-		if (!$plugins = $cache->get($levels)) {
-			$db		= JFactory::getDbo();
-			$query	= $db->getQuery(true);
+			$query = 'SELECT folder AS type, element AS name, params'
+				. ' FROM #__plugins'
+				. ' WHERE published >= 1'
+				. ' AND access <= ' . (int) $aid
+				. ' ORDER BY ordering';
+		}
+		else
+		{
+			$query = 'SELECT folder AS type, element AS name, params'
+				. ' FROM #__plugins'
+				. ' WHERE published >= 1'
+				. ' ORDER BY ordering';
+		}
 
-			$query->select('folder AS type, element AS name, params')
-				->from('#__extensions')
-				->where('enabled >= 1')
-				->where('type ='.$db->Quote('plugin'))
-				->where('state >= 0')
-				->where('access IN ('.$levels.')')
-				->order('ordering');
+		$db->setQuery( $query );
 
-			$plugins = $db->setQuery($query)
-				->loadObjectList();
-
-			if ($error = $db->getErrorMsg()) {
-				JError::raiseWarning(500, $error);
-				return false;
-			}
-
-			$cache->store($plugins, $levels);
+		if (!($plugins = $db->loadObjectList())) {
+			JError::raiseWarning( 'SOME_ERROR_CODE', "Error loading Plugins: " . $db->getErrorMsg());
+			return false;
 		}
 
 		return $plugins;
 	}
+
 }

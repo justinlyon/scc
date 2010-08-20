@@ -1,12 +1,19 @@
 <?php
 /**
- * @version		$Id: module.php 18013 2010-07-03 03:42:31Z infograf768 $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
+* @version		$Id: module.php 14401 2010-01-26 14:10:00Z louis $
+* @package		Joomla.Framework
+* @subpackage	Document
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
-// No direct access
-defined('JPATH_BASE') or die;
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 /**
  * JDocument Module renderer
@@ -20,24 +27,24 @@ class JDocumentRendererModule extends JDocumentRenderer
 	/**
 	 * Renders a module script and returns the results as a string
 	 *
-	 * @param	string $name	The name of the module to render
-	 * @param	array $params	Associative array of values
-	 * @return	string			The output of the script
+	 * @access public
+	 * @param string 	$name		The name of the module to render
+	 * @param array 		$params		Associative array of values
+	 * @return string	The output of the script
 	 */
-	public function render($module, $params = array(), $content = null)
+	function render( $module, $params = array(), $content = null )
 	{
 		if (!is_object($module))
 		{
 			$title	= isset($params['title']) ? $params['title'] : null;
 
-			$module = JModuleHelper::getModule($module, $title);
+			$module =& JModuleHelper::getModule($module, $title);
 
 			if (!is_object($module))
 			{
 				if (is_null($content)) {
 					return '';
-				}
-				else {
+				} else {
 					/**
 					 * If module isn't found in the database but data has been pushed in the buffer
 					 * we want to render it
@@ -53,8 +60,8 @@ class JDocumentRendererModule extends JDocumentRenderer
 		}
 
 		// get the user and configuration object
-		//$user = JFactory::getUser();
-		$conf = JFactory::getConfig();
+		$user =& JFactory::getUser();
+		$conf =& JFactory::getConfig();
 
 		// set the module content
 		if (!is_null($content)) {
@@ -62,28 +69,18 @@ class JDocumentRendererModule extends JDocumentRenderer
 		}
 
 		//get module parameters
-		$mod_params = new JRegistry;
-		$mod_params->loadJSON($module->params);
+		$mod_params = new JParameter( $module->params );
 
 		$contents = '';
+		if ($mod_params->get('cache', 0) && $conf->getValue( 'config.caching' ))
+		{	
+			$cache =& JFactory::getCache( $module->module );
 
+			$cache->setLifeTime( $mod_params->get( 'cache_time', $conf->getValue( 'config.cachetime' ) * 60 ) );
+			$cache->setCacheValidation(true);
 
-		$cachemode = $mod_params->get('cachemode','oldstatic');  // default for compatibility purposes. Set cachemode parameter or use JModuleHelper::moduleCache from within the module instead
-
-		if ($mod_params->get('cache', 0) == 1  && $conf->get('caching') >= 1 && $cachemode != 'id' && $cachemode != 'safeuri')
-		{
-
-			// default to itemid creating mehod and workarounds on
-			$cacheparams = new stdClass;
-			$cacheparams->cachemode = $cachemode;
-			$cacheparams->class = 'JModuleHelper';
-			$cacheparams->method = 'renderModule';
-			$cacheparams->methodparams = array($module, $params);
-
-			$contents = JModuleHelper::ModuleCache($module, $mod_params,$cacheparams);
-
-		}
-		else {
+			$contents =  $cache->get( array('JModuleHelper', 'renderModule'), array( $module, $params ), $module->id. $user->get('aid', 0) );
+		} else {
 			$contents = JModuleHelper::renderModule($module, $params);
 		}
 

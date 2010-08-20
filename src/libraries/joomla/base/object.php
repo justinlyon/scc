@@ -1,18 +1,19 @@
 <?php
 /**
- * @version		$Id:observer.php 6961 2007-03-15 16:06:53Z tcp $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @version		$Id: object.php 14401 2010-01-26 14:10:00Z louis $
+ * @package		Joomla.Framework
+ * @subpackage	Base
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant
+ * to the GNU General Public License, and as distributed it includes or
+ * is derivative of works licensed under the GNU General Public License or
+ * other free or open source software licenses.
+ * See COPYRIGHT.php for copyright notices and details.
  */
-
-// No direct access
-defined('JPATH_BASE') or die;
-
+defined('JPATH_BASE') or die();
 /**
- * Base object class.
- *
- * This class allows for simple but smart objects with get and set methods
- * and an internal error handler.
+ * Object class, allowing __construct in PHP4.
  *
  * @package		Joomla.Framework
  * @subpackage	Base
@@ -20,82 +21,74 @@ defined('JPATH_BASE') or die;
  */
 class JObject
 {
+
 	/**
 	 * An array of errors
 	 *
-	 * @var		array of error messages or JExceptions objects.
+	 * @var		array of error messages or JExceptions objects
+	 * @access	protected
+	 * @since	1.0
+	 */
+	var		$_errors		= array();
+
+	/**
+	 * A hack to support __construct() on PHP 4
+	 *
+	 * Hint: descendant classes have no PHP4 class_name() constructors,
+	 * so this constructor gets called first and calls the top-layer __construct()
+	 * which (if present) should call parent::__construct()
+	 *
+	 * @access	public
+	 * @return	Object
 	 * @since	1.5
 	 */
-	protected $_errors = array();
+	function JObject()
+	{
+		$args = func_get_args();
+		call_user_func_array(array(&$this, '__construct'), $args);
+	}
 
 	/**
 	 * Class constructor, overridden in descendant classes.
 	 *
-	 * @param	mixed $properties	Either and associative array or another object to set the initial properties of the object.
+	 * @access	protected
 	 * @since	1.5
 	 */
-	public function __construct($properties = null)
-	{
-		if ($properties !== null) {
-			$this->setProperties($properties);
-		}
-	}
+	function __construct() {}
 
-	/**
-	 * Magic method to convert the object to a string gracefully.
-	 *
-	 * @return	string	The classname.
-	 * @since	1.6
-	 */
-	public function __toString()
-	{
-		return get_class($this);
-	}
-
-	/**
-	 * Sets a default value if not alreay assigned
-	 *
-	 * @param	string $property	The name of the property.
-	 * @param	mixed  $default		The default value.
-	 * @since	1.6
-	 */
-	public function def($property, $default=null)
-	{
-		$value = $this->get($property, $default);
-		return $this->set($property, $value);
-	}
 
 	/**
 	 * Returns a property of the object or the default value if the property is not set.
 	 *
-	 * @param	string $property	The name of the property.
-	 * @param	mixed  $default		The default value.
-	 *
-	 * @return	mixed	The value of the property.
+	 * @access	public
+	 * @param	string $property The name of the property
+	 * @param	mixed  $default The default value
+	 * @return	mixed The value of the property
 	 * @see		getProperties()
 	 * @since	1.5
-	 */
-	public function get($property, $default=null)
+ 	 */
+	function get($property, $default=null)
 	{
-		if (isset($this->$property)) {
+		if(isset($this->$property)) {
 			return $this->$property;
 		}
 		return $default;
 	}
 
 	/**
-	 * Returns an associative array of object properties.
+	 * Returns an associative array of object properties
 	 *
-	 * @param	boolean $public	If true, returns only the public properties.
-	 *
+	 * @access	public
+	 * @param	boolean $public If true, returns only the public properties
 	 * @return	array
 	 * @see		get()
 	 * @since	1.5
-	 */
-	public function getProperties($public = true)
+ 	 */
+	function getProperties( $public = true )
 	{
 		$vars  = get_object_vars($this);
-		if ($public)
+
+        if($public)
 		{
 			foreach ($vars as $key => $value)
 			{
@@ -105,27 +98,27 @@ class JObject
 			}
 		}
 
-		return $vars;
+        return $vars;
 	}
 
 	/**
-	 * Get the most recent error message.
+	 * Get the most recent error message
 	 *
-	 * @param	integer	$i			Option error index.
-	 * @param	boolean	$toString	Indicates if JError objects should return their error message.
+	 * @param	integer	$i Option error index
+	 * @param	boolean	$toString Indicates if JError objects should return their error message
 	 * @return	string	Error message
+	 * @access	public
 	 * @since	1.5
 	 */
-	public function getError($i = null, $toString = true)
+	function getError($i = null, $toString = true )
 	{
 		// Find the error
-		if ($i === null)
-		{
+		if ( $i === null) {
 			// Default, return the last message
 			$error = end($this->_errors);
 		}
-		else if (!array_key_exists($i, $this->_errors))
-		{
+		else
+		if ( ! array_key_exists($i, $this->_errors) ) {
 			// If $i has been specified but does not exist, return false
 			return false;
 		}
@@ -134,34 +127,37 @@ class JObject
 		}
 
 		// Check if only the string is requested
-		if (JError::isError($error) && $toString) {
-			return (string)$error;
+		if ( JError::isError($error) && $toString ) {
+			return $error->toString();
 		}
 
 		return $error;
 	}
 
 	/**
-	 * Return all errors, if any.
+	 * Return all errors, if any
 	 *
-	 * @return	array	Array of error messages or JErrors.
+	 * @access	public
+	 * @return	array	Array of error messages or JErrors
 	 * @since	1.5
 	 */
-	public function getErrors()
+	function getErrors()
 	{
 		return $this->_errors;
 	}
 
+
 	/**
 	 * Modifies a property of the object, creating it if it does not already exist.
 	 *
-	 * @param	string $property	The name of the property.
-	 * @param	mixed  $value		The value of the property to set.
-	 *
-	 * @return	mixed	Previous value of the property.
+	 * @access	public
+	 * @param	string $property The name of the property
+	 * @param	mixed  $value The value of the property to set
+	 * @return	mixed Previous value of the property
+	 * @see		setProperties()
 	 * @since	1.5
 	 */
-	public function set($property, $value = null)
+	function set( $property, $value = null )
 	{
 		$previous = isset($this->$property) ? $this->$property : null;
 		$this->$property = $value;
@@ -169,22 +165,24 @@ class JObject
 	}
 
 	/**
-	 * Set the object properties based on a named array/hash.
-	 *
-	 * @param	mixed $properties	Either and associative array or another object.
-	 * @return	boolean
-	 * @see		set()
-	 * @since	1.5
-	 */
-	public function setProperties($properties)
+	* Set the object properties based on a named array/hash
+	*
+	* @access	protected
+	* @param	$array  mixed Either and associative array or another object
+	* @return	boolean
+	* @see		set()
+	* @since	1.5
+	*/
+	function setProperties( $properties )
 	{
-		if (is_array($properties) || is_object($properties))
+		$properties = (array) $properties; //cast to an array
+
+		if (is_array($properties))
 		{
-			foreach ((array) $properties as $k => $v)
-			{
-				// Use the set function which might be overriden.
-				$this->set($k, $v);
+			foreach ($properties as $k => $v) {
+				$this->$k = $v;
 			}
+
 			return true;
 		}
 
@@ -192,22 +190,38 @@ class JObject
 	}
 
 	/**
-	 * Add an error message.
+	 * Add an error message
 	 *
-	 * @param	string $error	Error message.
+	 * @param	string $error Error message
+	 * @access	public
 	 * @since	1.0
 	 */
-	public function setError($error)
+	function setError($error)
 	{
 		array_push($this->_errors, $error);
 	}
 
 	/**
-	 * @deprecated 1.6 - Jun 24, 2009
-	 * @see __toString()
-	 */
+	 * Object-to-string conversion.
+	 * Each class can override it as necessary.
+	 *
+	 * @access	public
+	 * @return	string This name of this class
+	 * @since	1.5
+ 	 */
 	function toString()
 	{
-		return __toString();
+		return get_class($this);
+	}
+
+	/**
+	 * Legacy Method, use {@link JObject::getProperties()}  instead
+	 *
+	 * @deprecated as of 1.5
+	 * @since 1.0
+	 */
+	function getPublicProperties()
+	{
+		return $this->getProperties();
 	}
 }

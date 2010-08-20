@@ -1,14 +1,19 @@
 <?php
 /**
- * @version		$Id: request.php 17972 2010-06-30 10:18:39Z ian $
+ * @version		$Id: request.php 14401 2010-01-26 14:10:00Z louis $
  * @package		Joomla.Framework
  * @subpackage	Environment
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant
+ * to the GNU General Public License, and as distributed it includes or
+ * is derivative of works licensed under the GNU General Public License or
+ * other free or open source software licenses.
+ * See COPYRIGHT.php for copyright notices and details.
  */
 
-// No direct access
-defined('JPATH_BASE') or die;
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 /**
  * Create the request global object
@@ -18,9 +23,9 @@ $GLOBALS['_JREQUEST'] = array();
 /**
  * Set the available masks for cleaning variables
  */
-define('JREQUEST_NOTRIM',	1);
-define('JREQUEST_ALLOWRAW',	2);
-define('JREQUEST_ALLOWHTML',4);
+define( 'JREQUEST_NOTRIM'   , 1 );
+define( 'JREQUEST_ALLOWRAW' , 2 );
+define( 'JREQUEST_ALLOWHTML', 4 );
 
 /**
  * JRequest Class
@@ -37,24 +42,24 @@ define('JREQUEST_ALLOWHTML',4);
 class JRequest
 {
 	/**
-	 * Gets the full request path.
+	 * Gets the full request path
 	 *
 	 * @return string
 	 */
-	public static function getURI()
+	function getURI()
 	{
-		$uri = JFactory::getURI();
+		$uri = &JFactory::getURI();
 		return $uri->toString(array('path', 'query'));
 	}
 
 	/**
-	 * Gets the request method.
+	 * Gets the request method
 	 *
 	 * @return string
 	 */
-	public static function getMethod()
+	function getMethod()
 	{
-		$method = strtoupper($_SERVER['REQUEST_METHOD']);
+		$method = strtoupper( $_SERVER['REQUEST_METHOD'] );
 		return $method;
 	}
 
@@ -68,52 +73,53 @@ class JRequest
 	 *
 	 * You can force the source by setting the $hash parameter:
 	 *
-	 *	post	$_POST
-	 *	get		$_GET
-	 *	files	$_FILES
-	 *	cookie	$_COOKIE
-	 *	env		$_ENV
-	 *	server	$_SERVER
-	 *	method	via current $_SERVER['REQUEST_METHOD']
-	 *	default	$_REQUEST
+	 *   post		$_POST
+	 *   get		$_GET
+	 *   files		$_FILES
+	 *   cookie		$_COOKIE
+	 *   env		$_ENV
+	 *   server		$_SERVER
+	 *   method		via current $_SERVER['REQUEST_METHOD']
+	 *   default	$_REQUEST
 	 *
-	 * @param	string	$name		Variable name.
-	 * @param	string	$default	Default value if the variable does not exist.
-	 * @param	string	$hash		Where the var should come from (POST, GET, FILES, COOKIE, METHOD).
-	 * @param	string	$type		Return type for the variable, for valid values see {@link JFilterInput::clean()}.
-	 * @param	int		$mask		Filter mask for the variable.
-	 * @return	mixed	Requested variable.
+	 * @static
+	 * @param	string	$name		Variable name
+	 * @param	string	$default	Default value if the variable does not exist
+	 * @param	string	$hash		Where the var should come from (POST, GET, FILES, COOKIE, METHOD)
+	 * @param	string	$type		Return type for the variable, for valid values see {@link JFilterInput::clean()}
+	 * @param	int		$mask		Filter mask for the variable
+	 * @return	mixed	Requested variable
 	 * @since	1.5
 	 */
-	public static function getVar($name, $default = null, $hash = 'default', $type = 'none', $mask = 0)
+	function getVar($name, $default = null, $hash = 'default', $type = 'none', $mask = 0)
 	{
 		// Ensure hash and type are uppercase
-		$hash = strtoupper($hash);
+		$hash = strtoupper( $hash );
 		if ($hash === 'METHOD') {
-			$hash = strtoupper($_SERVER['REQUEST_METHOD']);
+			$hash = strtoupper( $_SERVER['REQUEST_METHOD'] );
 		}
-		$type	= strtoupper($type);
+		$type	= strtoupper( $type );
 		$sig	= $hash.$type.$mask;
 
 		// Get the input hash
 		switch ($hash)
 		{
-			case 'GET':
+			case 'GET' :
 				$input = &$_GET;
 				break;
-			case 'POST':
+			case 'POST' :
 				$input = &$_POST;
 				break;
-			case 'FILES':
+			case 'FILES' :
 				$input = &$_FILES;
 				break;
-			case 'COOKIE':
+			case 'COOKIE' :
 				$input = &$_COOKIE;
 				break;
-			case 'ENV':
+			case 'ENV'    :
 				$input = &$_ENV;
 				break;
-			case 'SERVER':
+			case 'SERVER'    :
 				$input = &$_SERVER;
 				break;
 			default:
@@ -125,24 +131,24 @@ class JRequest
 		if (isset($GLOBALS['_JREQUEST'][$name]['SET.'.$hash]) && ($GLOBALS['_JREQUEST'][$name]['SET.'.$hash] === true)) {
 			// Get the variable from the input hash
 			$var = (isset($input[$name]) && $input[$name] !== null) ? $input[$name] : $default;
-			$var = self::_cleanVar($var, $mask, $type);
+			$var = JRequest::_cleanVar($var, $mask, $type);
 		}
 		elseif (!isset($GLOBALS['_JREQUEST'][$name][$sig]))
 		{
 			if (isset($input[$name]) && $input[$name] !== null) {
 				// Get the variable from the input hash and clean it
-				$var = self::_cleanVar($input[$name], $mask, $type);
+				$var = JRequest::_cleanVar($input[$name], $mask, $type);
 
 				// Handle magic quotes compatability
 				if (get_magic_quotes_gpc() && ($var != $default) && ($hash != 'FILES')) {
-					$var = self::_stripSlashesRecursive($var);
+					$var = JRequest::_stripSlashesRecursive( $var );
 				}
 
 				$GLOBALS['_JREQUEST'][$name][$sig] = $var;
 			}
 			elseif ($default !== null) {
 				// Clean the default value
-				$var = self::_cleanVar($default, $mask, $type);
+				$var = JRequest::_cleanVar($default, $mask, $type);
 			}
 			else {
 				$var = $default;
@@ -161,15 +167,16 @@ class JRequest
 	 *
 	 * See getVar() for more in-depth documentation on the parameters.
 	 *
-	 * @param	string	$name		Variable name.
-	 * @param	string	$default	Default value if the variable does not exist.
-	 * @param	string	$hash		Where the var should come from (POST, GET, FILES, COOKIE, METHOD).
-	 * @return	integer	Requested variable.
+	 * @static
+	 * @param	string	$name		Variable name
+	 * @param	string	$default	Default value if the variable does not exist
+	 * @param	string	$hash		Where the var should come from (POST, GET, FILES, COOKIE, METHOD)
+	 * @return	integer	Requested variable
 	 * @since	1.5
 	 */
-	public static function getInt($name, $default = 0, $hash = 'default')
+	function getInt($name, $default = 0, $hash = 'default')
 	{
-		return self::getVar($name, $default, $hash, 'int');
+		return JRequest::getVar($name, $default, $hash, 'int');
 	}
 
 	/**
@@ -179,15 +186,16 @@ class JRequest
 	 *
 	 * See getVar() for more in-depth documentation on the parameters.
 	 *
-	 * @param	string	$name		Variable name.
-	 * @param	string	$default	Default value if the variable does not exist.
-	 * @param	string	$hash		Where the var should come from (POST, GET, FILES, COOKIE, METHOD).
-	 * @return	float	Requested variable.
+	 * @static
+	 * @param	string	$name		Variable name
+	 * @param	string	$default	Default value if the variable does not exist
+	 * @param	string	$hash		Where the var should come from (POST, GET, FILES, COOKIE, METHOD)
+	 * @return	float	Requested variable
 	 * @since	1.5
 	 */
-	public static function getFloat($name, $default = 0.0, $hash = 'default')
+	function getFloat($name, $default = 0.0, $hash = 'default')
 	{
-		return self::getVar($name, $default, $hash, 'float');
+		return JRequest::getVar($name, $default, $hash, 'float');
 	}
 
 	/**
@@ -197,15 +205,16 @@ class JRequest
 	 *
 	 * See getVar() for more in-depth documentation on the parameters.
 	 *
-	 * @param	string	$name		Variable name.
-	 * @param	string	$default	Default value if the variable does not exist.
-	 * @param	string	$hash		Where the var should come from (POST, GET, FILES, COOKIE, METHOD).
-	 * @return	bool	Requested variable.
+	 * @static
+	 * @param	string	$name		Variable name
+	 * @param	string	$default	Default value if the variable does not exist
+	 * @param	string	$hash		Where the var should come from (POST, GET, FILES, COOKIE, METHOD)
+	 * @return	bool		Requested variable
 	 * @since	1.5
 	 */
-	public static function getBool($name, $default = false, $hash = 'default')
+	function getBool($name, $default = false, $hash = 'default')
 	{
-		return self::getVar($name, $default, $hash, 'bool');
+		return JRequest::getVar($name, $default, $hash, 'bool');
 	}
 
 	/**
@@ -215,15 +224,16 @@ class JRequest
 	 *
 	 * See getVar() for more in-depth documentation on the parameters.
 	 *
-	 * @param	string	$name		Variable name.
-	 * @param	string	$default	Default value if the variable does not exist.
-	 * @param	string	$hash		Where the var should come from (POST, GET, FILES, COOKIE, METHOD).
-	 * @return	string	Requested variable.
+	 * @static
+	 * @param	string	$name		Variable name
+	 * @param	string	$default	Default value if the variable does not exist
+	 * @param	string	$hash		Where the var should come from (POST, GET, FILES, COOKIE, METHOD)
+	 * @return	string	Requested variable
 	 * @since	1.5
 	 */
-	public static function getWord($name, $default = '', $hash = 'default')
+	function getWord($name, $default = '', $hash = 'default')
 	{
-		return self::getVar($name, $default, $hash, 'word');
+		return JRequest::getVar($name, $default, $hash, 'word');
 	}
 
 	/**
@@ -233,15 +243,16 @@ class JRequest
 	 *
 	 * See getVar() for more in-depth documentation on the parameters.
 	 *
+	 * @static
 	 * @param	string	$name		Variable name
 	 * @param	string	$default	Default value if the variable does not exist
 	 * @param	string	$hash		Where the var should come from (POST, GET, FILES, COOKIE, METHOD)
 	 * @return	string	Requested variable
 	 * @since	1.5
 	 */
-	public static function getCmd($name, $default = '', $hash = 'default')
+	function getCmd($name, $default = '', $hash = 'default')
 	{
-		return self::getVar($name, $default, $hash, 'cmd');
+		return JRequest::getVar($name, $default, $hash, 'cmd');
 	}
 
 	/**
@@ -251,22 +262,24 @@ class JRequest
 	 *
 	 * See getVar() for more in-depth documentation on the parameters.
 	 *
+	 * @static
 	 * @param	string	$name		Variable name
 	 * @param	string	$default	Default value if the variable does not exist
 	 * @param	string	$hash		Where the var should come from (POST, GET, FILES, COOKIE, METHOD)
-	 * @param	int		$mask		Filter mask for the variable
+ 	 * @param	int		$mask		Filter mask for the variable
 	 * @return	string	Requested variable
 	 * @since	1.5
 	 */
-	public static function getString($name, $default = '', $hash = 'default', $mask = 0)
+	function getString($name, $default = '', $hash = 'default', $mask = 0)
 	{
 		// Cast to string, in case JREQUEST_ALLOWRAW was specified for mask
-		return (string) self::getVar($name, $default, $hash, 'string', $mask);
+		return (string) JRequest::getVar($name, $default, $hash, 'string', $mask);
 	}
 
 	/**
-	 * Set a variabe in on of the request variables.
+	 * Set a variabe in on of the request variables
 	 *
+	 * @access	public
 	 * @param	string	$name		Name
 	 * @param	string	$value		Value
 	 * @param	string	$hash		Hash
@@ -274,10 +287,10 @@ class JRequest
 	 * @return	string	Previous value
 	 * @since	1.5
 	 */
-	public static function setVar($name, $value = null, $hash = 'method', $overwrite = true)
+	function setVar($name, $value = null, $hash = 'method', $overwrite = true)
 	{
 		//If overwrite is true, makes sure the variable hasn't been set yet
-		if (!$overwrite && array_key_exists($name, $_REQUEST)) {
+		if(!$overwrite && array_key_exists($name, $_REQUEST)) {
 			return $_REQUEST[$name];
 		}
 
@@ -309,10 +322,10 @@ class JRequest
 			case 'FILES' :
 				$_FILES[$name] = $value;
 				break;
-			case 'ENV':
+			case 'ENV'    :
 				$_ENV['name'] = $value;
 				break;
-			case 'SERVER':
+			case 'SERVER'    :
 				$_SERVER['name'] = $value;
 				break;
 		}
@@ -333,26 +346,27 @@ class JRequest
 	 *
 	 * You can force the source by setting the $hash parameter:
 	 *
-	 *	post	$_POST
-	 *	get		$_GET
-	 *	files	$_FILES
-	 *	cookie	$_COOKIE
-	 *	env		$_ENV
-	 *	server	$_SERVER
-	 *	method	via current $_SERVER['REQUEST_METHOD']
-	 *	default	$_REQUEST
+	 *   post		$_POST
+	 *   get		$_GET
+	 *   files		$_FILES
+	 *   cookie		$_COOKIE
+	 *   env		$_ENV
+	 *   server		$_SERVER
+	 *   method		via current $_SERVER['REQUEST_METHOD']
+	 *   default	$_REQUEST
 	 *
-	 * @param	string	$hash	to get (POST, GET, FILES, METHOD).
-	 * @param	int		$mask	Filter mask for the variable.
-	 * @return	mixed	Request hash.
+	 * @static
+	 * @param	string	$hash	to get (POST, GET, FILES, METHOD)
+	 * @param	int		$mask	Filter mask for the variable
+	 * @return	mixed	Request hash
 	 * @since	1.5
 	 */
-	public static function get($hash = 'default', $mask = 0)
+	function get($hash = 'default', $mask = 0)
 	{
 		$hash = strtoupper($hash);
 
 		if ($hash === 'METHOD') {
-			$hash = strtoupper($_SERVER['REQUEST_METHOD']);
+			$hash = strtoupper( $_SERVER['REQUEST_METHOD'] );
 		}
 
 		switch ($hash)
@@ -373,11 +387,11 @@ class JRequest
 				$input = $_COOKIE;
 				break;
 
-			case 'ENV':
+			case 'ENV'    :
 				$input = &$_ENV;
 				break;
 
-			case 'SERVER':
+			case 'SERVER'    :
 				$input = &$_SERVER;
 				break;
 
@@ -386,50 +400,49 @@ class JRequest
 				break;
 		}
 
-		$result = self::_cleanVar($input, $mask);
+		$result = JRequest::_cleanVar($input, $mask);
 
 		// Handle magic quotes compatability
 		if (get_magic_quotes_gpc() && ($hash != 'FILES')) {
-			$result = self::_stripSlashesRecursive($result);
+			$result = JRequest::_stripSlashesRecursive( $result );
 		}
 
 		return $result;
 	}
 
 	/**
-	 * Sets a request variable.
+	 * Sets a request variable
 	 *
-	 * @param	array	An associative array of key-value pairs.
-	 * @param	string	The request variable to set (POST, GET, FILES, METHOD).
-	 * @param	boolean	If true and an existing key is found, the value is overwritten, otherwise it is ignored.
+	 * @param	array	An associative array of key-value pairs
+	 * @param	string	The request variable to set (POST, GET, FILES, METHOD)
+	 * @param	boolean	If true and an existing key is found, the value is overwritten, otherwise it is ingored
 	 */
-	public static function set($array, $hash = 'default', $overwrite = true)
+	function set( $array, $hash = 'default', $overwrite = true )
 	{
 		foreach ($array as $key => $value) {
-			self::setVar($key, $value, $hash, $overwrite);
+			JRequest::setVar($key, $value, $hash, $overwrite);
 		}
 	}
 
 	/**
-	 * Checks for a form token in the request.
+	 * Checks for a form token in the request
 	 *
-	 * Use in conjuction with JHtml::_('form.token').
+	 * Use in conjuction with JHTML::_( 'form.token' )
 	 *
-	 * @param	string	The request method in which to look for the token key.
-	 * @return	boolean	True if found and valid, false otherwise.
+	 * @param	string	The request method in which to look for the token key
+	 * @return	boolean	True if found and valid, false otherwise
 	 */
-	public static function checkToken($method = 'post')
+	function checkToken( $method = 'post' )
 	{
-		$token = JUtility::getToken();
-		if (!self::getVar($token, '', $method, 'alnum'))
-		{
+		$token	= JUtility::getToken();
+		if(!JRequest::getVar( $token, '', $method, 'alnum' )) {
 			$session = JFactory::getSession();
-			if ($session->isNew()) {
-				// Redirect to login screen.
-				$app = JFactory::getApplication();
+			if($session->isNew()) {
+				//Redirect to login screen
+				global $mainframe;
 				$return = JRoute::_('index.php');
-				$app->redirect($return, JText::_('JLIB_ENVIRONMENT_SESSION_EXPIRED'));
-				$app->close();
+;				$mainframe->redirect($return, JText::_('SESSION_EXPIRED'));
+				$mainframe->close();
 			} else {
 				return false;
 			}
@@ -441,20 +454,21 @@ class JRequest
 	/**
 	 * Cleans the request from script injection.
 	 *
+	 * @static
 	 * @return	void
 	 * @since	1.5
 	 */
-	public static function clean()
+	function clean()
 	{
-		self::_cleanArray($_FILES);
-		self::_cleanArray($_ENV);
-		self::_cleanArray($_GET);
-		self::_cleanArray($_POST);
-		self::_cleanArray($_COOKIE);
-		self::_cleanArray($_SERVER);
+		JRequest::_cleanArray( $_FILES );
+		JRequest::_cleanArray( $_ENV );
+		JRequest::_cleanArray( $_GET );
+		JRequest::_cleanArray( $_POST );
+		JRequest::_cleanArray( $_COOKIE );
+		JRequest::_cleanArray( $_SERVER );
 
-		if (isset($_SESSION)) {
-			self::_cleanArray($_SESSION);
+		if (isset( $_SESSION )) {
+			JRequest::_cleanArray( $_SESSION );
 		}
 
 		$REQUEST	= $_REQUEST;
@@ -465,14 +479,14 @@ class JRequest
 		$ENV		= $_ENV;
 		$SERVER		= $_SERVER;
 
-		if (isset ($_SESSION)) {
+		if (isset ( $_SESSION )) {
 			$SESSION = $_SESSION;
 		}
 
 		foreach ($GLOBALS as $key => $value)
 		{
-			if ($key != 'GLOBALS') {
-				unset ($GLOBALS [ $key ]);
+			if ( $key != 'GLOBALS' ) {
+				unset ( $GLOBALS [ $key ] );
 			}
 		}
 		$_REQUEST	= $REQUEST;
@@ -480,10 +494,10 @@ class JRequest
 		$_POST		= $POST;
 		$_COOKIE	= $COOKIE;
 		$_FILES		= $FILES;
-		$_ENV		= $ENV;
-		$_SERVER	= $SERVER;
+		$_ENV 		= $ENV;
+		$_SERVER 	= $SERVER;
 
-		if (isset ($SESSION)) {
+		if (isset ( $SESSION )) {
 			$_SESSION = $SESSION;
 		}
 
@@ -492,25 +506,26 @@ class JRequest
 	}
 
 	/**
-	 * Adds an array to the GLOBALS array and checks that the GLOBALS variable is not being attacked.
+	 * Adds an array to the GLOBALS array and checks that the GLOBALS variable is not being attacked
 	 *
-	 * @param	array	$array	Array to clean.
-	 * @param	boolean	True if the array is to be added to the GLOBALS.
+	 * @access	protected
+	 * @param	array	$array	Array to clean
+	 * @param	boolean	True if the array is to be added to the GLOBALS
 	 * @since	1.5
 	 */
-	static function _cleanArray(&$array, $globalise=false)
+	function _cleanArray( &$array, $globalise=false )
 	{
-		static $banned = array('_files', '_env', '_get', '_post', '_cookie', '_server', '_session', 'globals');
+		static $banned = array( '_files', '_env', '_get', '_post', '_cookie', '_server', '_session', 'globals' );
 
 		foreach ($array as $key => $value)
 		{
 			// PHP GLOBALS injection bug
-			$failed = in_array(strtolower($key), $banned);
+			$failed = in_array( strtolower( $key ), $banned );
 
 			// PHP Zend_Hash_Del_Key_Or_Index bug
-			$failed |= is_numeric($key);
+			$failed |= is_numeric( $key );
 			if ($failed) {
-				jexit('Illegal variable <b>' . implode('</b> or <b>', $banned) . '</b> passed to script.');
+				jexit( 'Illegal variable <b>' . implode( '</b> or <b>', $banned ) . '</b> passed to script.' );
 			}
 			if ($globalise) {
 				$GLOBALS[$key] = $value;
@@ -530,7 +545,7 @@ class JRequest
 	 * other than the 1 bit is set, a strict filter is applied.
 	 * @param string The variable type {@see JFilterInput::clean()}.
 	 */
-	static function _cleanVar($var, $mask = 0, $type=null)
+	function _cleanVar($var, $mask = 0, $type=null)
 	{
 		// Static input filters for specific settings
 		static $noHtmlFilter	= null;
@@ -551,7 +566,7 @@ class JRequest
 		{
 			// If the allow html flag is set, apply a safe html filter to the variable
 			if (is_null($safeHtmlFilter)) {
-				$safeHtmlFilter = JFilterInput::getInstance(null, null, 1, 1);
+				$safeHtmlFilter = & JFilterInput::getInstance(null, null, 1, 1);
 			}
 			$var = $safeHtmlFilter->clean($var, $type);
 		}
@@ -559,7 +574,7 @@ class JRequest
 		{
 			// Since no allow flags were set, we will apply the most strict filter to the variable
 			if (is_null($noHtmlFilter)) {
-				$noHtmlFilter = JFilterInput::getInstance(/* $tags, $attr, $tag_method, $attr_method, $xss_auto */);
+				$noHtmlFilter = & JFilterInput::getInstance(/* $tags, $attr, $tag_method, $attr_method, $xss_auto */);
 			}
 			$var = $noHtmlFilter->clean($var, $type);
 		}
@@ -567,14 +582,15 @@ class JRequest
 	}
 
 	/**
-	 * Strips slashes recursively on an array.
+	 * Strips slashes recursively on an array
 	 *
-	 * @param	array	$array		Array of (nested arrays of) strings.
-	 * @return	array	The input array with stripshlashes applied to it.
+	 * @access	protected
+	 * @param	array	$array		Array of (nested arrays of) strings
+	 * @return	array	The input array with stripshlashes applied to it
 	 */
-	protected static function _stripSlashesRecursive($value)
+	function _stripSlashesRecursive( $value )
 	{
-		$value = is_array($value) ? array_map(array('JRequest', '_stripSlashesRecursive'), $value) : stripslashes($value);
+		$value = is_array( $value ) ? array_map( array( 'JRequest', '_stripSlashesRecursive' ), $value ) : stripslashes( $value );
 		return $value;
 	}
 }

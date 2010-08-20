@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: strcspn.php 16235 2010-04-20 04:13:25Z pasamio $
+* @version $Id: strcspn.php 10381 2008-06-01 03:35:53Z pasamio $
 * @package utf8
 * @subpackage strings
 */

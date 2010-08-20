@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<install type="component" version="1.5.0">
+	<name>sh404sef</name>
+	<author><![CDATA[ Yannick Gaultier]]></author>
+	<creationDate>2010-08-09</creationDate>
+	<copyright>2010 - Yannick Gaultier - Anything Digital</copyright>
+	<license>http://www.gnu.org/copyleft/gpl.html GNU/GPL</license>
+	<authorEmail>admin@anything-digital.com</authorEmail>
+	<authorUrl>dev.anything-digital.com</authorUrl>
+	<version>2.0.3.545</version>
+	<description>This component rewrites Joomla! URLs to be Search Engine
+		Friendly. It has plugins, for handling various components, can work
+		without .htaccess, build up meta tags automatically or manually, and
+		more. 
+</description>
+	<installfile>install.sh404sef.php</installfile>
+	<uninstallfile>uninstall.sh404sef.php</uninstallfile>
+	<install>
+		<queries>
+			<query>CREATE TABLE IF NOT EXISTS `#__redirection` (
+				`id` int(11) NOT
+				NULL auto_increment,
+				`cpt` int(11) NOT NULL default '0',
+				`rank`
+				int(11) NOT NULL default '0',
+				`oldurl` varchar(255) NOT NULL default
+				'',
+				`newurl` varchar(255) NOT NULL default '',
+				`dateadd` date NOT NULL
+				default '0000-00-00',
+				PRIMARY KEY (`id`),
+				KEY `newurl` (`newurl`),
+				KEY
+				`rank` (`rank`),
+				KEY `oldurl` (`oldurl`)
+				) TYPE=MyISAM DEFAULT CHARACTER SET `utf8`;
+			</query>
+			<query>CREATE TABLE IF NOT EXISTS `#__sh404SEF_meta` (
+				`id` int(11)
+				NOT NULL auto_increment,
+				`newurl` varchar(255) NOT NULL default '',
+				`metadesc` varchar(255) default '',
+				`metakey` varchar(255) default
+				'',
+				`metatitle` varchar(255) default '',
+				`metalang` varchar(30)
+				default '',
+				`metarobots` varchar(30) default '',
+				PRIMARY KEY (`id`),
+				KEY `newurl` (`newurl`)
+				) TYPE=MyISAM DEFAULT CHARACTER SET `utf8`;
+			</query>
+			<query>CREATE TABLE IF NOT EXISTS `#__sh404sef_aliases` (
+				`id` int(11) NOT NULL auto_increment,
+				`newurl` varchar(255) NOT NULL default '',
+				`alias` varchar(255) NOT NULL default '',
+				`type` tinyint(3) NOT NULL DEFAULT '0',
+        `hits` int(11) NOT NULL DEFAULT '0',
+				PRIMARY KEY (`id`),
+				KEY	`newurl` (`newurl`),
+				KEY `alias` (`alias`),
+        KEY `type` (`type`)
+				) TYPE=MyISAM DEFAULT CHARACTER SET `utf8`;
+			</query>
+			<query>CREATE TABLE IF NOT EXISTS `#__sh404sef_pageids` (
+        `id` int(11) NOT NULL auto_increment,
+        `newurl` varchar(255) NOT NULL default '',
+        `pageid` varchar(255) NOT NULL default '',
+        `type` tinyint(3) NOT NULL DEFAULT '0',
+        `hits` int(11) NOT NULL DEFAULT '0',
+        PRIMARY KEY (`id`),
+        KEY `newurl` (`newurl`),
+        KEY `alias` (`pageid`),
+        KEY `type` (`type`)
+        ) TYPE=MyISAM DEFAULT CHARACTER SET `utf8`;
+      </query>
+		</queries>
+	</install>
+	<files folder="site">
+		<filename>index.html</filename>
+		<filename>sh404sef.php</filename>
+		<filename>sh404sef.inc.php</filename>
+		<filename>sef_ext.php</filename>
+		<filename>sample-404-Not-Found.tpl.html</filename>
+		<filename>shCache.php</filename>
+		<filename>shInit.php</filename>
+		<filename>shPageRewrite.php</filename>
+		<filename>shSec.php</filename>
+
+		<filename>cache/shCacheContent.php</filename>
+		<filename>cache/index.html</filename>
+		<filename>images/external-black.png</filename>
+		<filename>images/external-white.png</filename>
+		<filename>sef_ext/com_banners.php</filename>
+		<filename>sef_ext/com_chronocontact.php</filename>
+		<filename>sef_ext/com_community.php</filename>
+		<filename>sef_ext/com_comprofiler.php</filename>
+		<filename>sef_ext/com_contact.php</filename>
+		<filename>sef_ext/com_content.php</filename>
+		<filename>sef_ext/com_deeppockets.php</filename>
+		<filename>sef_ext/com_docman.php</filename>
+		<filename>sef_ext/com_hotproperty.php</filename>
+		<filename>sef_ext/com_kunena.php</filename>
+		<filename>sef_ext/com_letterman.php</filename>
+		<filename>sef_ext/com_login.php</filename>
+		<filename>sef_ext/com_magazine.php</filename>
+		<filename>sef_ext/com_mtree.php</filename>
+		<filename>sef_ext/com_myblog.php</filename>
+		<filename>sef_ext/com_newsfeeds.php</filename>
+		<filename>sef_ext/com_news_portal.php</filename>
+		<filename>sef_ext/com_poll.php</filename>
+		<filename>sef_ext/com_rd_rss.php</filename>
+		<filename>sef_ext/com_registration.php</filename>
+		<filename>sef_ext/com_remository.php</filename>
+		<filename>sef_ext/dev_com_rsgallery2.php</filename>
+		<filename>sef_ext/com_search.php</filename>
+		<filename>sef_ext/com_sobi2.php</filename>
+		<filename>sef_ext/com_user.php</filename>
+		<filename>sef_ext/com_virtuemart.php</filename>
+		<filename>sef_ext/com_weblinks.php</filename>
+		<filename>sef_ext/com_wrapper.php</filename>
+		<filename>sef_ext/sample_com_plugin.php</filename>
+		<filename>meta_ext/com_virtuemart.php</filename>
+		<filename>meta_ext/com_content.php</filename>
+	</files>
+	<languages>
+		<language tag="en-GB">languages/site/en-GB.com_sh404sef.ini</language>
+	</languages>
+	<administration>
+		<menu img="components/com_sh404sef/assets/images/menu-icon-sh404sef.png">sh404sef</menu>
+		<submenu>
+		  <menu link="option=com_sh404sef&amp;c=default" >Control panel</menu>
+      <menu link="option=com_sh404sef&amp;c=urls&amp;layout=default&amp;view=urls" >Url manager</menu>
+      <menu link="option=com_sh404sef&amp;c=aliases&amp;layout=default&amp;view=aliases" >Aliases manager</menu>
+      <menu link="option=com_sh404sef&amp;c=pageids&amp;layout=default&amp;view=pageids" >pageId manager</menu>
+      <menu link="option=com_sh404sef&amp;c=urls&amp;layout=view404&amp;view=urls" >404 requests manager</menu>
+      <menu link="option=com_sh404sef&amp;c=metas&amp;layout=default&amp;view=metas" >Title and metas manager</menu>
+      <menu link="option=com_sh404sef&amp;layout=info&amp;view=default&amp;task=info" >Documentation</menu>
+    </submenu>
+		<files folder="admin">
+			<filename>admin.sh404sef.php</filename>
+			<filename>changelog.log</filename>
+			<filename>index.html</filename>
+			<filename>install.sh404sef.php</filename>
+			<filename>pagination.php</filename>
+			<filename>readme.inc.php</filename>
+			<filename>SEFConfig.class.php</filename>
+			<filename>sh_Net_URL.class.php</filename>
+			<filename>sh404sef.class.php</filename>
+			<filename>sh404SEFMeta.class.php</filename>
+			<filename>shJConfig.class.php</filename>
+			<filename>shMosSEF.class.php</filename>
+			<filename>shSimpleLogger.class.php</filename>
+			<filename>uninstall.sh404sef.php</filename>
+			<filename>plugins/system/shsef.php</filename>
+			<filename>plugins/system/shsef.xml</filename>
+			<filename>plugins/sh404sefcore/sh404sefsimilarurls.php</filename>
+			<filename>plugins/sh404sefcore/sh404sefsimilarurls.xml</filename>
+			<filename>plugins/system/shjlang16.xml</filename>
+			<filename>plugins/system/shjlang16.php</filename>
+			<folder>plugins/system/shjlang16</folder>
+			<filename>plugins/system/shmobile.php</filename>
+      <filename>plugins/system/shmobile.xml</filename>
+			<filename>config/config.sef.php</filename>
+			<filename>config/index.html</filename>
+			<filename>language/dutch.php</filename>
+			<filename>language/english.php</filename>
+			<filename>language/german.php</filename>
+			<filename>language/germanf.php</filename>
+			<filename>language/germani.php</filename>
+			<filename>language/italian.php</filename>
+			<filename>language/spanish.php</filename>
+			<filename>language/french.php</filename>
+			<filename>language/hungarian.php</filename>
+			<filename>language/hungariani.php</filename>
+			<filename>language/russian.php</filename>
+			<filename>language/plugins/com_chronocontact.php</filename>
+			<filename>language/plugins/com_comprofiler.php</filename>
+			<filename>language/plugins/com_content.php</filename>
+			<filename>language/plugins/com_docman.php</filename>
+			<filename>language/plugins/com_kunena.php</filename>
+			<filename>language/plugins/com_hotproperty.php</filename>
+			<filename>language/plugins/com_letterman.php</filename>
+			<filename>language/plugins/com_magazine.php</filename>
+			<filename>language/plugins/com_mtree.php</filename>
+			<filename>language/plugins/com_myblog.php</filename>
+			<filename>language/plugins/com_newsfeeds.php</filename>
+			<filename>language/plugins/com_poll.php</filename>
+			<filename>language/plugins/com_rd_rss.php</filename>
+			<filename>language/plugins/com_registration.php</filename>
+			<filename>language/plugins/com_remository.php</filename>
+			<filename>language/plugins/com_rsgallery2.php</filename>
+			<filename>language/plugins/com_search.php</filename>
+			<filename>language/plugins/com_sobi2.php</filename>
+			<filename>language/plugins/com_user.php</filename>
+			<filename>language/plugins/com_virtuemart.php</filename>
+			<filename>language/plugins/com_weblinks.php</filename>
+
+			<filename>logs/index.html</filename>
+			<filename>security/index.html</filename>
+			<filename>security/sh404SEF_IP_black_list.txt</filename>
+			<filename>security/sh404SEF_IP_white_list.txt</filename>
+			<filename>security/sh404SEF_uAgent_black_list.txt</filename>
+			<filename>security/sh404SEF_uAgent_white_list.txt</filename>
+			<filename>images/config.png</filename>
+			<filename>images/cut-logs.png</filename>
+			<filename>images/cut-redirect.png</filename>
+			<filename>images/cut-url.png</filename>
+			<filename>images/down.png</filename>
+			<filename>images/help.png</filename>
+			<filename>images/info.png</filename>
+			<filename>images/sh404SEF-logo.png</filename>
+			<filename>images/sh404SEF-logo-big.png</filename>
+			<filename>images/logs.png</filename>
+			<filename>images/redirect.png</filename>
+			<filename>images/up.png</filename>
+			<filename>images/url.png</filename>
+			
+			<folder>adapters</folder>
+			<folder>assets</folder>
+			<folder>classes</folder>
+			<folder>controllers</folder>
+			<folder>exceptions</folder>
+			<folder>helpers</folder>
+			<folder>lib</folder>
+			<folder>models</folder>
+			<folder>tables</folder>
+			<folder>views</folder>
+			
+			<filename>sh404seffactory.php</filename>
+		</files>
+		<languages>
+			<language tag="en-GB">languages/admin/en-GB.com_sh404sef.ini
+			</language>
+		</languages>
+	</administration>
+
+</install>
+		

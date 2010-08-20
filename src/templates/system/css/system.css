@@ -1,12 +1,6 @@
-/**
- * @version		$Id: system.css 14276 2010-01-18 14:20:28Z louis $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
-
 /* OpenID icon style */
 input.system-openid, input.com-system-openid {
-   background: url(http://openid.net/login-bg.gif) no-repeat;
+   background: url(http://openid.net/images/login-bg.gif) no-repeat;
    background-color: #fff;
    background-position: 0 50%;
    color: #000;

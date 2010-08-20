@@ -1,61 +1,63 @@
 <?php
 /**
- * @version		$Id: pagination.php 17298 2010-05-27 14:58:59Z infograf768 $
- * @package		Joomla.Site
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @version		$Id: pagination.php 14401 2010-01-26 14:10:00Z louis $
+ * @package		Joomla
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant
+ * to the GNU General Public License, and as distributed it includes or
+ * is derivative of works licensed under the GNU General Public License or
+ * other free or open source software licenses.
+ * See COPYRIGHT.php for copyright notices and details.
  */
 
 // no direct access
-defined('_JEXEC') or die;
+defined('_JEXEC') or die('Restricted access');
 
 /**
  * This is a file to add template specific chrome to pagination rendering.
  *
  * pagination_list_footer
- *	Input variable $list is an array with offsets:
- *		$list[prefix]		: string
- *		$list[limit]		: int
- *		$list[limitstart]	: int
- *		$list[total]		: int
- *		$list[limitfield]	: string
- *		$list[pagescounter]	: string
- *		$list[pageslinks]	: string
+ * 	Input variable $list is an array with offsets:
+ * 		$list[limit]		: int
+ * 		$list[limitstart]	: int
+ * 		$list[total]		: int
+ * 		$list[limitfield]	: string
+ * 		$list[pagescounter]	: string
+ * 		$list[pageslinks]	: string
  *
  * pagination_list_render
- *	Input variable $list is an array with offsets:
- *		$list[all]
- *			[data]		: string
- *			[active]	: boolean
- *		$list[start]
- *			[data]		: string
- *			[active]	: boolean
- *		$list[previous]
- *			[data]		: string
- *			[active]	: boolean
- *		$list[next]
- *			[data]		: string
- *			[active]	: boolean
- *		$list[end]
- *			[data]		: string
- *			[active]	: boolean
- *		$list[pages]
- *			[{PAGE}][data]		: string
- *			[{PAGE}][active]	: boolean
+ * 	Input variable $list is an array with offsets:
+ * 		$list[all]
+ * 			[data]		: string
+ * 			[active]	: boolean
+ * 		$list[start]
+ * 			[data]		: string
+ * 			[active]	: boolean
+ * 		$list[previous]
+ * 			[data]		: string
+ * 			[active]	: boolean
+ * 		$list[next]
+ * 			[data]		: string
+ * 			[active]	: boolean
+ * 		$list[end]
+ * 			[data]		: string
+ * 			[active]	: boolean
+ * 		$list[pages]
+ * 			[{PAGE}][data]		: string
+ * 			[{PAGE}][active]	: boolean
  *
  * pagination_item_active
- *	Input variable $item is an object with fields:
- *		$item->base	: integer
- *		$item->prefix	: string
- *		$item->link	: string
- *		$item->text	: string
+ * 	Input variable $item is an object with fields:
+ * 		$item->base	: integer
+ * 		$item->link	: string
+ * 		$item->text	: string
  *
  * pagination_item_inactive
- *	Input variable $item is an object with fields:
- *		$item->base	: integer
- *		$item->prefix	: string
- *		$item->link	: string
- *		$item->text	: string
+ * 	Input variable $item is an object with fields:
+ * 		$item->base	: integer
+ * 		$item->link	: string
+ * 		$item->text	: string
  *
  * This gives template designers ultimate control over how pagination is rendered.
  *
@@ -66,11 +68,11 @@ function pagination_list_footer($list)
 {
 	$html = "<div class=\"list-footer\">\n";
 
-	$html .= "\n<div class=\"limit\">".JText::_('JGLOBAL_DISPLAY_NUM').$list['limitfield']."</div>";
+	$html .= "\n<div class=\"limit\">".JText::_('Display Num').$list['limitfield']."</div>";
 	$html .= $list['pageslinks'];
 	$html .= "\n<div class=\"counter\">".$list['pagescounter']."</div>";
 
-	$html .= "\n<input type=\"hidden\" name=\"" . $list['prefix'] . "limitstart\" value=\"".$list['limitstart']."\" />";
+	$html .= "\n<input type=\"hidden\" name=\"limitstart\" value=\"".$list['limitstart']."\" />";
 	$html .= "\n</div>";
 
 	return $html;
@@ -78,20 +80,20 @@ function pagination_list_footer($list)
 
 function pagination_list_render($list)
 {
-	// Initialise variables.
+	// Initialize variables
 	$html = "<span class=\"pagination\">";
 	$html .= '<span>&laquo;</span>'.$list['start']['data'];
 	$html .= $list['previous']['data'];
 
-	foreach($list['pages'] as $page)
+	foreach( $list['pages'] as $page )
 	{
-		if ($page['data']['active']) {
+		if($page['data']['active']) {
 			$html .= '<strong>';
 		}
 
 		$html .= $page['data'];
 
-		if ($page['data']['active']) {
+		if($page['data']['active']) {
 			$html .= '</strong>';
 		}
 	}

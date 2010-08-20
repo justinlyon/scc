@@ -1,151 +1,138 @@
+<?php defined('_JEXEC') or die('Restricted access'); ?>
+
+<?php  JHTML::_('behavior.tooltip');  ?>
+
 <?php
-/**
- * @version		$Id: default.php 17983 2010-06-30 13:04:31Z infograf768 $
- * @package		Joomla.Administrator
- * @subpackage	com_users
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
-
-// No direct access.
-defined('_JEXEC') or die;
-
-// Include the component HTML helpers.
-JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
-
-// Load the tooltip behavior.
-JHtml::_('behavior.tooltip');
-
-$canDo = UsersHelper::getActions();
-$listOrder	= $this->state->get('list.ordering');
-$listDirn	= $this->state->get('list.direction');
+	JToolBarHelper::title( JText::_( 'User Manager' ), 'user.png' );
+	JToolBarHelper::custom( 'logout', 'cancel.png', 'cancel_f2.png', 'Logout' );
+	JToolBarHelper::deleteList();
+	JToolBarHelper::editListX();
+	JToolBarHelper::addNewX();
+	JToolBarHelper::help( 'screen.users' );
 ?>
 
-<form action="<?php echo JRoute::_('index.php?option=com_users&view=users');?>" method="post" name="adminForm">
-	<fieldset id="filter-bar">
-		<div class="filter-search fltlft">
-			<label class="filter-search-lbl" for="filter_search"><?php echo JText::_('COM_USERS_SEARCH_USERS'); ?></label>
-			<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->state->get('filter.search'); ?>" title="<?php echo JText::_('COM_USERS_SEARCH_USERS'); ?>" />
-			<button type="submit"><?php echo JText::_('JSEARCH_FILTER_SUBMIT'); ?></button>
-			<button type="button" onclick="document.id('filter_search').value='';this.form.submit();"><?php echo JText::_('JSEARCH_RESET'); ?></button>
-		</div>
-		<div class="filter-select fltrt">
-			<label for="filter_state">
-				<?php echo JText::_('COM_USERS_FILTER_LABEL'); ?>
-			</label>
+<form action="index.php?option=com_users" method="post" name="adminForm">
+	<table>
+		<tr>
+			<td width="100%">
+				<?php echo JText::_( 'Filter' ); ?>:
+				<input type="text" name="search" id="search" value="<?php echo htmlspecialchars($this->lists['search']);?>" class="text_area" onchange="document.adminForm.submit();" />
+				<button onclick="this.form.submit();"><?php echo JText::_( 'Go' ); ?></button>
+				<button onclick="document.getElementById('search').value='';this.form.getElementById('filter_type').value='0';this.form.getElementById('filter_logged').value='0';this.form.submit();"><?php echo JText::_( 'Reset' ); ?></button>
+			</td>
+			<td nowrap="nowrap">
+				<?php echo $this->lists['type'];?>
+				<?php echo $this->lists['logged'];?>
+			</td>
+		</tr>
+	</table>
 
-			<select name="filter_state" class="inputbox" onchange="this.form.submit()">
-				<option value="*"><?php echo JText::_('COM_USERS_FILTER_STATE');?></option>
-				<?php echo JHtml::_('select.options', UsersHelper::getStateOptions(), 'value', 'text', $this->state->get('filter.state'));?>
-			</select>
-
-			<select name="filter_active" class="inputbox" onchange="this.form.submit()">
-				<option value="*"><?php echo JText::_('COM_USERS_FILTER_ACTIVE');?></option>
-				<?php echo JHtml::_('select.options', UsersHelper::getActiveOptions(), 'value', 'text', $this->state->get('filter.active'));?>
-			</select>
-
-			<select name="filter_group_id" class="inputbox" onchange="this.form.submit()">
-				<option value=""><?php echo JText::_('COM_USERS_FILTER_USERGROUP');?></option>
-				<?php echo JHtml::_('select.options', UsersHelper::getGroups(), 'value', 'text', $this->state->get('filter.group_id'));?>
-			</select>
-		</div>
-	</fieldset>
-	<div class="clr"> </div>
-
-	<table class="adminlist">
+	<table class="adminlist" cellpadding="1">
 		<thead>
 			<tr>
-				<th width="1%">
-					<input type="checkbox" name="checkall-toggle" value="" onclick="checkAll(this)" />
+				<th width="2%" class="title">
+					<?php echo JText::_( 'NUM' ); ?>
 				</th>
-				<th class="left">
-					<?php echo JHtml::_('grid.sort', 'COM_USERS_HEADING_NAME', 'a.name', $listDirn, $listOrder); ?>
+				<th width="3%" class="title">
+					<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count($this->items); ?>);" />
 				</th>
-				<th class="nowrap" width="10%">
-					<?php echo JHtml::_('grid.sort', 'JGLOBAL_USERNAME', 'a.username', $listDirn, $listOrder); ?>
+				<th class="title">
+					<?php echo JHTML::_('grid.sort',   'Name', 'a.name', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				</th>
-				<th class="nowrap" width="5%">
-					<?php echo JHtml::_('grid.sort', 'JENABLED', 'a.block', $listDirn, $listOrder); ?>
+				<th width="15%" class="title" >
+					<?php echo JHTML::_('grid.sort',   'Username', 'a.username', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				</th>
-				<th class="nowrap" width="5%">
-					<?php echo JHtml::_('grid.sort', 'COM_USERS_HEADING_ACTIVATED', 'a.activation', $listDirn, $listOrder); ?>
+				<th width="5%" class="title" nowrap="nowrap">
+					<?php echo JText::_( 'Logged In' ); ?>
 				</th>
-				<th class="nowrap" width="10%">
-					<?php echo JHtml::_('grid.sort', 'COM_USERS_HEADING_GROUPS', 'group_names', $listDirn, $listOrder); ?>
+				<th width="5%" class="title" nowrap="nowrap">
+					<?php echo JHTML::_('grid.sort',   'Enabled', 'a.block', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				</th>
-				<th class="nowrap" width="15%">
-					<?php echo JHtml::_('grid.sort', 'COM_USERS_HEADING_EMAIL', 'a.email', $listDirn, $listOrder); ?>
+				<th width="15%" class="title">
+					<?php echo JHTML::_('grid.sort',   'Group', 'groupname', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				</th>
-				<th class="nowrap" width="15%">
-					<?php echo JHtml::_('grid.sort', 'COM_USERS_HEADING_LAST_VISIT_DATE', 'a.lastvisitDate', $listDirn, $listOrder); ?>
+				<th width="15%" class="title">
+					<?php echo JHTML::_('grid.sort',   'E-Mail', 'a.email', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				</th>
-				<th class="nowrap" width="15%">
-					<?php echo JHtml::_('grid.sort', 'COM_USERS_HEADING_REGISTRATION_DATE', 'a.registerDate', $listDirn, $listOrder); ?>
+				<th width="10%" class="title">
+					<?php echo JHTML::_('grid.sort',   'Last Visit', 'a.lastvisitDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				</th>
-				<th class="nowrap" width="3%">
-					<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
+				<th width="1%" class="title" nowrap="nowrap">
+					<?php echo JHTML::_('grid.sort',   'ID', 'a.id', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				</th>
 			</tr>
 		</thead>
 		<tfoot>
 			<tr>
-				<td colspan="15">
+				<td colspan="10">
 					<?php echo $this->pagination->getListFooter(); ?>
 				</td>
 			</tr>
 		</tfoot>
 		<tbody>
-		<?php foreach ($this->items as $i => $item) : ?>
-			<tr class="row<?php echo $i % 2; ?>">
-				<td class="center">
-					<?php echo JHtml::_('grid.id', $i, $item->id); ?>
+		<?php
+			$k = 0;
+			for ($i=0, $n=count( $this->items ); $i < $n; $i++)
+			{
+				$row 	=& $this->items[$i];
+
+				$img 	= $row->block ? 'publish_x.png' : 'tick.png';
+				$task 	= $row->block ? 'unblock' : 'block';
+				$alt 	= $row->block ? JText::_( 'Enabled' ) : JText::_( 'Blocked' );
+				$link 	= 'index.php?option=com_users&amp;view=user&amp;task=edit&amp;cid[]='. $row->id. '';
+
+				if ($row->lastvisitDate == "0000-00-00 00:00:00") {
+					$lvisit = JText::_( 'Never' );
+				} else {
+					$lvisit	= JHTML::_('date', $row->lastvisitDate, '%Y-%m-%d %H:%M:%S');
+				}
+			?>
+			<tr class="<?php echo "row$k"; ?>">
+				<td>
+					<?php echo $i+1+$this->pagination->limitstart;?>
 				</td>
 				<td>
-					<?php if ($canDo->get('core.edit')) : ?>
-					<a href="<?php echo JRoute::_('index.php?option=com_users&task=user.edit&id='.$item->id); ?>" title="<?php echo JText::sprintf('COM_USERS_EDIT_USER', $item->name); ?>">
-						<?php echo $this->escape($item->name); ?></a>
-					<?php else : ?>
-						<?php echo $this->escape($item->name); ?>
-					<?php endif; ?>
+					<?php echo JHTML::_('grid.id', $i, $row->id ); ?>
 				</td>
-				<td class="center">
-					<?php echo $this->escape($item->username); ?>
+				<td>
+					<a href="<?php echo $link; ?>">
+						<?php echo $row->name; ?></a>
 				</td>
-				<td class="center">
-					<?php echo JHtml::_('grid.boolean', $i, !$item->block, 'users.unblock', 'users.block'); ?>
+				<td>
+					<?php echo $row->username; ?>
 				</td>
-				<td class="center">
-					<?php echo JHtml::_('grid.boolean', $i, !$item->activation, 'users.activate', null); ?>
+				<td align="center">
+					<?php echo $row->loggedin ? '<img src="images/tick.png" width="16" height="16" border="0" alt="" />': ''; ?>
 				</td>
-				<td class="center">
-					<?php echo nl2br($item->group_names); ?>
+				<td align="center">
+					<a href="javascript:void(0);" onclick="return listItemTask('cb<?php echo $i;?>','<?php echo $task;?>')">
+						<img src="images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" /></a>
 				</td>
-				<td class="center">
-					<?php echo $this->escape($item->email); ?>
+				<td>
+					<?php echo JText::_( $row->groupname ); ?>
 				</td>
-				<td class="center">
-					<?php if ($item->lastvisitDate!='0000-00-00 00:00:00'):?>
-						<?php echo JHTML::_('date',$item->lastvisitDate, 'Y-m-d H:i:s'); ?>
-					<?php else:?>
-						<?php echo JText::_('JNEVER'); ?>
-					<?php endif;?>
+				<td>
+					<a href="mailto:<?php echo $row->email; ?>">
+						<?php echo $row->email; ?></a>
 				</td>
-				<td class="center">
-					<?php echo JHTML::_('date',$item->registerDate, 'Y-m-d H:i:s'); ?>
+				<td nowrap="nowrap">
+					<?php echo $lvisit; ?>
 				</td>
-				<td class="center">
-					<?php echo (int) $item->id; ?>
+				<td>
+					<?php echo $row->id; ?>
 				</td>
 			</tr>
-			<?php endforeach; ?>
+			<?php
+				$k = 1 - $k;
+				}
+			?>
 		</tbody>
 	</table>
 
-	<div>
-		<input type="hidden" name="task" value="" />
-		<input type="hidden" name="boxchecked" value="0" />
-		<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>" />
-		<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>" />
-		<?php echo JHtml::_('form.token'); ?>
-	</div>
+	<input type="hidden" name="option" value="com_users" />
+	<input type="hidden" name="task" value="" />
+	<input type="hidden" name="boxchecked" value="0" />
+	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
+	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
+	<?php echo JHTML::_( 'form.token' ); ?>
 </form>

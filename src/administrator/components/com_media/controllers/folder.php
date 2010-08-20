@@ -1,12 +1,19 @@
 <?php
 /**
- * @version		$Id: folder.php 16986 2010-05-12 11:03:06Z eddieajau $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @version		$Id: folder.php 14401 2010-01-26 14:10:00Z louis $
+ * @package		Joomla
+ * @subpackage	Media
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant to the
+ * GNU General Public License, and as distributed it includes or is derivative
+ * of works licensed under the GNU General Public License or other free or open
+ * source software licenses. See COPYRIGHT.php for copyright notices and
+ * details.
  */
 
-// No direct access
-defined('_JEXEC') or die;
+// Check to ensure this file is included in Joomla!
+defined('_JEXEC') or die( 'Restricted access' );
 
 jimport('joomla.filesystem.file');
 jimport('joomla.filesystem.folder');
@@ -14,11 +21,11 @@ jimport('joomla.filesystem.folder');
 /**
  * Weblinks Weblink Controller
  *
- * @package		Joomla.Administrator
- * @subpackage	com_media
+ * @package		Joomla
+ * @subpackage	Media
  * @since 1.5
  */
-class MediaControllerFolder extends JController
+class MediaControllerFolder extends MediaController
 {
 
 	/**
@@ -29,26 +36,28 @@ class MediaControllerFolder extends JController
 	 */
 	function delete()
 	{
-		JRequest::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+		global $mainframe;
+
+		JRequest::checkToken('request') or jexit( 'Invalid Token' );
 
 		// Set FTP credentials, if given
 		jimport('joomla.client.helper');
 		JClientHelper::setCredentialsFromRequest('ftp');
 
 		// Get some data from the request
-		$tmpl	= JRequest::getCmd('tmpl');
-		$paths	= JRequest::getVar('rm', array(), '', 'array');
-		$folder = JRequest::getVar('folder', '', '', 'path');
+		$tmpl	= JRequest::getCmd( 'tmpl' );
+		$paths	= JRequest::getVar( 'rm', array(), '', 'array' );
+		$folder = JRequest::getVar( 'folder', '', '', 'path');
 
-		// Initialise variables.
+		// Initialize variables
 		$msg = array();
 		$ret = true;
 
 		if (count($paths)) {
-			foreach ($paths as $path) {
+			foreach ($paths as $path)
+			{
 				if ($path !== JFile::makeSafe($path)) {
-					$dirname = htmlspecialchars($path, ENT_COMPAT, 'UTF-8');
-					JError::raiseWarning(100, JText::sprintf('COM_MEDIA_ERROR_UNABLE_TO_DELETE_FOLDER_WARNDIRNAME', $dirname));
+					JError::raiseWarning(100, JText::_('Unable to delete:').htmlspecialchars($path, ENT_COMPAT, 'UTF-8').' '.JText::_('WARNDIRNAME'));
 					continue;
 				}
 
@@ -66,16 +75,16 @@ class MediaControllerFolder extends JController
 					if ($canDelete) {
 						$ret |= !JFolder::delete($fullPath);
 					} else {
-						JError::raiseWarning(100, JText::sprintf('COM_MEDIA_ERROR_UNABLE_TO_DELETE_FOLDER_NOT_EMPTY',$fullPath));
+						JError::raiseWarning(100, JText::_('Unable to delete:').$fullPath.' '.JText::_('Not Empty!'));
 					}
 				}
 			}
 		}
 		if ($tmpl == 'component') {
 			// We are inside the iframe
-			$this->setRedirect('index.php?option=com_media&view=mediaList&folder='.$folder.'&tmpl=component');
+			$mainframe->redirect('index.php?option=com_media&view=mediaList&folder='.$folder.'&tmpl=component');
 		} else {
-			$this->setRedirect('index.php?option=com_media&folder='.$folder);
+			$mainframe->redirect('index.php?option=com_media&folder='.$folder);
 		}
 	}
 
@@ -87,35 +96,35 @@ class MediaControllerFolder extends JController
 	 */
 	function create()
 	{
+		global $mainframe;
+
 		// Check for request forgeries
-		JRequest::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		// Set FTP credentials, if given
 		jimport('joomla.client.helper');
 		JClientHelper::setCredentialsFromRequest('ftp');
 
-		$folder			= JRequest::getCmd('foldername', '');
-		$folderCheck	= JRequest::getVar('foldername', null, '', 'string', JREQUEST_ALLOWRAW);
-		$parent			= JRequest::getVar('folderbase', '', '', 'path');
+		$folder			= JRequest::getCmd( 'foldername', '');
+		$folderCheck	= JRequest::getVar( 'foldername', null, '', 'string', JREQUEST_ALLOWRAW);
+		$parent			= JRequest::getVar( 'folderbase', '', '', 'path' );
 
 		JRequest::setVar('folder', $parent);
 
 		if (($folderCheck !== null) && ($folder !== $folderCheck)) {
-			$this->setRedirect('index.php?option=com_media&folder='.$parent, JText::_('COM_MEDIA_ERROR_UNABLE_TO_CREATE_FOLDER_WARNDIRNAME'));
-			return;
+			$mainframe->redirect('index.php?option=com_media&folder='.$parent, JText::_('WARNDIRNAME'));
 		}
 
 		if (strlen($folder) > 0) {
 			$path = JPath::clean(COM_MEDIA_BASE.DS.$parent.DS.$folder);
-			if (!is_dir($path) && !is_file($path)) {
+			if (!is_dir($path) && !is_file($path))
+			{
 				jimport('joomla.filesystem.*');
 				JFolder::create($path);
-				$data = "<html>\n<body bgcolor=\"#FFFFFF\">\n</body>\n</html>";
-				JFile::write($path.DS."index.html", $data);
+				JFile::write($path.DS."index.html", "<html>\n<body bgcolor=\"#FFFFFF\">\n</body>\n</html>");
 			}
 			JRequest::setVar('folder', ($parent) ? $parent.'/'.$folder : $folder);
 		}
-
-		$this->setRedirect('index.php?option=com_media&folder='.$parent);
+		$mainframe->redirect('index.php?option=com_media&folder='.$parent);
 	}
 }

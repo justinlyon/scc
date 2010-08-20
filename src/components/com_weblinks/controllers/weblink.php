@@ -1,184 +1,137 @@
 <?php
 /**
- * @version		$Id: weblink.php 18212 2010-07-22 06:02:54Z eddieajau $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @version		$Id: weblink.php 14401 2010-01-26 14:10:00Z louis $
+ * @package		Joomla
+ * @subpackage	Content
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant to the
+ * GNU General Public License, and as distributed it includes or is derivative
+ * of works licensed under the GNU General Public License or other free or open
+ * source software licenses. See COPYRIGHT.php for copyright notices and
+ * details.
  */
 
-// no direct access
-defined('_JEXEC') or die;
+// Check to ensure this file is included in Joomla!
+defined('_JEXEC') or die( 'Restricted access' );
 
-jimport('joomla.application.component.controllerform');
+jimport('joomla.application.component.controller');
 
 /**
- * @package		Joomla.Site
- * @subpackage	com_weblinks
- * @since		1.5
+ * Weblinks Weblink Controller
+ *
+ * @package		Joomla
+ * @subpackage	Weblinks
+ * @since 1.5
  */
-class WeblinksControllerWeblink extends JControllerForm
+class WeblinksControllerWeblink extends WeblinksController
 {
 	/**
-	 * @since	1.6
-	 */
-	protected $context = 'com_weblinks.edit.weblink';
-
-	/**
-	 * @since	1.6
-	 */
-	protected $view_item = 'form';
-
-	/**
-	 * @since	1.6
-	 */
-	protected $view_list = 'categories';
-
-	/**
-	 * Constructor
-	 *
-	 * @since	1.6
-	 */
-	public function __construct($config = array())
+	* Edit a weblink and show the edit form
+	*
+	* @acces public
+	* @since 1.5
+	*/
+	function edit()
 	{
-		parent::__construct($config);
+		$user = & JFactory::getUser();
 
-		$this->registerTask('apply',		'save');
-		$this->registerTask('save2new',		'save');
-		$this->registerTask('save2copy',	'save');
+		// Make sure you are logged in
+		if ($user->get('aid', 0) < 1) {
+			JError::raiseError( 403, JText::_('ALERTNOTAUTH') );
+			return;
+		}
+
+		JRequest::setVar('view', 'weblink');
+		JRequest::setVar('layout', 'form');
+
+		$model =& $this->getModel('weblink');
+		$model->checkout();
+
+		parent::display();
 	}
 
 	/**
-	 * Method to get a model object, loading it if required.
-	 *
-	 * @param	string	The model name. Optional.
-	 * @param	string	The class prefix. Optional.
-	 * @param	array	Configuration array for model. Optional.
-	 *
-	 * @return	object	The model.
-	 * @since	1.5
-	 */
-	public function &getModel($name = 'form', $prefix = '', $config = array())
+	* Saves the record on an edit form submit
+	*
+	* @acces public
+	* @since 1.5
+	*/
+	function save()
 	{
-		$model = parent::getModel($name, $prefix, $config);
+		// Check for request forgeries
+		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		return $model;
-	}
-	/**
-	 * Save the record
-	 */
-	public function save()
-	{
-		if( parent::save() === true ) {
-			$cid = JRequest::getVar( 'jform' );
-			$cid = ( int ) $cid[ 'catid' ];
-			$this->setRedirect( JRoute::_( 'index.php?option=com_weblinks&view=category&id='.$cid, false ) );
-		}
-		$this->setMessage(JText::_('COM_WEBLINK_SUBMIT_SAVE_SUCCESS'));
-	}
-	/**
-	 * Method to cancel an edit
-	 *
-	 * Checks the item in, sets item ID in the session to null, and then redirects to the list page.
-	 *
-	 * @access	public
-	 * @return	void
-	 */
-	public function cancel()
-	{
-		// Check for request forgeries.
-		JRequest::checkToken() or jexit(JText::_('JInvalid_Token'));
+		// Get some objects from the JApplication
+		$db		=& JFactory::getDBO();
+		$user	=& JFactory::getUser();
 
-		// Initialise variables.
-		$app		= JFactory::getApplication();
-		$context	= $this->context.'.';
-
-		// Redirect to the list screen.
-		$this->setRedirect($this->_getReturnPage());
-	}
-
-	protected function _getReturnPage()
-	{
-		$app		= JFactory::getApplication();
-		$context	= $this->context.'.';
-
-		if (!($return = $app->getUserState($context.'.return'))) {
-			$return = JRequest::getVar('return', base64_encode(JURI::base()));
+		// Must be logged in
+		if ($user->get('id') < 1) {
+			JError::raiseError( 403, JText::_('ALERTNOTAUTH') );
+			return;
 		}
 
-		$return = JFilterInput::getInstance()->clean($return, 'base64');
-		$return = base64_decode($return);
+		//get data from the request
+		$post = JRequest::getVar('jform', array(), 'post', 'array');
 
-		if (!JURI::isInternal($return)) {
-			$return = JURI::base();
-		}
+		$model = $this->getModel('weblink');
 
-		return $return;
-	}
-
-	protected function _setReturnPage()
-	{
-		$app		= JFactory::getApplication();
-		$context	= $this->context.'.';
-
-		$return = JRequest::getVar('return', null, 'default', 'base64');
-
-		$app->setUserState($context.'return', $return);
-	}
-
-	/**
-	 * Go to a weblink
-	 *
-	 * @return	void
-	 * @since	1.6
-	 */
-	public function go()
-	{
-		// Get the ID from the request
-		$id = JRequest::getInt('id');
-
-		// Get the model, requiring published items
-		$modelLink	= $this->getModel('Weblink', '', array('ignore_request' => true));
-		$modelLink->setState('filter.published', 1);
-
-		// Get the item
-		$link	= $modelLink->getItem($id);
-
-		// Make sure the item was found.
-		if (empty($link)) {
-			return JError::raiseWarning(404, JText::_('COM_WEBLINKS_ERROR_WEBLINK_NOT_FOUND'));
-		}
-
-		// Check whether item access level allows access.
-		$user	= JFactory::getUser();
-		$groups	= $user->authorisedLevels();
-
-		if (!in_array($link->access, $groups)) {
-			return JError::raiseError(403, JText::_("JERROR_ALERTNOAUTHOR"));
-		}
-
-		// Check whether category access level allows access.
-		$modelCat = $this->getModel('Category', 'WeblinksModel', array('ignore_request' => true));
-		$modelCat->setState('filter.published', 1);
-
-		// Get the category
-		$category = $modelCat->getCategory($link->catid);
-
-		// Make sure the category was found.
-		if (empty($category)) {
-			return JError::raiseWarning(404, JText::_('COM_WEBLINKS_ERROR_WEBLINK_NOT_FOUND'));
-		}
-
-		// Check whether item access level allows access.
-		if (!in_array($category->access, $groups)) {
-			return JError::raiseError(403, JText::_('JERROR_ALERTNOAUTHOR'));
-		}
-
-		// Redirect to the URL
-		// TODO: Probably should check for a valid http link
-		if ($link->url) {
-			$modelLink->hit($id);
-			JFactory::getApplication()->redirect($link->url);
+		if ($model->store($post)) {
+			$msg = JText::_( 'Weblink Saved' );
 		} else {
-			return JError::raiseWarning(404, JText::_('COM_WEBLINKS_ERROR_WEBLINK_URL_INVALID'));
+			$msg = JText::_( 'Error Saving Weblink' );
 		}
+
+		// Check the table in so it can be edited.... we are done with it anyway
+		$model->checkin();
+
+		// admin users gid
+		$gid = 25;
+
+		// list of admins
+		$query = 'SELECT email, name' .
+				' FROM #__users' .
+				' WHERE gid = ' . $gid .
+				' AND sendEmail = 1';
+		$db->setQuery($query);
+		if (!$db->query()) {
+			JError::raiseError( 500, $db->stderr(true));
+			return;
+		}
+		$adminRows = $db->loadObjectList();
+
+		// send email notification to admins
+		foreach ($adminRows as $adminRow) {
+			JUtility::sendAdminMail($adminRow->name, $adminRow->email, '',  JText::_('Web Link'), $post['title']." URL link ".$post[url], $user->get('username'), JURI::base());
+		}
+
+		$this->setRedirect(JRoute::_('index.php?option=com_weblinks&view=category&id='.$post['catid'], false), $msg);
+	}
+
+	/**
+	* Cancel the editing of a web link
+	*
+	* @access	public
+	* @since	1.5
+	*/
+	function cancel()
+	{
+		// Get some objects from the JApplication
+		$user	= & JFactory::getUser();
+
+		// Must be logged in
+		if ($user->get('id') < 1) {
+			JError::raiseError( 403, JText::_('ALERTNOTAUTH') );
+			return;
+		}
+
+		// Checkin the weblink
+		$model = $this->getModel('weblink');
+		$model->checkin();
+
+		$this->setRedirect(JRoute::_('index.php?option=com_weblinks&view=categories', false));
 	}
 }
+
+?>

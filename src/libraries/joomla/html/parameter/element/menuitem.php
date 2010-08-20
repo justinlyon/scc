@@ -1,19 +1,24 @@
 <?php
 /**
- * @version		$Id: menuitem.php 17854 2010-06-23 17:43:55Z eddieajau $
- * @package		Joomla.Framework
- * @subpackage	Parameter
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
+* @version		$Id: menuitem.php 14401 2010-01-26 14:10:00Z louis $
+* @package		Joomla.Framework
+* @subpackage	Parameter
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
-// No direct access
-defined('JPATH_BASE') or die;
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 /**
  * Renders a menu item element
  *
- * @package		Joomla.Framework
+ * @package 	Joomla.Framework
  * @subpackage	Parameter
  * @since		1.5
  */
@@ -26,11 +31,11 @@ class JElementMenuItem extends JElement
 	* @access	protected
 	* @var		string
 	*/
-	protected $_name = 'MenuItem';
+	var	$_name = 'MenuItem';
 
-	public function fetchElement($name, $value, &$node, $control_name)
+	function fetchElement($name, $value, &$node, $control_name)
 	{
-		$db = JFactory::getDbo();
+		$db =& JFactory::getDBO();
 
 		$menuType = $this->_parent->get('menu_type');
 		if (!empty($menuType)) {
@@ -44,7 +49,7 @@ class JElementMenuItem extends JElement
 		$query = 'SELECT menutype, title' .
 				' FROM #__menu_types' .
 				' ORDER BY title';
-		$db->setQuery($query);
+		$db->setQuery( $query );
 		$menuTypes = $db->loadObjectList();
 
 		if ($state = $node->attributes('state')) {
@@ -53,10 +58,10 @@ class JElementMenuItem extends JElement
 
 		// load the list of menu items
 		// TODO: move query to model
-		$query = 'SELECT id, parent_id, name, menutype, type' .
+		$query = 'SELECT id, parent, name, menutype, type' .
 				' FROM #__menu' .
 				$where .
-				' ORDER BY menutype, parent_id, ordering'
+				' ORDER BY menutype, parent, ordering'
 				;
 
 		$db->setQuery($query);
@@ -71,64 +76,58 @@ class JElementMenuItem extends JElement
 			// first pass - collect children
 			foreach ($menuItems as $v)
 			{
-				$pt	= $v->parent_id;
-				$list	= @$children[$pt] ? $children[$pt] : array();
-				array_push($list, $v);
+				$pt 	= $v->parent;
+				$list 	= @$children[$pt] ? $children[$pt] : array();
+				array_push( $list, $v );
 				$children[$pt] = $list;
 			}
 		}
 
 		// second pass - get an indent list of the items
-		$list = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
+		$list = JHTML::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0 );
 
 		// assemble into menutype groups
-		$n = count($list);
+		$n = count( $list );
 		$groupedList = array();
 		foreach ($list as $k => $v) {
 			$groupedList[$v->menutype][] = &$list[$k];
 		}
 
 		// assemble menu items to the array
-		$options	= array();
-		$options[]	= JHtml::_('select.option', '', JText::_('JOPTION_SELECT_MENU_ITEM'));
+		$options 	= array();
+		$options[]	= JHTML::_('select.option', '', '- '.JText::_('Select Item').' -');
 
 		foreach ($menuTypes as $type)
 		{
 			if ($menuType == '')
 			{
-				$options[]	= JHtml::_('select.option',  '0', '&#160;', 'value', 'text', true);
-				$options[]	= JHtml::_('select.option',  $type->menutype, $type->title . ' - ' . JText::_('JGLOBAL_TOP'), 'value', 'text', true);
+				$options[]	= JHTML::_('select.option',  '0', '&nbsp;', 'value', 'text', true);
+				$options[]	= JHTML::_('select.option',  $type->menutype, $type->title . ' - ' . JText::_( 'Top' ), 'value', 'text', true );
 			}
-			if (isset($groupedList[$type->menutype]))
+			if (isset( $groupedList[$type->menutype] ))
 			{
-				$n = count($groupedList[$type->menutype]);
+				$n = count( $groupedList[$type->menutype] );
 				for ($i = 0; $i < $n; $i++)
 				{
 					$item = &$groupedList[$type->menutype][$i];
-
+					
 					//If menutype is changed but item is not saved yet, use the new type in the list
-					if (JRequest::getString('option', '', 'get') == 'com_menus') {
+					if ( JRequest::getString('option', '', 'get') == 'com_menus' ) {
 						$currentItemArray = JRequest::getVar('cid', array(0), '', 'array');
 						$currentItemId = (int) $currentItemArray[0];
 						$currentItemType = JRequest::getString('type', $item->type, 'get');
-						if ($currentItemId == $item->id && $currentItemType != $item->type) {
+						if ( $currentItemId == $item->id && $currentItemType != $item->type) {
 							$item->type = $currentItemType;
 						}
 					}
-
+					
 					$disable = strpos($node->attributes('disable'), $item->type) !== false ? true : false;
-					$options[] = JHtml::_('select.option',  $item->id, '&#160;&#160;&#160;' .$item->treename, 'value', 'text', $disable);
+					$options[] = JHTML::_('select.option',  $item->id, '&nbsp;&nbsp;&nbsp;' .$item->treename, 'value', 'text', $disable );
 
 				}
 			}
 		}
 
-		return JHtml::_('select.genericlist', $options, $control_name.'['.$name.']',
-			array(
-				'id' => $control_name.$name,
-				'list.attr' => 'class="inputbox"',
-				'list.select' => $value
-			)
-		);
+		return JHTML::_('select.genericlist',  $options, ''.$control_name.'['.$name.']', 'class="inputbox"', 'value', 'text', $value, $control_name.$name);
 	}
 }

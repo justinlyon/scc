@@ -1,19 +1,24 @@
 <?php
 /**
- * @version		$Id: standard.php 16405 2010-04-24 01:23:22Z infograf768 $
- * @package		Joomla.Framework
- * @subpackage	HTML
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
+* @version		$Id: standard.php 14401 2010-01-26 14:10:00Z louis $
+* @package		Joomla.Framework
+* @subpackage	HTML
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
-// No direct access
-defined('JPATH_BASE') or die;
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 /**
  * Renders a standard button
  *
- * @package		Joomla.Framework
+ * @package 	Joomla.Framework
  * @subpackage		HTML
  * @since		1.5
  */
@@ -25,16 +30,16 @@ class JButtonStandard extends JButton
 	 * @access	protected
 	 * @var		string
 	 */
-	protected $_name = 'Standard';
+	var $_name = 'Standard';
 
-	public function fetchButton($type='Standard', $name = '', $text = '', $task = '', $list = true)
+	function fetchButton( $type='Standard', $name = '', $text = '', $task = '', $list = true, $hideMenu = false )
 	{
 		$i18n_text	= JText::_($text);
 		$class	= $this->fetchIconClass($name);
-		$doTask	= $this->_getCommand($text, $task, $list);
+		$doTask	= $this->_getCommand($text, $task, $list, $hideMenu);
 
 		$html	= "<a href=\"#\" onclick=\"$doTask\" class=\"toolbar\">\n";
-		$html .= "<span class=\"$class\">\n";
+		$html .= "<span class=\"$class\" title=\"$i18n_text\">\n";
 		$html .= "</span>\n";
 		$html	.= "$i18n_text\n";
 		$html	.= "</a>\n";
@@ -49,9 +54,9 @@ class JButtonStandard extends JButton
 	 * @return	string	Button CSS Id
 	 * @since	1.5
 	 */
-	public function fetchId($type='Standard', $name = '', $text = '', $task = '', $list = true, $hideMenu = false)
+	function fetchId( $type='Standard', $name = '', $text = '', $task = '', $list = true, $hideMenu = false )
 	{
-		return $this->_parent->getName().'-'.$name;
+		return $this->_parent->_name.'-'.$name;
 	}
 
 	/**
@@ -61,18 +66,21 @@ class JButtonStandard extends JButton
 	 * @param	string	$name	The task name as seen by the user
 	 * @param	string	$task	The task used by the application
 	 * @param	???		$list
+	 * @param	boolean	$hide
 	 * @return	string	JavaScript command string
 	 * @since	1.5
 	 */
-	protected function _getCommand($name, $task, $list)
+	function _getCommand($name, $task, $list, $hide)
 	{
-		$message	= JText::_('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST');
+		$todo		= JString::strtolower(JText::_( $name ));
+		$message	= JText::sprintf( 'Please make a selection from the list to', $todo );
 		$message	= addslashes($message);
+		$hidecode	= $hide ? 'hideMainMenu();' : '';
 
 		if ($list) {
-			$cmd = "javascript:if (document.adminForm.boxchecked.value==0){alert('$message');}else{ submitbutton('$task')}";
+			$cmd = "javascript:if(document.adminForm.boxchecked.value==0){alert('$message');}else{ $hidecode submitbutton('$task')}";
 		} else {
-			$cmd = "javascript:submitbutton('$task')";
+			$cmd = "javascript:$hidecode submitbutton('$task')";
 		}
 
 

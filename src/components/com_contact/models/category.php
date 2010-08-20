@@ -1,256 +1,159 @@
 <?php
 /**
- * @version		$Id: category.php 17855 2010-06-23 17:46:38Z eddieajau $
- * @package		Joomla.Site
+ * @version		$Id: category.php 14401 2010-01-26 14:10:00Z louis $
+ * @package		Joomla
  * @subpackage	Contact
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant to the
+ * GNU General Public License, and as distributed it includes or is derivative
+ * of works licensed under the GNU General Public License or other free or open
+ * source software licenses. See COPYRIGHT.php for copyright notices and
+ * details.
  */
 
-// No direct access
-defined('_JEXEC') or die;
+// Check to ensure this file is included in Joomla!
+defined('_JEXEC') or die( 'Restricted access' );
 
-jimport('joomla.application.component.modellist');
+jimport('joomla.application.component.model');
 
 /**
- * @package		Joomla.Site
+ * @package		Joomla
  * @subpackage	Contact
  */
-class ContactModelCategory extends JModelList
+class ContactModelCategory extends JModel
 {
 	/**
-	 * Category items data
-	 *
-	 * @var array
+	 * Builds the query to select contact categories
+	 * @param array
+	 * @return string
+	 * @access protected
 	 */
-	protected $_item = null;
-
-	protected $_articles = null;
-
-	protected $_siblings = null;
-
-	protected $_children = null;
-
-	protected $_parent = null;
-
-	/**
-	 * The category that applies.
-	 *
-	 * @access	protected
-	 * @var		object
-	 */
-	protected $_category = null;
-
-	/**
-	 * The list of other newfeed categories.
-	 *
-	 * @access	protected
-	 * @var		array
-	 */
-	protected $_categories = null;
-
-	/**
-	 * Method to get a list of items.
-	 *
-	 * @return	mixed	An array of objects on success, false on failure.
-	 */
-	public function &getItems()
+	function _getCatgoriesQuery( &$options )
 	{
-		// Invoke the parent getItems method to get the main list
-		$items = &parent::getItems();
+		// TODO: Cache on the fingerprint of the arguments
+		$db		=& JFactory::getDBO();
+		$aid	= @$options['aid'];
 
-		// Convert the params field into an object, saving original in _params
-		for ($i = 0, $n = count($items); $i < $n; $i++) {
-			$item = &$items[$i];
-			if (!isset($this->_params)) {
-				$params = new JRegistry();
-				$params->loadJSON($item->params);
-				$item->params = $params;
-			}
+		$wheres[] = 'a.published = 1';
+		$wheres[] = 'cc.section = ' . $db->Quote( 'com_contact_details' );
+		$wheres[] = 'cc.published = 1';
+
+		if ($aid !== null)
+		{
+			$wheres[] = 'a.access <= ' . (int) $aid;
+			$wheres[] = 'cc.access <= ' . (int) $aid;
 		}
 
-		return $items;
+		$groupBy	= 'cc.id';
+		$orderBy	= 'cc.ordering' ;
+
+		/*
+		 * Query to retrieve all categories that belong under the contacts
+		 * section and that are published.
+		 */
+		$query = 'SELECT cc.*, COUNT( a.id ) AS numlinks, a.id as cid'.
+				' FROM #__categories AS cc'.
+				' LEFT JOIN #__contact_details AS a ON a.catid = cc.id'.
+				' WHERE ' . implode( ' AND ', $wheres ) .
+				' GROUP BY ' . $groupBy .
+				' ORDER BY ' . $orderBy;
+
+		//echo $query;
+		return $query;
 	}
 
 	/**
-	 * Method to build an SQL query to load the list data.
-	 *
-	 * @return	string	An SQL query
-	 * @since	1.6
+	 * Builds the query to select contact items
+	 * @param array
+	 * @return string
+	 * @access protected
 	 */
-	protected function getListQuery()
+	function _getContactsQuery( &$options )
 	{
-		$user	= JFactory::getUser();
-		$groups	= implode(',', $user->authorisedLevels());
+		// TODO: Cache on the fingerprint of the arguments
+		$db			=& JFactory::getDBO();
+		$aid		= @$options['aid'];
+		$catId		= @$options['category_id'];
+		$groupBy	= @$options['group by'];
+		$orderBy	= @$options['order by'];
 
-		// Create a new query object.
-		$db		= $this->getDbo();
-		$query	= $db->getQuery(true);
+		$select = 'cd.*, ' .
+				'cc.name AS category_name, cc.description AS category_description, cc.image AS category_image,'.
+				' CASE WHEN CHAR_LENGTH(cd.alias) THEN CONCAT_WS(\':\', cd.id, cd.alias) ELSE cd.id END as slug, '.
+				' CASE WHEN CHAR_LENGTH(cc.alias) THEN CONCAT_WS(\':\', cc.id, cc.alias) ELSE cc.id END as catslug ';
+		$from	= '#__contact_details AS cd';
 
-		// Select required fields from the categories.
-		$query->select($this->getState('list.select', 'a.*'));
-		$query->from('`#__contact_details` AS a');
-		$query->where('a.access IN ('.$groups.')');
+		$joins[] = 'INNER JOIN #__categories AS cc on cd.catid = cc.id';
 
-		// Filter by category.
-		if ($categoryId = $this->getState('category.id')) {
-			$query->where('a.catid = '.(int) $categoryId);
-			$query->join('LEFT', '#__categories AS c ON c.id = a.catid');
-			$query->where('c.access IN ('.$groups.')');
+		if ($catId)
+		{
+			$wheres[] = 'cd.catid = ' . (int) $catId;
+		}
+		$wheres[] = 'cc.published = 1';
+		$wheres[] = 'cd.published = 1';
+
+		if ($aid !== null)
+		{
+			$wheres[] = 'cc.access <= ' . (int) $aid;
+			$wheres[] = 'cd.access <= ' . (int) $aid;
 		}
 
-		// Filter by state
-		$state = $this->getState('filter.state');
-		if (is_numeric($state)) {
-			$query->where('a.state = '.(int) $state);
-		}
-		// Filter by start and end dates.
-		$nullDate = $db->Quote($db->getNullDate());
-		$nowDate = $db->Quote(JFactory::getDate()->toMySQL());
-
-		$query->where('(a.publish_up = ' . $nullDate . ' OR a.publish_up <= ' . $nowDate . ')');
-		$query->where('(a.publish_down = ' . $nullDate . ' OR a.publish_down >= ' . $nowDate . ')');
-
-		// Filter by language
-		if ($this->getState('filter.language')) {
-			$query->where('a.language in (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')');
-		}
-
-		// Add the list ordering clause.
-		$query->order($db->getEscaped($this->getState('list.ordering', 'a.ordering')).' '.$db->getEscaped($this->getState('list.direction', 'ASC')));
+		/*
+		 * Query to retrieve all categories that belong under the contacts
+		 * section and that are published.
+		 */
+		$query = 'SELECT ' . $select .
+				' FROM ' . $from .
+				' ' . implode ( ' ', $joins ) .
+				' WHERE ' . implode( ' AND ', $wheres ) .
+				($groupBy ? ' GROUP BY ' . $groupBy : '').
+				($orderBy ? ' ORDER BY ' . $orderBy : '');
 
 		return $query;
 	}
 
 	/**
-	 * Method to auto-populate the model state.
-	 *
-	 * Note. Calling getState in this method will result in recursion.
-	 *
-	 * @since	1.6
+	 * Gets a list of categories
+	 * @param array
+	 * @return array
 	 */
-	protected function populateState()
+	function getCategories( $options=array() )
 	{
-		// Initialise variables.
-		$app	= JFactory::getApplication();
-		$params	= JComponentHelper::getParams('com_contact');
-
-		// List state information
-		$limit = $app->getUserStateFromRequest('global.list.limit', 'limit', $app->getCfg('list_limit'));
-		$this->setState('list.limit', $limit);
-
-		$limitstart = JRequest::getVar('limitstart', 0, '', 'int');
-		$this->setState('list.start', $limitstart);
-
-		$orderCol	= JRequest::getCmd('filter_order', 'ordering');
-		$this->setState('list.ordering', $orderCol);
-
-		$listOrder	=  JRequest::getCmd('filter_order_Dir', 'ASC');
-		$this->setState('list.direction', $listOrder);
-
-		$id = JRequest::getVar('id', 0, '', 'int');
-		$this->setState('category.id', $id);
-
-		$this->setState('filter.published',	1);
-
-		$this->setState('filter.language',$app->getLanguageFilter());
-
-		// Load the parameters.
-		$this->setState('params', $params);
+		$query	= $this->_getCatgoriesQuery( $options );
+		return $this->_getList( $query, @$options['limitstart'], @$options['limit'] );
 	}
 
 	/**
-	 * Method to get category data for the current category
-	 *
-	 * @param	int		An optional ID
-	 *
-	 * @return	object
-	 * @since	1.5
+	 * Gets the count of the categories for the given options
+	 * @param array
+	 * @return int
 	 */
-	public function getCategory()
+	function getCategoryCount( $options=array() )
 	{
-		if(!is_object($this->_item))
-		{
-			$app = JFactory::getApplication();
-			$menu = $app->getMenu();
-			$active = $menu->getActive();
-			$params = new JRegistry();
-			$params->loadJSON($active->params);
-			$options = array();
-			$options['countItems'] = $params->get('show_contacts', 0);
-			$categories = JCategories::getInstance('Contact', $options);
-			$this->_item = $categories->get($this->getState('category.id', 'root'));
-			if(is_object($this->_item))
-			{
-				$this->_children = $this->_item->getChildren();
-				$this->_parent = false;
-				if($this->_item->getParent())
-				{
-					$this->_parent = $this->_item->getParent();
-				}
-				$this->_rightsibling = $this->_item->getSibling();
-				$this->_leftsibling = $this->_item->getSibling(false);
-			} else {
-				$this->_children = false;
-				$this->_parent = false;
-			}
-		}
-
-		return $this->_item;
+		$query	= $this->_getCatgoriesQuery( $options );
+		return $this->_getListCount( $query );
 	}
 
 	/**
-	 * Get the parent categorie.
-	 *
-	 * @param	int		An optional category id. If not supplied, the model state 'category.id' will be used.
-	 *
-	 * @return	mixed	An array of categories or false if an error occurs.
+	 * Gets a list of categories
+	 * @param array
+	 * @return array
 	 */
-	public function getParent()
+	function getContacts( $options=array() )
 	{
-		if(!is_object($this->_item))
-		{
-			$this->getCategory();
-		}
-		return $this->_parent;
+		$query	= $this->_getContactsQuery( $options );
+		return $this->_getList( $query, @$options['limitstart'], @$options['limit'] );
 	}
 
 	/**
-	 * Get the sibling (adjacent) categories.
-	 *
-	 * @return	mixed	An array of categories or false if an error occurs.
+	 * Gets the count of the categories for the given options
+	 * @param array
+	 * @return int
 	 */
-	function &getLeftSibling()
+	function getContactCount( $options=array() )
 	{
-		if(!is_object($this->_item))
-		{
-			$this->getCategory();
-		}
-		return $this->_leftsibling;
-	}
-
-	function &getRightSibling()
-	{
-		if(!is_object($this->_item))
-		{
-			$this->getCategory();
-		}
-		return $this->_rightsibling;
-	}
-
-	/**
-	 * Get the child categories.
-	 *
-	 * @param	int		An optional category id. If not supplied, the model state 'category.id' will be used.
-	 *
-	 * @return	mixed	An array of categories or false if an error occurs.
-	 */
-	function &getChildren()
-	{
-		if(!is_object($this->_item))
-		{
-			$this->getCategory();
-		}
-		return $this->_children;
+		$query	= $this->_getContactsQuery( $options );
+		return $this->_getListCount( $query );
 	}
 }

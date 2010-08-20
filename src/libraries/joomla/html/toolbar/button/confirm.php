@@ -1,19 +1,24 @@
 <?php
 /**
- * @version		$Id:confirm.php 6961 2007-03-15 16:06:53Z tcp $
- * @package		Joomla.Framework
- * @subpackage	HTML
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
+* @version		$Id:confirm.php 6961 2007-03-15 16:06:53Z tcp $
+* @package		Joomla.Framework
+* @subpackage	HTML
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
-// No direct access
-defined('JPATH_BASE') or die;
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 /**
  * Renders a standard button with a confirm dialog
  *
- * @package		Joomla.Framework
+ * @package 	Joomla.Framework
  * @subpackage	HTML
  * @since		1.5
  */
@@ -25,17 +30,17 @@ class JButtonConfirm extends JButton
 	 * @access	protected
 	 * @var		string
 	 */
-	protected $_name = 'Confirm';
+	var $_name = 'Confirm';
 
-	public function fetchButton($type='Confirm', $msg='', $name = '', $text = '', $task = '', $list = true, $hideMenu = false)
+	function fetchButton( $type='Confirm', $msg='', $name = '', $text = '', $task = '', $list = true, $hideMenu = false )
 	{
 		$text	= JText::_($text);
 		$msg	= JText::_($msg, true);
 		$class	= $this->fetchIconClass($name);
-		$doTask	= $this->_getCommand($msg, $name, $task, $list);
+		$doTask	= $this->_getCommand($msg, $name, $task, $list, $hideMenu);
 
 		$html	= "<a href=\"#\" onclick=\"$doTask\" class=\"toolbar\">\n";
-		$html .= "<span class=\"$class\">\n";
+		$html .= "<span class=\"$class\" title=\"$text\">\n";
 		$html .= "</span>\n";
 		$html	.= "$text\n";
 		$html	.= "</a>\n";
@@ -50,9 +55,9 @@ class JButtonConfirm extends JButton
 	 * @return	string	Button CSS Id
 	 * @since	1.5
 	 */
-	public function fetchId($type='Confirm', $name = '', $text = '', $task = '', $list = true, $hideMenu = false)
+	function fetchId( $type='Confirm', $name = '', $text = '', $task = '', $list = true, $hideMenu = false )
 	{
-		return $this->_parent->getName().'-'.$name;
+		return $this->_parent->_name.'-'.$name;
 	}
 
 	/**
@@ -63,15 +68,24 @@ class JButtonConfirm extends JButton
 	 * @return	string	JavaScript command string
 	 * @since	1.5
 	 */
-	protected function _getCommand($msg, $name, $task, $list)
+	function _getCommand($msg, $name, $task, $list, $hide)
 	{
-		$message	= JText::_('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST');
-		$message	= addslashes($message);
+		$todo	 = JString::strtolower(JText::_( $name ));
+		$message = JText::sprintf( 'Please make a selection from the list to', $todo );
+		$message = addslashes($message);
 
-		if ($list) {
-			$cmd = "javascript:if (document.adminForm.boxchecked.value==0){alert('$message');}else{if (confirm('$msg')){submitbutton('$task');}}";
+		if ($hide) {
+			if ($list) {
+				$cmd = "javascript:if(document.adminForm.boxchecked.value==0){alert('$message');}else{hideMainMenu();if(confirm('$msg')){submitbutton('$task');}}";
+			} else {
+				$cmd = "javascript:hideMainMenu();if(confirm('$msg')){submitbutton('$task');}";
+			}
 		} else {
-			$cmd = "javascript:if (confirm('$msg')){submitbutton('$task');}";
+			if ($list) {
+				$cmd = "javascript:if(document.adminForm.boxchecked.value==0){alert('$message');}else{if(confirm('$msg')){submitbutton('$task');}}";
+			} else {
+				$cmd = "javascript:if(confirm('$msg')){submitbutton('$task');}";
+			}
 		}
 
 		return $cmd;

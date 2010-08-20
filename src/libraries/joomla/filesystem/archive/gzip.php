@@ -3,12 +3,17 @@
  * @version		$Id:gzip.php 6961 2007-03-15 16:06:53Z tcp $
  * @package		Joomla.Framework
  * @subpackage	FileSystem
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant
+ * to the GNU General Public License, and as distributed it includes or
+ * is derivative of works licensed under the GNU General Public License or
+ * other free or open source software licenses.
+ * See COPYRIGHT.php for copyright notices and details.
  */
 
-// No direct access
-defined('JPATH_BASE') or die;
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 /**
  * Gzip format adapter for the JArchive class
@@ -19,7 +24,7 @@ defined('JPATH_BASE') or die;
  * @contributor  Michael Slusarz <slusarz@horde.org>
  * @contributor  Michael Cochrane <mike@graftonhall.co.nz>
  *
- * @package		Joomla.Framework
+ * @package 	Joomla.Framework
  * @subpackage	FileSystem
  * @since		1.5
  */
@@ -55,15 +60,14 @@ class JArchiveGzip extends JObject
 	*/
 	function extract($archive, $destination, $options = array ())
 	{
-		// Initialise variables.
+		// Initialize variables
 		$this->_data = null;
 
 		if (!extension_loaded('zlib')) {
-			$this->set('error.message', JText::_('JLIB_FILESYSTEM_GZIP_NOT_SUPPORTED'));
+			$this->set('error.message', 'Zlib Not Supported');
 			return JError::raiseWarning(100, $this->get('error.message'));
 		}
 
-		/*
 		if (!$this->_data = JFile::read($archive)) {
 			$this->set('error.message', 'Unable to read archive');
 			return JError::raiseWarning(100, $this->get('error.message'));
@@ -81,35 +85,6 @@ class JArchiveGzip extends JObject
 			return JError::raiseWarning(100, $this->get('error.message'));
 		}
 		return true;
-		*/
-		// New style! streams!
-		$input = JFactory::getStream();
-		$input->set('processingmethod','gz'); // use gz
-		if(!$input->open($archive)) {
-			$this->set('error.message', JText::_('JLIB_FILESYSTEM_GZIP_UNABLE_TO_READ'));
-			return JError::raiseWarning(100, $this->get('error.message'));
-		}
-
-		$output = JFactory::getStream();
-		if(!$output->open($destination, 'w')) {
-			$this->set('error.message', JText::_('JLIB_FILESYSTEM_GZIP_UNABLE_TO_WRITE'));
-			$input->close(); // close the previous file
-			return JError::raiseWarning(100, $this->get('error.message'));
-		}
-
-		$written = 0;
-		do {
-			$this->_data = $input->read($input->get('chunksize', 8196));
-			if($this->_data) {
-				if(!$output->write($this->_data)) {
-					$this->set('error.message', JText::_('JLIB_FILESYSTEM_GZIP_UNABLE_TO_WRITE_FILE'));
-					return JError::raiseWarning(100, $this->get('error.message'));
-				}
-			}
-		} while ($this->_data);
-		$output->close();
-		$input->close();
-		return true;
 	}
 
 	/**
@@ -125,7 +100,7 @@ class JArchiveGzip extends JObject
 		$position = 0;
 		$info = @ unpack('CCM/CFLG/VTime/CXFL/COS', substr($this->_data, $position +2));
 		if (!$info) {
-			$this->set('error.message', JText::_('JLIB_FILESYSTEM_GZIP_UNABLE_TO_DECOMPRESS'));
+			$this->set('error.message', 'Unable to decompress data');
 			return false;
 		}
 		$position += 10;

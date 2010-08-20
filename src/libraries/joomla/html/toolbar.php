@@ -1,14 +1,19 @@
 <?php
 /**
- * @version		$Id: toolbar.php 17837 2010-06-22 22:49:50Z eddieajau $
+ * @version		$Id: toolbar.php 14401 2010-01-26 14:10:00Z louis $
  * @package		Joomla.Framework
  * @subpackage	HTML
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant
+ * to the GNU General Public License, and as distributed it includes or
+ * is derivative of works licensed under the GNU General Public License or
+ * other free or open source software licenses.
+ * See COPYRIGHT.php for copyright notices and details.
  */
 
-// No direct access
-defined('JPATH_BASE') or die;
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 //Register the session storage class with the loader
 JLoader::register('JButton', dirname(__FILE__).DS.'toolbar'.DS.'button.php');
@@ -16,7 +21,7 @@ JLoader::register('JButton', dirname(__FILE__).DS.'toolbar'.DS.'button.php');
 /**
  * ToolBar handler
  *
- * @package		Joomla.Framework
+ * @package 	Joomla.Framework
  * @subpackage	HTML
  * @since		1.5
  */
@@ -25,62 +30,71 @@ class JToolBar extends JObject
 	/**
 	 * Toolbar name
 	 *
+	 * @access	private
 	 * @var		string
 	 */
-	protected $_name = array ();
+	var $_name = array ();
 
 	/**
 	 * Toolbar array
 	 *
+	 * @access	private
 	 * @var		array
 	 */
-	protected $_bar = array ();
+	var $_bar = array ();
 
 	/**
 	 * Loaded buttons
 	 *
+	 * @access	private
 	 * @var		array
 	 */
-	protected $_buttons = array ();
+	var $_buttons = array ();
 
 	/**
-	 * Directories, where button types can be stored.
+	 * Directories, where button types can be stored
 	 *
+	 * @access	private
 	 * @var		array
 	 */
-	protected $_buttonPath = array ();
+	var $_buttonPath = array ();
 
 	/**
 	 * Constructor
 	 *
-	 * @param	string	The toolbar name.
+	 * @access protected
+	 * @param string The toolbar name
+	 * @var string The type of setup file
 	 */
-	public function __construct($name = 'toolbar')
+	function __construct($name = 'toolbar')
 	{
 		$this->_name = $name;
 
-		// Set base path to find buttons.
+		// Set base path to find buttons
 		$this->_buttonPath[] = dirname(__FILE__).DS.'toolbar'.DS.'button';
 
 	}
 
 	/**
-	 * Returns the global JToolBar object, only creating it if it
+	 * Returns a reference to a global JToolBar object, only creating it if it
 	 * doesn't already exist.
+	 *
+	 * This method must be invoked as:
+	 * 		<pre>  $toolbar = & JToolBar::getInstance( $name );</pre>
 	 *
 	 * @access	public
 	 * @param	string		$name  The name of the toolbar.
 	 * @return	JToolBar	The JToolBar object.
 	 */
-	public static function getInstance($name = 'toolbar')
+	function & getInstance($name = 'toolbar')
 	{
 		static $instances;
 
-		if (!isset($instances)) {
+		if (!isset ($instances)) {
 			$instances = array ();
 		}
 
-		if (empty($instances[$name])) {
+		if (empty ($instances[$name])) {
 			$instances[$name] = new JToolBar($name);
 		}
 
@@ -90,112 +104,97 @@ class JToolBar extends JObject
 	/**
 	 * Set a value
 	 *
-	 * @param	string	The name of the param.
-	 * @param	string	The value of the parameter.
-	 * @return	string	The set value.
+	 * @access	public
+	 * @param	string	The name of the param
+	 * @param	string	The value of the parameter
+	 * @return	string	The set value
 	 */
-	public function appendButton()
+	function appendButton()
 	{
-		// Push button onto the end of the toolbar array.
+		// Push button onto the end of the toolbar array
 		$btn = func_get_args();
 		array_push($this->_bar, $btn);
 		return true;
 	}
 
 	/**
-	 * Get the list of toolbar links.
+	 * Get a value
 	 *
-	 * @return	array
-	 * @since	1.6
-	 */
-	public function getItems()
-	{
-		return $this->_bar;
-	}
-
-	/**
-	 * Get the name of the toolbar.
-	 *
-	 * @return	string
-	 * @since	1.6
-	 */
-	public function getName()
-	{
-		return $this->_name;
-	}
-
-	/**
-	 * Get a value.
-	 *
-	 * @param	string	The name of the param.
-	 * @param	mixed	The default value if not found.
+	 * @access	public
+	 * @param	string	The name of the param
+	 * @param	mixed	The default value if not found
 	 * @return	string
 	 */
-	public function prependButton()
+	function prependButton()
 	{
-		// Insert button into the front of the toolbar array.
+		// Insert button into the front of the toolbar array
 		$btn = func_get_args();
 		array_unshift($this->_bar, $btn);
 		return true;
 	}
 
 	/**
-	 * Render.
+	 * Render
 	 *
-	 * @param	string	The name of the control, or the default text area if a setup file is not found.
+	 * @access	public
+	 * @param	string	The name of the control, or the default text area if a setup file is not found
 	 * @return	string	HTML
 	 */
-	public function render()
+	function render()
 	{
 		$html = array ();
 
-		// Start toolbar div.
-		$html[] = '<div class="toolbar-list" id="'.$this->_name.'">';
-		$html[] = '<ul>';
+		// Start toolbar div
+		$html[] = '<div class="toolbar" id="'.$this->_name.'">';
+		$html[] = '<table class="toolbar"><tr>';
 
-		// Render each button in the toolbar.
+		// Render each button in the toolbar
 		foreach ($this->_bar as $button) {
 			$html[] = $this->renderButton($button);
 		}
 
-		// End toolbar div.
-		$html[] = '</ul>';
-		$html[] = '<div class="clr"></div>';
+		// End toolbar div
+		$html[] = '</tr></table>';
 		$html[] = '</div>';
 
 		return implode("\n", $html);
 	}
 
 	/**
-	 * Render a parameter type.
+	 * Render a parameter type
 	 *
-	 * @param	object	A param tag node.
-	 * @param	string	The control name.
-	 * @return	array	Any array of the label, the form element and the tooltip.
+	 * @param	object	A param tag node
+	 * @param	string	The control name
+	 * @return	array	Any array of the label, the form element and the tooltip
 	 */
-	public function renderButton(&$node)
+	function renderButton( &$node )
 	{
-		// Get the button type.
+		// Get the button type
 		$type = $node[0];
 
-		$button = $this->loadButtonType($type);
+		$button = & $this->loadButtonType($type);
 
-		// Check for error.
+		/**
+		 * Error Occurred
+		 */
 		if ($button === false) {
-			return JText::sprintf('JLIB_HTML_BUTTON_NOT_DEFINED', $type);
+			return JText::_('Button not defined for type').' = '.$type;
 		}
 		return $button->render($node);
 	}
 
 	/**
-	 * Loads a button type.
+	 * Loads a button type
 	 *
+	 * @access	public
 	 * @param	string	buttonType
 	 * @return	object
 	 * @since	1.5
 	 */
-	public function loadButtonType($type, $new = false)
+	function & loadButtonType($type, $new = false)
 	{
+		$false = false;
+
 		$signature = md5($type);
 		if (isset ($this->_buttons[$signature]) && $new === false) {
 			return $this->_buttons[$signature];
@@ -203,8 +202,8 @@ class JToolBar extends JObject
 
 		if (!class_exists('JButton'))
 		{
-			JError::raiseWarning('SOME_ERROR_CODE', JText::_('JLIB_HTML_BUTTON_BASE_CLASS'));
-			return false;
+			JError::raiseWarning( 'SOME_ERROR_CODE', 'Could not load button base class.' );
+			return $false;
 		}
 
 		$buttonClass = 'JButton'.$type;
@@ -216,21 +215,21 @@ class JToolBar extends JObject
 				$dirs = array ();
 			}
 
-			$file = JFilterInput::getInstance()->clean(str_replace('_', DS, strtolower($type)).'.php', 'path');
+			$file = JFilterInput::clean(str_replace('_', DS, strtolower($type)).'.php', 'path');
 
 			jimport('joomla.filesystem.path');
 			if ($buttonFile = JPath::find($dirs, $file)) {
 				include_once $buttonFile;
 			} else {
-				JError::raiseWarning('SOME_ERROR_CODE', JText::sprintf('JLIB_HTML_BUTTON_NO_LOAD', $buttonClass, $buttonFile));
-				return false;
+				JError::raiseWarning('SOME_ERROR_CODE', "Could not load module $buttonClass ($buttonFile).");
+				return $false;
 			}
 		}
 
 		if (!class_exists($buttonClass))
 		{
-			//return	JError::raiseError('SOME_ERROR_CODE', "Module file $buttonFile does not contain class $buttonClass.");
-			return false;
+			//return	JError::raiseError( 'SOME_ERROR_CODE', "Module file $buttonFile does not contain class $buttonClass." );
+			return $false;
 		}
 		$this->_buttons[$signature] = new $buttonClass($this);
 
@@ -238,7 +237,7 @@ class JToolBar extends JObject
 	}
 
 	/**
-	 * Add a directory where JToolBar should search for button types.
+	 * Add a directory where JToolBar should search for button types
 	 *
 	 * You may either pass a string or an array of directories.
 	 *
@@ -250,7 +249,7 @@ class JToolBar extends JObject
 	 * @param	string|array	directory or directories to search.
 	 * @since	1.5
 	 */
-	public function addButtonPath($path)
+	function addButtonPath($path)
 	{
 		if (is_array($path)) {
 			$this->_buttonPath = array_merge($this->_buttonPath, $path);

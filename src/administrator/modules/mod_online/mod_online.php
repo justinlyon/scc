@@ -1,21 +1,30 @@
 <?php
 /**
- * @version		$Id: mod_online.php 14276 2010-01-18 14:20:28Z louis $
- * @package		Joomla.Administrator
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
+* @version		$Id: mod_online.php 14401 2010-01-26 14:10:00Z louis $
+* @package		Joomla
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
 // no direct access
-defined('_JEXEC') or die;
+defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// Include the mod_online functions only once.
-require_once dirname(__FILE__).'/helper.php';
+$db			=& JFactory::getDBO();
+$session		=& JFactory::getSession();
 
-// Get layout data.
-$count = modOnlineHelper::getOnlineCount();
+$session_id = $session->getId();
 
-if ($count !== false) {
-	// Render the module.
-	require JModuleHelper::getLayoutPath('mod_online', $params->get('layout', 'default'));
-}
+// Get no. of users online not including current session
+$query = 'SELECT COUNT( session_id )'
+. ' FROM #__session'
+. ' WHERE session_id <> '.$db->Quote($session_id)
+;
+$db->setQuery($query);
+$online_num = intval( $db->loadResult() );
+
+echo $online_num . ' <img src="images/users.png" align="middle" alt="'. JText::_( 'Users Online' ) .'" />';

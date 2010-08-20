@@ -1,154 +1,150 @@
 <?php
 /**
- * @version		$Id: image.php 17854 2010-06-23 17:43:55Z eddieajau $
- * @package		Joomla.Framework
- * @subpackage	Html
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
+* @version		$Id: image.php 14401 2010-01-26 14:10:00Z louis $
+* @package		Joomla.Framework
+* @subpackage	HTML
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
-// No direct access.
-defined('_JEXEC') or die;
+// no direct access
+defined( '_JEXEC' ) or die( 'Restricted access' );
 
 /**
- * Utility class working with images.
+ * Utility class working with images
  *
- * @package		Joomla.Framework
- * @subpackage	Html
+ * @static
+ * @package 	Joomla.Framework
+ * @subpackage	HTML
  * @since		1.5
  */
-abstract class JHtmlImage
+class JHTMLImage
 {
 	/**
-	 * Checks to see if an image exists in the current templates image directory.
-	 * If it does it loads this image.  Otherwise the default image is loaded.
-	 * Also can be used in conjunction with the menulist param to create the chosen image
-	 * load the default or use no image.
-	 *
-	 * @param	string	$file		The file name, eg foobar.png.
-	 * @param	string	$folder		The path to the image.
-	 * @param	int		$altFile	Empty: use $file and $folder, -1: show no image, not-empty: use $altFile and $altFolder.
-	 * @param	string	$altFolder	Another path.  Only used for the contact us form based on the value of the imagelist param.
-	 * @param	string	$alt		Alternative text.
-	 * @param	array	$attribs	An associative array of attributes to add.
-	 * @param	bool	$asTag		True (default) to display full tag, false to return just the path.
-	 * @deprecated since 1.6
-	 */
-	public static function site($file, $folder = '/images/system/', $altFile = null, $altFolder = '/images/system/', $alt = null, $attribs = null, $asTag = true)
+	* Checks to see if an image exists in the current templates image directory
+ 	* if it does it loads this image.  Otherwise the default image is loaded.
+	* Also can be used in conjunction with the menulist param to create the chosen image
+	* load the default or use no image
+	*
+	* @param	string	The file name, eg foobar.png
+	* @param	string	The path to the image
+	* @param	int		empty: use $file and $folder, -1: show no image, not-empty: use $altFile and $altFolder
+	* @param	string	Another path.  Only used for the contact us form based on the value of the imagelist parm
+	* @param	string	Alt text
+	* @param	array	An associative array of attributes to add
+	* @param	boolean	True (default) to display full tag, false to return just the path
+	*/
+	function site( $file, $folder='/images/M_images/', $altFile=NULL, $altFolder='/images/M_images/', $alt=NULL, $attribs = null, $asTag = 1)
 	{
 		static $paths;
-		$app = JFactory::getApplication();
+		global $mainframe;
 
 		if (!$paths) {
 			$paths = array();
 		}
 
-		if (is_array($attribs)) {
-			$attribs = JArrayHelper::toString($attribs);
+		if (is_array( $attribs )) {
+			$attribs = JArrayHelper::toString( $attribs );
 		}
 
-		$cur_template = $app->getTemplate();
+		$cur_template = $mainframe->getTemplate();
 
-		// Strip HTML.
-		$alt = html_entity_decode($alt, ENT_COMPAT, 'UTF-8');
-
-		if ($altFile) {
+		if ( $altFile )
+		{
+			// $param allows for an alternative file to be used
 			$src = $altFolder . $altFile;
 		}
-		else if ($altFile == -1) {
-			return '';
-		}
-		else
+		else if ( $altFile == -1 )
 		{
+			// Comes from an image list param field with 'Do not use' selected
+			return '';
+		} else {
 			$path = JPATH_SITE .'/templates/'. $cur_template .'/images/'. $file;
-			if (!isset($paths[$path]))
+			if (!isset( $paths[$path] ))
 			{
-				if (file_exists(JPATH_SITE .'/templates/'. $cur_template .'/images/'. $file)) {
+				if ( file_exists( JPATH_SITE .'/templates/'. $cur_template .'/images/'. $file ) ) {
 					$paths[$path] = 'templates/'. $cur_template .'/images/'. $file;
-				}
-				else
-				{
-					// Outputs only path to image.
+				} else {
+					// outputs only path to image
 					$paths[$path] = $folder . $file;
 				}
 			}
 			$src = $paths[$path];
 		}
 
-		if (substr($src, 0, 1) == "/") {
+		if (substr($src, 0, 1 ) == "/") {
 			$src = substr_replace($src, '', 0, 1);
 		}
 
-		// Prepend the base path.
+		// Prepend the base path
 		$src = JURI::base(true).'/'.$src;
 
-		// Outputs actual html <img> tag.
+		// outputs actual html <img> tag
 		if ($asTag) {
-			return '<img src="'. $src .'" alt="'. html_entity_decode($alt, ENT_COMPAT, 'UTF-8') .'" '.$attribs.' />';
+			return '<img src="'. $src .'" alt="'. html_entity_decode( $alt ) .'" '.$attribs.' />';
 		}
 
 		return $src;
 	}
 
 	/**
-	 * Checks to see if an image exists in the current templates image directory
-	 * if it does it loads this image.  Otherwise the default image is loaded.
-	 * Also can be used in conjunction with the menulist param to create the chosen image
-	 * load the default or use no image
-	 *
-	 * @param	string	$file		The file name, eg foobar.png.
-	 * @param	string	$folder		The path to the image.
-	 * @param	int		$altFile	Empty: use $file and $folder, -1: show no image, not-empty: use $altFile and $altFolder.
-	 * @param	string	$altFolder	Another path.  Only used for the contact us form based on the value of the imagelist param.
-	 * @param	string	$alt		Alternative text.
-	 * @param	array	$attribs	An associative array of attributes to add.
-	 * @param	bool	$asTag		True (default) to display full tag, false to return just the path.
-	 * @deprecated since 1.6
-	 */
-	public static function administrator($file, $folder = '/images/', $altFile = null, $altFolder = '/images/', $alt = null, $attribs = null, $asTag = true)
+	* Checks to see if an image exists in the current templates image directory
+	* if it does it loads this image.  Otherwise the default image is loaded.
+	* Also can be used in conjunction with the menulist param to create the chosen image
+	* load the default or use no image
+	*
+	* @param	string	The file name, eg foobar.png
+	* @param	string	The path to the image
+	* @param	int		empty: use $file and $folder, -1: show no image, not-empty: use $altFile and $altFolder
+	* @param	string	Another path.  Only used for the contact us form based on the value of the imagelist parm
+	* @param	string	Alt text
+	* @param	array	An associative array of attributes to add
+	* @param	boolean	True (default) to display full tag, false to return just the path
+	*/
+	function administrator( $file, $directory='/images/', $param=NULL, $param_directory='/images/', $alt = NULL, $attribs = null, $type = 1 )
 	{
-		$app = JFactory::getApplication();
+		global $mainframe;
 
-		if (is_array($attribs)) {
-			$attribs = JArrayHelper::toString($attribs);
+		if (is_array( $attribs )) {
+			$attribs = JArrayHelper::toString( $attribs );
 		}
 
-		$cur_template = $app->getTemplate();
+		$cur_template = $mainframe->getTemplate();
 
-		// Strip HTML.
-		$alt = html_entity_decode($alt, ENT_COMPAT, 'UTF-8');
+		// strip html
+		$alt	= html_entity_decode( $alt );
 
-		if ($altFile) {
-			$image = $altFolder . $altFile;
-		}
-		else if ($altFile == -1) {
+		if ( $param ) {
+			$image = $param_directory . $param;
+		} else if ( $param == -1 ) {
 			$image = '';
-		}
-		else
-		{
-			if (file_exists(JPATH_ADMINISTRATOR .'/templates/'. $cur_template .'/images/'. $file)) {
+		} else {
+			if ( file_exists( JPATH_ADMINISTRATOR .'/templates/'. $cur_template .'/images/'. $file ) ) {
 				$image = 'templates/'. $cur_template .'/images/'. $file;
-			}
-			else
-			{
-				// Compability with previous versions.
-				if (substr($folder, 0, 14) == "/administrator") {
-					$image = substr($folder, 15) . $file;
+			} else {
+				// compability with previous versions
+				if ( substr($directory, 0, 14 )== "/administrator" ) {
+					$image = substr($directory,15) . $file;
 				} else {
-					$image = $folder . $file;
+					$image = $directory . $file;
 				}
 			}
 		}
 
-		if (substr($image, 0, 1) == "/") {
+		if (substr($image, 0, 1 ) == "/") {
 			$image = substr_replace($image, '', 0, 1);
 		}
 
-		// Prepend the base path.
+		// Prepend the base path
 		$image = JURI::base(true).'/'.$image;
 
-		// Outputs actual html <img> tag.
-		if ($asTag) {
+		// outputs actual html <img> tag
+		if ( $type ) {
 			$image = '<img src="'. $image .'" alt="'. $alt .'" '.$attribs.' />';
 		}
 

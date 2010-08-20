@@ -3,12 +3,17 @@
  * @version		$id:$
  * @package		Joomla.Framework
  * @subpackage	Cache
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant
+ * to the GNU General Public License, and as distributed it includes or
+ * is derivative of works licensed under the GNU General Public License or
+ * other free or open source software licenses.
+ * See COPYRIGHT.php for copyright notices and details.
  */
 
-// No direct access
-defined('JPATH_BASE') or die;
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 /**
  * XCache cache storage handler
@@ -17,98 +22,74 @@ defined('JPATH_BASE') or die;
  * @subpackage	Cache
  * @since		1.5
  */
-class JCacheStorageXcache extends JCacheStorage
+class JCacheStorageXCache extends JCacheStorage
 {
+	/**
+	* Constructor
+	*
+	* @access protected
+	* @param array $options optional parameters
+	*/
+	function __construct( $options = array() )
+	{
+		parent::__construct($options);
+
+		$config			=& JFactory::getConfig();
+		$this->_hash	= $config->getValue('config.secret');
+	}
+
 	/**
 	 * Get cached data by id and group
 	 *
+	 * @access	public
 	 * @param	string	$id			The cache data id
 	 * @param	string	$group		The cache data group
 	 * @param	boolean	$checkTime	True to verify cache time expiration threshold
 	 * @return	mixed	Boolean false on failure or a cached data string
 	 * @since	1.5
 	 */
-	public function get($id, $group, $checkTime)
+	function get($id, $group, $checkTime)
 	{
 		$cache_id = $this->_getCacheId($id, $group);
-		$cache_content = xcache_get($cache_id);
 
-		if ($cache_content === null) {
+		//check if id exists
+		if( !xcache_isset( $cache_id ) ){
 			return false;
 		}
 
-		return $cache_content;
-	}
-
-	/**
-	 * Get all cached data
-	 *
-	 *  requires the php.ini setting xcache.admin.enable_auth = Off
-	 *
-	 * @return	array data
-	 * @since	1.6
-	 */
-	public function getAll()
-	{
-		parent::getAll();
-
-		$allinfo 	= xcache_list(XC_TYPE_VAR, 0);
-		$keys 		= $allinfo['cache_list'];
-		$secret 	= $this->_hash;
-
-		$data = array();
-
-		foreach ($keys as $key) {
-
-			$namearr = explode('-',$key['name']);
-
-			if ($namearr !== false && $namearr[0]==$secret &&  $namearr[1]=='cache') {
-				$group = $namearr[2];
-
-				if (!isset($data[$group])) {
-					$item = new JCacheStorageHelper($group);
-				} else {
-					$item = $data[$group];
-				}
-
-				$item->updateSize($key['size']/1024);
-
-				$data[$group] = $item;
-			}
-		}
-
-		return $data;
+		return xcache_get($cache_id);
 	}
 
 	/**
 	 * Store the data by id and group
 	 *
+	 * @access	public
 	 * @param	string	$id		The cache data id
 	 * @param	string	$group	The cache data group
 	 * @param	string	$data	The data to store in cache
 	 * @return	boolean	True on success, false otherwise
 	 * @since	1.5
 	 */
-	public function store($id, $group, $data)
+	function store($id, $group, $data)
 	{
 		$cache_id = $this->_getCacheId($id, $group);
-		$store = xcache_set($cache_id, $data, $this->_lifetime);
-		return $store;
+		return xcache_set($cache_id, $data, $this->_lifetime);
 	}
 
 	/**
 	 * Remove a cached data entry by id and group
 	 *
+	 * @access	public
 	 * @param	string	$id		The cache data id
 	 * @param	string	$group	The cache data group
 	 * @return	boolean	True on success, false otherwise
 	 * @since	1.5
 	 */
-	public function remove($id, $group)
+	function remove($id, $group)
 	{
 		$cache_id = $this->_getCacheId($id, $group);
 
-		if (!xcache_isset($cache_id)){
+		if( !xcache_isset( $cache_id ) ){
 			return true;
 		}
 
@@ -118,70 +99,44 @@ class JCacheStorageXcache extends JCacheStorage
 	/**
 	 * Clean cache for a group given a mode.
 	 *
-	 * requires the php.ini setting xcache.admin.enable_auth = Off
-	 *
 	 * group mode		: cleans all cache in the group
 	 * notgroup mode	: cleans all cache not in the group
 	 *
+	 * @access	public
 	 * @param	string	$group	The cache data group
 	 * @param	string	$mode	The mode for cleaning cache [group|notgroup]
 	 * @return	boolean	True on success, false otherwise
 	 * @since	1.5
 	 */
-	public function clean($group, $mode)
+	function clean($group, $mode)
 	{
-		$allinfo = xcache_list(XC_TYPE_VAR, 0);
-		$keys = $allinfo['cache_list'];
-
-		$secret = $this->_hash;
-		foreach ($keys as $key) {
-
-		if (strpos($key['name'], $secret.'-cache-'.$group.'-')===0 xor $mode != 'group')
-			xcache_unset($key['name']);
-		}
-		return true;
-	}
-
-	/**
-	 * Garbage collect expired cache data
-	 *
-	 * @return boolean  True on success, false otherwise.
-	 * @since	1.6
-	 */
-	public function gc()
-	{
-		// dummy, xcache has builtin garbage collector, turn it on in php.ini by changing default xcache.gc_interval setting from 0 to 3600 (=1 hour)
-
-		/**
-		$now = time();
-
-		$cachecount = xcache_count(XC_TYPE_VAR);
-
-			for ($i = 0; $i < $cachecount; $i ++) {
-
-				$allinfo  = xcache_list(XC_TYPE_VAR, $i);
-				$keys = $allinfo ['cache_list'];
-
-				foreach($keys as $key) {
-
-					if (strstr($key['name'], $this->_hash)) {
-						if (($key['ctime'] + $this->_lifetime ) < $this->_now) xcache_unset($key['name']);
-					}
-				}
-			}
-
-		 */
-
 		return true;
 	}
 
 	/**
 	 * Test to see if the cache storage is available.
 	 *
+	 * @static
+	 * @access public
 	 * @return boolean  True on success, false otherwise.
 	 */
-	public static function test()
+	function test()
 	{
 		return (extension_loaded('xcache'));
+	}
+
+	/**
+	 * Get a cache_id string from an id/group pair
+	 *
+	 * @access	private
+	 * @param	string	$id		The cache data id
+	 * @param	string	$group	The cache data group
+	 * @return	string	The cache_id string
+	 * @since	1.5
+	 */
+	function _getCacheId($id, $group)
+	{
+		$name	= md5($this->_application.'-'.$id.'-'.$this->_hash.'-'.$this->_language);
+		return 'cache_'.$group.'-'.$name;
 	}
 }

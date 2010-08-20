@@ -1,18 +1,29 @@
 <?php
 /**
- * @version		$Id: contact.php 15976 2010-04-10 04:44:23Z hackwar $
- * @package		Joomla.Site
+ * @version		$Id: contact.php 14401 2010-01-26 14:10:00Z louis $
+ * @package		Joomla
  * @subpackage	Contact
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant to the
+ * GNU General Public License, and as distributed it includes or is derivative
+ * of works licensed under the GNU General Public License or other free or open
+ * source software licenses. See COPYRIGHT.php for copyright notices and
+ * details.
  */
 
 // no direct access
-defined('_JEXEC') or die;
+defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.controller');
-require_once JPATH_COMPONENT.'/helpers/route.php';
+jimport('joomla.application.component.helper');
 
-$controller = JController::getInstance('Contact');
-$controller->execute(JRequest::getCmd('task'));
+require_once(JPATH_COMPONENT.DS.'controller.php');
+
+// Create the controller
+$controller = new ContactController();
+
+// Perform the Request task
+$controller->execute(JRequest::getVar('task', null, 'default', 'cmd'));
+
+// Redirect if set by the controller
 $controller->redirect();

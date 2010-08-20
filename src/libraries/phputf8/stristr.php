@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: stristr.php 16235 2010-04-20 04:13:25Z pasamio $
+* @version $Id: stristr.php 10381 2008-06-01 03:35:53Z pasamio $
 * @package utf8
 * @subpackage strings
 */
@@ -26,7 +26,7 @@ function utf8_stristr($str, $search) {
 
     $lstr = utf8_strtolower($str);
     $lsearch = utf8_strtolower($search);
-    preg_match('/^(.*)'.preg_quote($lsearch).'/Us',$lstr, $matches);
+    preg_match('|^(.*)'.preg_quote($lsearch).'|Us',$lstr, $matches);
 
     if ( count($matches) == 2 ) {
         return substr($str, strlen($matches[1]));

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="system">
+	<name>sh404sef - System plugin</name>
+	<author>Yannick Gaultier</author>
+	<creationDate>2010-08-09</creationDate>
+	<copyright>2010 - Yannick Gaultier</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+	<authorEmail>admin@anything-digital.com</authorEmail>
+	<authorUrl>dev.anything-digital.com</authorUrl>
+	<version>2.0.3.545</version>
+	<description>Hook up with sh404SEF routing</description>
+	<files>
+		<filename plugin="shsef">shsef.php</filename>
+	</files>
+	<params>
+		<param name="plugin_element" default="shsef" type="hidden" />
+		<param name="plugin_folder" default="system" type="hidden" />
+	</params>
+</install>

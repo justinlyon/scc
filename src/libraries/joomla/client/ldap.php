@@ -1,16 +1,15 @@
 <?php
 
 /**
- * @version		$Id: ldap.php 15970 2010-04-09 08:43:18Z infograf768 $
- * @package		Joomla.Framework
- * @subpackage	Client
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
-
-
-// No direct access
-defined('JPATH_BASE') or die();
+* @version		$Id: ldap.php 14401 2010-01-26 14:10:00Z louis $
+* @package		Joomla.Framework
+* @subpackage	Client
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+* Joomla! is free software and parts of it may contain or be derived from the
+* GNU General Public License or other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
 /**
  * LDAP client class
@@ -19,6 +18,10 @@ defined('JPATH_BASE') or die();
  * @subpackage	Client
  * @since		1.5
  */
+
+// no direct access
+defined('_JEXEC') or die('Restricted access');
+
 class JLDAP extends JObject
 {
 	/** @var string Hostname of LDAP server
@@ -135,7 +138,7 @@ class JLDAP extends JObject
 	{
 		if ($this->users_dn == '' || $nosub) {
 			$this->_dn = $username;
-		} else if (strlen($username)) {
+		} else if(strlen($username)) {
 			$this->_dn = str_replace('[username]', $username, $this->users_dn);
 		} else {
 			$this->_dn = '';
@@ -176,7 +179,7 @@ class JLDAP extends JObject
 			$password = $this->password;
 		}
 		$this->setDN($username,$nosub);
-		//if (strlen($this->getDN()))
+		//if(strlen($this->getDN()))
 		$bindResult = @ldap_bind($this->_resource, $this->getDN(), $password);
 		return $bindResult;
 	}
@@ -405,14 +408,14 @@ class JLDAP extends JObject
 	 *  Novell Docs, see: http://developer.novell.com/ndk/doc/ndslib/schm_enu/data/sdk5624.html#sdk5624
 	 *  for Address types: http://developer.novell.com/ndk/doc/ndslib/index.html?page=/ndk/doc/ndslib/schm_enu/data/sdk4170.html
 	 *  LDAP Format, String:
-	 *	taggedData = uint32String "#" octetstring
-	 *	byte 0 = uint32String = Address Type: 0= IPX Address; 1 = IP Address
-	 *	byte 1 = char = "#" - separator
-	 *	byte 2+ = octetstring - the ordinal value of the address
-	 *	Note: with eDirectory 8.6.2, the IP address (type 1) returns
-	 *				correctly, however, an IPX address does not seem to.  eDir 8.7 may correct this.
+	 *	 taggedData = uint32String "#" octetstring
+	 *	 byte 0 = uint32String = Address Type: 0= IPX Address; 1 = IP Address
+	 *	 byte 1 = char = "#" - separator
+	 *	 byte 2+ = octetstring - the ordinal value of the address
+	 *   Note: with eDirectory 8.6.2, the IP address (type 1) returns
+	 *				 correctly, however, an IPX address does not seem to.  eDir 8.7 may correct this.
 	 *  Enhancement made by Merijn van de Schoot:
-	 *	If addresstype is 8 (UDP) or 9 (TCP) do some additional parsing like still returning the IP address
+	 *	 If addresstype is 8 (UDP) or 9 (TCP) do some additional parsing like still returning the IP address
 	 */
 	function LDAPNetAddr($networkaddress)
 	{
@@ -449,15 +452,15 @@ class JLDAP extends JObject
 			{
 				$byte = substr($networkaddress, $i, 1);
 				$addr .= ord($byte);
-				if (($addrtype == 1) || ($addrtype == 8) || ($addrtype = 9)) { // dot separate IP addresses...
+				if ( ($addrtype == 1) || ($addrtype == 8) || ($addrtype = 9) ) { // dot separate IP addresses...
 					$addr .= ".";
 				}
 			}
-			if (($addrtype == 1) || ($addrtype == 8) || ($addrtype = 9)) { // strip last period from end of $addr
+			if ( ($addrtype == 1) || ($addrtype == 8) || ($addrtype = 9) ) { // strip last period from end of $addr
 				$addr = substr($addr, 0, strlen($addr) - 1);
 			}
 		} else {
-			$addr .= JText::_('JLIB_CLIENT_ERROR_LDAP_ADDRESS_NOT_AVAILABLE');
+			$addr .= "address not available.";
 		}
 		return Array('protocol'=>$addrtypes[$addrtype], 'address'=>$addr);
 	}
@@ -473,10 +476,10 @@ class JLDAP extends JObject
 		$userpassword = '';
 		switch(strtolower($type)) {
 			case 'sha':
-				$userpassword = '{SHA}' . base64_encode(pack('H*', sha1($password)));
+				$userpassword = '{SHA}' . base64_encode( pack( 'H*', sha1( $password ) ) );
 			case 'md5':
 			default:
-				$userpassword = '{MD5}' . base64_encode(pack('H*', md5($password)));
+				$userpassword = '{MD5}' . base64_encode( pack( 'H*', md5( $password ) ) );
 				break;
 		}
 		return $userpassword;

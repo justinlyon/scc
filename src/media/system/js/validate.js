@@ -1,8 +1,14 @@
 /**
- * @version		$Id: validate.js 17911 2010-06-28 08:30:03Z ian $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
+* @version		$Id: validate.js 7401 2007-05-14 04:12:55Z eddieajau $
+* @package		Joomla
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
 /**
  * Unobtrusive Form Validation library
@@ -63,8 +69,9 @@ var JFormValidator = new Class({
 	attachToForm: function(form)
 	{
 		// Iterate through the form object and attach the validate method to all input fields.
-		form.getElements('fieldset').concat($A(form.elements)).each(function(el){
-			if (($(el).get('tag') == 'input' || $(el).get('tag') == 'button') && $(el).get('type') == 'submit') {
+		$A(form.elements).each(function(el){
+			el = $(el);
+			if ((el.getTag() == 'input' || el.getTag() == 'button') && el.getProperty('type') == 'submit') {
 				if (el.hasClass('validate')) {
 					el.onclick = function(){return document.formvalidator.isValid(this.form);};
 				}
@@ -76,23 +83,9 @@ var JFormValidator = new Class({
 
 	validate: function(el)
 	{
-		var el = $(el);
 		// If the field is required make sure it has a value
-		if (el.hasClass('required')) {
-			if (el.get('tag')=='fieldset' && (el.hasClass('radio') || el.hasClass('checkboxes'))) {
-				for(var i=0;;i++) {
-					if (document.id(el.get('id')+i)) {
-						if (document.id(el.get('id')+i).checked) {
-							break;
-						}
-					}
-					else {
-						this.handleResponse(false, el);
-						return false;
-					}
-				}
-			}
-			else if (!(el.get('value'))) {
+		if ($(el).hasClass('required')) {
+			if (!($(el).getValue())) {
 				this.handleResponse(false, el);
 				return false;
 			}
@@ -106,9 +99,9 @@ var JFormValidator = new Class({
 		}
 
 		// Check the additional validation types
-		if ((handler) && (handler != 'none') && (this.handlers[handler]) && el.get('value')) {
+		if ((handler) && (handler != 'none') && (this.handlers[handler]) && $(el).getValue()) {
 			// Execute the validation handler and return result
-			if (this.handlers[handler].exec(el.get('value')) != true) {
+			if (this.handlers[handler].exec($(el).getValue()) != true) {
 				this.handleResponse(false, el);
 				return false;
 			}
@@ -124,15 +117,14 @@ var JFormValidator = new Class({
 		var valid = true;
 
 		// Validate form fields
-		var elements = form.getElements('fieldset').concat($A(form.elements));
-		for (var i=0;i < elements.length; i++) {
-			if (this.validate(elements[i]) == false) {
+		for (var i=0;i < form.elements.length; i++) {
+			if (this.validate(form.elements[i]) == false) {
 				valid = false;
 			}
 		}
 
 		// Run custom form validators if present
-		new Hash(this.custom).each(function(validator){
+		$A(this.custom).each(function(validator){
 			if (validator.exec() != true) {
 				valid = false;
 			}
@@ -147,7 +139,7 @@ var JFormValidator = new Class({
 		if (!(el.labelref)) {
 			var labels = $$('label');
 			labels.each(function(label){
-				if (label.get('for') == el.get('id')) {
+				if (label.getProperty('for') == el.getProperty('id')) {
 					el.labelref = label;
 				}
 			});
@@ -157,18 +149,18 @@ var JFormValidator = new Class({
 		if (state == false) {
 			el.addClass('invalid');
 			if (el.labelref) {
-				document.id(el.labelref).addClass('invalid');
+				$(el.labelref).addClass('invalid');
 			}
 		} else {
 			el.removeClass('invalid');
 			if (el.labelref) {
-				document.id(el.labelref).removeClass('invalid');
+				$(el.labelref).removeClass('invalid');
 			}
 		}
 	}
 });
 
 document.formvalidator = null;
-window.addEvent('domready', function(){
+Window.onDomReady(function(){
 	document.formvalidator = new JFormValidator();
 });

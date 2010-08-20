@@ -1,41 +1,35 @@
 <?php
 /**
- * @version		$Id: media.php 17998 2010-07-01 19:39:08Z eddieajau $
- * @package		Joomla.Site
+ * @version		$Id: media.php 14401 2010-01-26 14:10:00Z louis $
+ * @package		Joomla
  * @subpackage	Massmail
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant to the
+ * GNU General Public License, and as distributed it includes or is derivative
+ * of works licensed under the GNU General Public License or other free or open
+ * source software licenses. See COPYRIGHT.php for copyright notices and
+ * details.
  */
 
 // no direct access
-defined('_JEXEC') or die;
-
-$params = JComponentHelper::getParams('com_media');
-$ranks = array('publisher', 'editor', 'author', 'registered');
-$acl = JFactory::getACL();
-
-// TODO: Fix this ACL call
-		//for($i = 0; $i < $params->get('allowed_media_usergroup', 3); $i++)
-		//{
-		//	$acl->addACL('com_media', 'popup', 'users', $ranks[$i]);
-		//}
-
+defined('_JEXEC') or die('Restricted access');
+$params =& JComponentHelper::getParams('com_media');
 // Make sure the user is authorized to view this page
-$user = JFactory::getUser();
-$app	= JFactory::getApplication();
-if (!$user->authorise('com_media', 'popup')) {
-	$app->redirect('index.php', JText::_('JERROR_ALERTNOAUTHOR'));
+$user = & JFactory::getUser();
+if (!$user->authorize( 'com_media', 'popup' )) {
+	$mainframe->redirect('index.php', JText::_('ALERTNOTAUTH'));
 }
 
 // Set the path definitions
-define('COM_MEDIA_BASE',	JPATH_ROOT.DS.$params->get('image_path', 'images'));
-define('COM_MEDIA_BASEURL', JURI::root().'/'.$params->get('image_path', 'images'));
+define('COM_MEDIA_BASE',    JPath::clean(JPATH_ROOT.DS.$params->get('image_path', 'images'.DS.'stories')));
+define('COM_MEDIA_BASEURL', JURI::root(true).'/'.$params->get('image_path', 'images/stories'));
 
 // Load the admin HTML view
-require_once JPATH_COMPONENT_ADMINISTRATOR.DS.'helpers'.DS.'media.php';
+require_once( JPATH_COMPONENT_ADMINISTRATOR.DS.'helpers'.DS.'media.php' );
 
 // Require the base controller
-require_once JPATH_COMPONENT.DS.'controller.php';
+require_once (JPATH_COMPONENT.DS.'controller.php');
 
 $cmd = JRequest::getCmd('task', null);
 if (strpos($cmd, '.') != false)
@@ -49,9 +43,9 @@ if (strpos($cmd, '.') != false)
 
 	// If the controller file path exists, include it ... else lets die with a 500 error
 	if (file_exists($controllerPath)) {
-		require_once $controllerPath;
+		require_once($controllerPath);
 	} else {
-		JError::raiseError(500, 'JERROR_INVALID_CONTROLLER');
+		JError::raiseError(500, 'Invalid Controller');
 	}
 }
 else
@@ -65,7 +59,7 @@ $controllerClass = 'MediaController'.ucfirst($controllerName);
 if (class_exists($controllerClass)) {
 	$controller = new $controllerClass();
 } else {
-	JError::raiseError(500, 'JERROR_INVALID_CONTROLLER_CLASS');
+	JError::raiseError(500, 'Invalid Controller Class');
 }
 
 // Set the model and view paths to the administrator folders

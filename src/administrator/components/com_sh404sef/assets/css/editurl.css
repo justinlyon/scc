@@ -1,0 +1,35 @@
+/**
+ * SEF module for Joomla!
+ *
+ * @author      $Author: shumisha $
+ * @copyright   Yannick Gaultier - 2007-2010
+ * @package     sh404SEF-15
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @version     $Id: editurl.css 1414 2010-05-23 21:04:41Z silianacom-svn $
+ */
+
+.sh404sef-popup #content-box {
+  border-left: none;
+  border-right: none;
+}
+
+.icon-48-sh404sef { background-image: url(../images/icon-48-sh404sef-logo.png); }
+.icon-32-cpanel { background-image: url(../images/icon-32-cpanel.png); }
+
+div.sh404sef-toolbar-title {
+  font-size: 22px; font-weight: bold; color: #0B55C4; line-height: 48px;
+  padding-left: 135px;
+  background-repeat: no-repeat;
+  margin-left: 10px;
+}
+
+.sh404sef-popup td.key {
+  text-align: right;
+}
+
+.sh-ajax-loading { 
+  background-image: url(../images/sh-ajax-loader-wide.gif);
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+  

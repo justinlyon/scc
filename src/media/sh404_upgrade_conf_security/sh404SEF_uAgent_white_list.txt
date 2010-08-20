@@ -1,0 +1,1 @@
+# sh404SEF User agent string white list file

@@ -1,20 +1,22 @@
 <?php
 /**
- * @version		$Id: arrayhelper.php 17854 2010-06-23 17:43:55Z eddieajau $
+ * @version		$Id: arrayhelper.php 14401 2010-01-26 14:10:00Z louis $
  * @package		Joomla.Framework
  * @subpackage	Utilities
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant to the
+ * GNU General Public License, and as distributed it includes or is derivative
+ * of works licensed under the GNU General Public License or other free or open
+ * source software licenses. See COPYRIGHT.php for copyright notices and
+ * details.
  */
-
-// No direct access
-defined('JPATH_BASE') or die;
-
+defined('JPATH_BASE') or die();
 /**
  * JArrayHelper is an array utility class for doing all sorts of odds and ends with arrays.
  *
  * @static
- * @package		Joomla.Framework
+ * @package 	Joomla.Framework
  * @subpackage	Utilities
  * @since		1.5
  */
@@ -28,7 +30,7 @@ class JArrayHelper
 	 * @param	mixed	$default	A default value (int|array) to assign if $array is not an array
 	 * @since	1.5
 	 */
-	public static function toInteger(&$array, $default = null)
+	function toInteger(&$array, $default = null)
 	{
 		if (is_array($array)) {
 			foreach ($array as $i => $v) {
@@ -41,7 +43,7 @@ class JArrayHelper
 				JArrayHelper::toInteger($default, null);
 				$array = $default;
 			} else {
-				$array = array((int) $default);
+				$array = array( (int) $default );
 			}
 		}
 	}
@@ -51,16 +53,18 @@ class JArrayHelper
 	 *
 	 * @static
 	 * @param	array	$array		The array to map.
-	 * @param	string	$calss		Name of the class to create
+	 * @param	string	$calss 		Name of the class to create
 	 * @return	object	The object mapped from the given array
 	 * @since	1.5
 	 */
-	public static function toObject(&$array, $class = 'stdClass')
+	function toObject(&$array, $class = 'stdClass')
 	{
 		$obj = null;
-		if (is_array($array)) {
+		if (is_array($array))
+		{
 			$obj = new $class();
-			foreach ($array as $k => $v) {
+			foreach ($array as $k => $v)
+			{
 				if (is_array($v)) {
 					$obj->$k = JArrayHelper::toObject($v, $class);
 				} else {
@@ -71,25 +75,29 @@ class JArrayHelper
 		return $obj;
 	}
 
-	public static function toString($array = null, $inner_glue = '=', $outer_glue = ' ', $keepOuterKey = false)
+	function toString( $array = null, $inner_glue = '=', $outer_glue = ' ', $keepOuterKey = false )
 	{
 		$output = array();
 
-		if (is_array($array)) {
-			foreach ($array as $key => $item) {
-				if (is_array ($item)) {
+		if (is_array($array))
+		{
+			foreach ($array as $key => $item)
+			{
+				if (is_array ($item))
+				{
 					if ($keepOuterKey) {
 						$output[] = $key;
 					}
 					// This is value is an array, go and do it again!
-					$output[] = JArrayHelper::toString($item, $inner_glue, $outer_glue, $keepOuterKey);
-				} else {
+					$output[] = JArrayHelper::toString( $item, $inner_glue, $outer_glue, $keepOuterKey);
+				}
+				else {
 					$output[] = $key.$inner_glue.'"'.$item.'"';
 				}
 			}
 		}
 
-		return implode($outer_glue, $output);
+		return implode( $outer_glue, $output);
 	}
 
 	/**
@@ -102,24 +110,30 @@ class JArrayHelper
 	 * @return	array	The array mapped from the given object
 	 * @since	1.5
 	 */
-	public static function fromObject($p_obj, $recurse = true, $regex = null)
+	function fromObject( $p_obj, $recurse = true, $regex = null )
 	{
 		$result = null;
-		if (is_object($p_obj)) {
+		if (is_object( $p_obj ))
+		{
 			$result = array();
-
-			foreach (get_object_vars($p_obj) as $k => $v) {
-				if ($regex) {
-					if (!preg_match($regex, $k)) {
+			foreach (get_object_vars($p_obj) as $k => $v)
+			{
+				if ($regex)
+				{
+					if (!preg_match( $regex, $k ))
+					{
 						continue;
 					}
 				}
-
-				if (is_object($v)) {
-					if ($recurse) {
-						$result[$k] = JArrayHelper::fromObject($v, $recurse, $regex);
+				if (is_object( $v ))
+				{
+					if ($recurse)
+					{
+						$result[$k] = JArrayHelper::fromObject( $v, $recurse, $regex );
 					}
-				} else {
+				}
+				else
+				{
 					$result[$k] = $v;
 				}
 			}
@@ -136,16 +150,16 @@ class JArrayHelper
 	 * @return	array	Column of values from the source array
 	 * @since	1.5
 	 */
-	public static function getColumn(&$array, $index)
+	function getColumn(&$array, $index)
 	{
 		$result = array ();
 
-		if (is_array($array)) {
+		if (is_array($array))
+		{
 			$n = count($array);
-
-			for ($i = 0; $i < $n; $i++) {
+			for ($i = 0; $i < $n; $i++)
+			{
 				$item = & $array[$i];
-
 				if (is_array($item) && isset ($item[$index])) {
 					$result[] = $item[$index];
 				} elseif (is_object($item) && isset ($item-> $index)) {
@@ -168,9 +182,9 @@ class JArrayHelper
 	 * @return	mixed	The value from the source array
 	 * @since	1.5
 	 */
-	public static function getValue(&$array, $name, $default=null, $type='')
+	function getValue(&$array, $name, $default=null, $type='')
 	{
-		// Initialise variables.
+		// Initialize variables
 		$result = null;
 
 		if (isset ($array[$name])) {
@@ -183,7 +197,8 @@ class JArrayHelper
 		}
 
 		// Handle the type constraint
-		switch (strtoupper($type)) {
+		switch (strtoupper($type))
+		{
 			case 'INT' :
 			case 'INTEGER' :
 				// Only use the first integer value
@@ -214,7 +229,7 @@ class JArrayHelper
 				break;
 
 			case 'WORD' :
-				$result = (string) preg_replace('#\W#', '', $result);
+				$result = (string) preg_replace( '#\W#', '', $result );
 				break;
 
 			case 'NONE' :
@@ -226,43 +241,23 @@ class JArrayHelper
 	}
 
 	/**
-	 * Method to determine if an array is an associative array.
-	 *
-	 * @param	array		An array to test.
-	 * @return	boolean		True if the array is an associative array.
-	 * @since	1.6
-	 */
-	public static function isAssociative($array)
-	{
-		if (is_array($array)) {
-			foreach (array_keys($array) as $k => $v) {
-				if ($k !== $v) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Utility function to sort an array of objects on a given field
 	 *
 	 * @static
-	 * @param	array			$arr		An array of objects
-	 * @param	string|array	$k			The key or a array of key to sort on
-	 * @param	int|array		$direction	Direction or an array of direction to sort in [1 = Ascending] [-1 = Descending]
-	 * @return	array						The sorted array of objects
+	 * @param	array	$arr		An array of objects
+	 * @param	string	$k			The key to sort on
+	 * @param	int		$direction	Direction to sort in [1 = Ascending] [-1 = Descending]
+	 * @return	array	The sorted array of objects
 	 * @since	1.5
 	 */
-	public static function sortObjects(&$a, $k, $direction=1)
+	function sortObjects( &$a, $k, $direction=1 )
 	{
 		$GLOBALS['JAH_so'] = array(
-			'key'		=> (array)$k,
-			'direction'	=> (array)$direction
+			'key'		=> $k,
+			'direction'	=> $direction
 		);
-		usort($a, array('JArrayHelper', '_sortObjects'));
-		unset($GLOBALS['JAH_so']);
+		usort( $a, array('JArrayHelper', '_sortObjects') );
+		unset( $GLOBALS['JAH_so'] );
 
 		return $a;
 	}
@@ -277,22 +272,14 @@ class JArrayHelper
 	 * @since	1.5
 	 * @see		JArrayHelper::sortObjects()
 	 */
-	public static function _sortObjects(&$a, &$b)
+	function _sortObjects( &$a, &$b )
 	{
 		$params = $GLOBALS['JAH_so'];
-
-		for($i=0,$count=count($params['key']);$i<$count;$i++) {
-			if (array_key_exists($i,$params['direction'])) {
-				$direction = $params['direction'][$i];
-			}
-
-			if ($a->$params['key'][$i] > $b->$params['key'][$i]) {
-				return $direction;
-			}
-
-			if ($a->$params['key'][$i] < $b->$params['key'][$i]) {
-				return -1 * $direction;
-			}
+		if ( $a->$params['key'] > $b->$params['key'] ) {
+			return $params['direction'];
+		}
+		if ( $a->$params['key'] < $b->$params['key'] ) {
+			return -1 * $params['direction'];
 		}
 		return 0;
 	}

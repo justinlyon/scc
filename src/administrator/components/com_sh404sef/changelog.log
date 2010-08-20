@@ -1,0 +1,240 @@
+                              sh404sef2 change log
+
+
+                         (09/08/10 16:15 - build #545)
+
+
+
+--------------------------------------------------------------------------------
+ [2010-08-09] Version 2.0.3.545
+--------------------------------------------------------------------------------
+
+2010-08-09
+     [bug] Debugging information left when packaging version 2.0.2, show cache
+           hits/misses at bottom of page
+
+--------------------------------------------------------------------------------
+ [2010-08-08] Version 2.0.2.542
+--------------------------------------------------------------------------------
+
+2010-08-08
+     [chg] Updated German translation by Jürgen Hörmann
+           Tracker #150
+     [bug] Incorrect Discussion "show all" url in JomSocial
+           Tracker #145
+2010-07-25
+     [bug] Meta management not performed if sh404sef is globally disabled
+2010-07-20
+     [chg] Updated language in manifest file
+2010-07-19
+     [chg] SQL character set instructions are now surrounded in single quotes,
+           seems to fix some Mysql-server version related issues
+     [chg] Added warning to tooltips that Trim friendly char should not be left
+           empty
+2010-07-18
+     [new] Added protection for class autoloading feature in case other
+           extension use similar function
+2010-07-09
+     [bug] Similar urls plugin throw error if request is shorter than minimum
+           number of characters it is set to search for
+           Tracker #174
+     [bug] Wrong language tag inserted in Joomla and Virtuemart pages
+           Tracker #177
+2010-07-05
+     [bug] pageId tag in content is deleted when editing content on frontend
+           Tracker #169
+
+--------------------------------------------------------------------------------
+ [2010-06-30] Version 2.0.1.531
+--------------------------------------------------------------------------------
+
+2010-06-30
+     [bug] Prepending and appending to page title do not work on other than
+           Joomla regular content pages
+           Tracker #166
+     [chg] Prevented possible warning in admin when using JRequest::getVar(
+           'client'...
+     [chg] Updated Jomsocial plugin to work with events, added in JS 1.8
+           Tracker #162
+     [new] Improved method for detecting POST data before performing redirections
+     [bug] May sometimes display warnings ("Could not delete folder") when
+           uninstalling sh404sef
+     [bug] May display 2 instances of the submenu bar
+           Tracker #158
+     [chg] Component prefix is now always added to SEF url when using a
+           router.php file, as these routers do not add prefix by themselves
+     [chg] Improved SEF urls for com_contact default component
+2010-06-25
+     [bug] Cannot edit 404 page in Chrome
+           Tracker #159
+
+--------------------------------------------------------------------------------
+ [2010-06-15] Version 2.0.0.RC.522
+--------------------------------------------------------------------------------
+
+2010-06-12
+     [chg] Changed pageId on page display tag from {sh404sef_page_id} to
+           {sh404sef_pageid}, for consistency
+     [new] Added parameters to adjust mobile template switcher. Works together
+           with system plugin
+     [chg] Removed risky "Purge" buttons from toolbars
+2010-06-09
+     [new] Added mobile device request, automatic template switcher
+2010-06-08
+     [chg] Removed "Headers already sent when I got control message" for cases
+           where HTTP code is 200. Left intact when we should have returned a
+           404, but could not because headers were sent
+     [chg] Replaced global $mainframe with JFactory::getApplication
+2010-06-03
+     [bug] Cannot post Kunena forum response or edit on front end
+           Tracker #151
+2010-05-27
+     [bug] Virtuemart plugin fails if uer select to not insert any category in
+           url (error 500, introduced in last release)
+     [new] Added url cache deletion even if no urls in db, in case user manually
+           purge the db table directly
+2010-05-26
+     [chg] Added extra quoting to prevent error messages in case of illegal
+           characters in urls
+           Tracker #133
+2010-05-25
+     [chg] Modified SQL udpdate instructions, for better utf8 collations
+           differences handling
+2010-05-24
+     [bug] Reverted change, need to catch all exception when doing version
+           check, because of bug in current Zend framework, which fails if cURL
+           is not installed, even if not used
+2010-05-23
+     [chg] Removed all deprecated export/import code
+     [new] All import features working, including import of pre-2.0 sh404sef
+           export files
+     [chg] Added protection against missing categories in Virtuemart plugin
+     [chg] Added check against security features actiavated globally before
+           using log to file feature
+2010-05-21
+     [new] Import of aliases working
+2010-05-20
+     [new] Export functions for all pages work
+     [bug] Database stucture update code in install file has hardcoded
+           jos_sh404sef_aliases instruction, would fail on sites which do not
+           use default database prefix
+2010-05-19
+     [bug] Updated from trunk with wrong language when showing homepage
+           (Virtuemart cart for instance)
+2010-05-18
+     [new] First draft of wizard-based import/export
+     [bug] Bad link to templates.css file
+     [chg] Added help text on Alias manager, explaining that Aliases are created
+           from URL manager, with a link to the url manager itself as well
+2010-05-16
+     [new] Added components menu item icon
+2010-05-14
+     [new] Added persistent messages when saving parameters that can require
+           urls purge. Include links to FAQ page on support site, and link to
+           URL page manager
+     [chg] More emphasis on the fact that pageId must also be activated under By
+           component tab of configuration
+2010-05-13
+     [chg] Improved css for narrow layout
+     [chg] Updated language for Aliases manager help text on control panel
+     [chg] Dropped unused 'Hits' column on aliases manager
+     [chg] Updated language on Quick start panel
+     [bug] pageId incorrectly selected for 404 pages
+     [chg] Better check of aliases for totally non-sef urls
+     [bug] Some 404 pages are counted twice
+     [chg] Reset check version display after upgrade, without waiting for next
+           day cache refresh or user Checking updates manually
+     [new] Added menu bar on other than dashboard pages, to improve navigation
+2010-05-12
+     [new] Added configuration item to enable/disable automatic version check
+           (under Advanced, Upgrade configuration)
+     [chg] Changed main "Enable" lable on Basic config to "Enable url
+           optimization". Clearer now that security features are separate from
+           url features
+     [chg] pagination : check that start item is not after total number of
+           items. Set to 0 if so. This may happen when deleting all items on the
+           last page of a list
+2010-05-10
+     [new] Added pageId deletion and purge
+2010-05-09
+     [new] Added pagedId creation, redirects and parameters
+     [new] Added separate table for pageIds
+     [chg] Reactivated Joomfish automatic language detection code
+     [chg] New version check is enabled by default
+2010-05-07
+     [chg] Update Quick start panel in background after saving or applying
+           configuration (except for seo and error page config)
+     [chg] Reverted previous change and added a refresh of control panel after
+           saving or applying configuration
+     [chg] Removed "enable" settings in basic config and security config, so as
+           to not interfere or require a refresh of the main contrl panel if
+           changed
+     [bug] Error page user set Itemid would not be used. Error page sub-template
+           would not be used
+     [bug] Backport of J! 1.6 language manager fails when running in debug mode
+           due to missing JStream dependency
+     [bug] Spelling
+     [chg] Improved usability in edig configuartion and 404 page. Added preview
+           button for urls
+     [chg] Remmoved check preventing storing a pre-existing non-sef url
+     [chg] Update to trunk, shared ssl and query vars
+     [bug] Bad escaping of metat data before display would cause loosing UTF-8
+           caracters
+     []    -chg-Update back, control panel and purge wording for clarity
+2010-05-05
+     [chg] Allow update response xml to be either text/xml (nginx) or
+           application/xml (other)
+2010-05-04
+     [new] Added workaround for IIS using Index.php instead of index.php on some
+           occasions (merged from trunk)
+2010-05-03
+     [new] Meta data deletion works
+     [new] 404 error page can now use alternate sub-templates from Joomla!
+           template, like 'component' for instance
+2010-05-02
+     [new] Can save meta data from new Meta manager
+     [bug] Alias editing would not work from alias manager!
+     [bug] Missing view name in edit aliases links
+     [new] Merged back offline http code plugin from trunk
+     [bug] Get non-var fix from trunk
+     [chg] Stripped down a bit Zend http client
+     [chg] Improved resilience to errors when checking for new version
+2010-05-01
+     [bug] Forced caching of updates on, in case admin deactivated it
+     [new] Added new version check and display on control panel tab
+     [chg] Added more checks for file access : cache, logs, custom.sef.php
+     [chg] Improved display for url stats and unwriteable config files
+     [bug] Warning on security panel if there is no security log file for
+           current month
+2010-04-30
+     [chg] Improved ajax progress bar on control panel
+           -chg-Cleaned up old admin code
+     [new] Security stats are update through ajax call
+           -NEW-New icon sets for control panel and toolbars
+     [bug] Number of items not counted correctly on non-default layouts
+     [chg] Modified version information
+2010-04-28
+     [new] Separated security functions from SEF urls, so that both can be
+           activated or disabled separately
+     [new] Added Quick control panel on main control panel
+     [new] Configuration saves to disk
+2010-04-27
+     [new] Configuration input pages as popups
+     [bug] Autoloaded does not load helper file in view
+2010-04-26
+     [new] Controller, model and view to handle configuration
+     [bug] Alias selection does not work on duplicates list page (removed the
+           drop-down)
+     [bug] Back button does not work on duplicates view, more generally, on
+           lists showing in a popup
+     [bug] "Check all" check box does not work on any list view
+     [bug] Aliases manager back button does not work (js issue)
+2010-04-25
+     [bug] Incorrect case for meta table, will not work on some servers
+     [bug] Fixed autoloader, would not lower case path, which would fail on
+           linux machines
+     [new] Release to beta testers of basic features of new backend
+2010-04-21
+     [chg] Updated to trunk
+
+                         (09/08/10 16:15 - build #545)

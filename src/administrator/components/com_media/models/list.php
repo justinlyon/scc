@@ -1,12 +1,19 @@
 <?php
 /**
- * @version		$Id: list.php 14567 2010-02-04 07:02:10Z eddieajau $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @version		$Id: list.php 14401 2010-01-26 14:10:00Z louis $
+ * @package		Joomla
+ * @subpackage	Media
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant to the
+ * GNU General Public License, and as distributed it includes or is derivative
+ * of works licensed under the GNU General Public License or other free or open
+ * source software licenses. See COPYRIGHT.php for copyright notices and
+ * details.
  */
 
-// No direct access
-defined('_JEXEC') or die;
+// Check to ensure this file is included in Joomla!
+defined('_JEXEC') or die( 'Restricted access' );
 
 jimport('joomla.application.component.model');
 jimport('joomla.filesystem.folder');
@@ -15,8 +22,8 @@ jimport('joomla.filesystem.file');
 /**
  * Media Component List Model
  *
- * @package		Joomla.Administrator
- * @subpackage	com_media
+ * @package		Joomla
+ * @subpackage	Media
  * @since 1.5
  */
 class MediaModelList extends JModel
@@ -27,7 +34,7 @@ class MediaModelList extends JModel
 		static $set;
 
 		if (!$set) {
-			$folder = JRequest::getVar('folder', '', '', 'path');
+			$folder = JRequest::getVar( 'folder', '', '', 'path' );
 			$this->setState('folder', $folder);
 
 			$parent = str_replace("\\", "/", dirname($folder));
@@ -79,7 +86,7 @@ class MediaModelList extends JModel
 			$current = '';
 		}
 
-		// Initialise variables.
+		// Initialize variables
 		if (strlen($current) > 0) {
 			$basePath = COM_MEDIA_BASE.DS.$current;
 		} else {
@@ -87,12 +94,12 @@ class MediaModelList extends JModel
 		}
 		$mediaBase = str_replace(DS, '/', COM_MEDIA_BASE.'/');
 
-		$images		= array ();
-		$folders	= array ();
-		$docs		= array ();
+		$images 	= array ();
+		$folders 	= array ();
+		$docs 		= array ();
 
 		// Get the list of files and folders from the given folder
-		$fileList	= JFolder::files($basePath);
+		$fileList 	= JFolder::files($basePath);
 		$folderList = JFolder::folders($basePath);
 
 		// Iterate over the files if they exist
@@ -146,19 +153,17 @@ class MediaModelList extends JModel
 							break;
 						// Non-image document
 						default:
-							// $iconfile_32 = JPATH_ADMINISTRATOR.DS."components".DS."com_media".DS."images".DS."mime-icon-32".DS.$ext.".png";
-							$iconfile_32 = "media".DS."images".DS."media".DS."mime-icon-32".DS.$ext.".png";
+							$iconfile_32 = JPATH_ADMINISTRATOR.DS."components".DS."com_media".DS."images".DS."mime-icon-32".DS.$ext.".png";
 							if (file_exists($iconfile_32)) {
-								$tmp->icon_32 = "media/mime-icon-32/".$ext.".png";
+								$tmp->icon_32 = "components/com_media/images/mime-icon-32/".$ext.".png";
 							} else {
-								$tmp->icon_32 = "media/con_info.png";
+								$tmp->icon_32 = "components/com_media/images/con_info.png";
 							}
-							// $iconfile_16 = JPATH_ADMINISTRATOR.DS."components".DS."com_media".DS."images".DS."mime-icon-16".DS.$ext.".png";
-							$iconfile_16 = "media".DS."images".DS."media".DS."mime-icon-16".DS.$ext.".png";
+							$iconfile_16 = JPATH_ADMINISTRATOR.DS."components".DS."com_media".DS."images".DS."mime-icon-16".DS.$ext.".png";
 							if (file_exists($iconfile_16)) {
-								$tmp->icon_16 = "media/mime-icon-16/".$ext.".png";
+								$tmp->icon_16 = "components/com_media/images/mime-icon-16/".$ext.".png";
 							} else {
-								$tmp->icon_16 = "media/con_info.png";
+								$tmp->icon_16 = "components/com_media/images/con_info.png";
 							}
 							$docs[] = $tmp;
 							break;

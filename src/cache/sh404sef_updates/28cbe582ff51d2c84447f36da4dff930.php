@@ -1,0 +1,2 @@
+<?php die("Access Denied"); ?>
+a:2:{s:6:"output";s:0:"";s:6:"result";O:8:"stdClass":10:{s:6:"status";b:1;s:13:"statusMessage";s:32:"No update required for your site";s:7:"current";s:9:"2.0.3.545";s:4:"note";s:49:"Release candidate, ready for first public release";s:13:"changelogLink";s:55:"http://dev.anything-digital.com/sh404SEF/changelog.html";s:19:"minVersionToUpgrade";s:3:"1.5";s:19:"maxVersionToUpgrade";s:1:"0";s:12:"shouldUpdate";b:0;s:8:"excludes";a:1:{i:0;s:3:"1.0";}s:12:"downloadLink";s:55:"http://dev.anything-digital.com/sh404sef-downloads.html";}}

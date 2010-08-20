@@ -1,20 +1,27 @@
 <?php
 /**
- * @version		$Id: newsfeed.php 18212 2010-07-22 06:02:54Z eddieajau $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @version		$Id: newsfeed.php 14401 2010-01-26 14:10:00Z louis $
+ * @package		Joomla
+ * @subpackage	Content
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant to the
+ * GNU General Public License, and as distributed it includes or is derivative
+ * of works licensed under the GNU General Public License or other free or open
+ * source software licenses. See COPYRIGHT.php for copyright notices and
+ * details.
  */
 
-// No direct access
-defined('_JEXEC') or die;
+// Check to ensure this file is included in Joomla!
+defined('_JEXEC') or die( 'Restricted access' );
 
 jimport('joomla.application.component.model');
 
 /**
  * Newsfeeds Component Newsfeed Model
  *
- * @package		Joomla.Site
- * @subpackage	com_newsfeeds
+ * @package		Joomla
+ * @subpackage	Newsfeeds
  * @since 1.5
  */
 class NewsfeedsModelNewsfeed extends JModel
@@ -38,7 +45,7 @@ class NewsfeedsModelNewsfeed extends JModel
 	 *
 	 * @since 1.5
 	 */
-	public function __construct()
+	function __construct()
 	{
 		parent::__construct();
 
@@ -52,11 +59,11 @@ class NewsfeedsModelNewsfeed extends JModel
 	 * @access	public
 	 * @param	int Newsfeed identifier
 	 */
-	public function setId($id)
+	function setId($id)
 	{
-		// Set newsfeed id and wipe data
-		$this->_id		= $id;
-		$this->_data	= null;
+		// Set weblink id and wipe data
+		$this->_id	 = $id;
+		$this->_data = null;
 	}
 
 	/**
@@ -64,29 +71,29 @@ class NewsfeedsModelNewsfeed extends JModel
 	 *
 	 * @since 1.5
 	 */
-	public function &getData()
+	function &getData()
 	{
-		// Load the newsfeed data
-		if ($this->_loadData()) {
-
-			// Initialise some variables
-			$user = JFactory::getUser();
+		// Load the weblink data
+		if ($this->_loadData())
+		{
+			// Initialize some variables
+			$user = &JFactory::getUser();
 
 			// Make sure the category is published
 			if (!$this->_data->published) {
-				JError::raiseError(404, JText::_("JGLOBAL_RESOURCE_NOT_FOUND"));
+				JError::raiseError(404, JText::_("Resource Not Found"));
 				return false;
 			}
 
 			// Check to see if the category is published
 			if (!$this->_data->cat_pub) {
-				JError::raiseError(404, JText::_("JGLOBAL_RESOURCE_NOT_FOUND"));
+				JError::raiseError( 404, JText::_("Resource Not Found") );
 				return;
 			}
 
 			// Check whether category access level allows access
-			if (!in_array($this->_data->cat_access, $user->authorisedLevels())) {
-				JError::raiseError(403, JText::_('JERROR_ALERTNOAUTHOR'));
+			if ($this->_data->cat_access > $user->get('aid', 0)) {
+				JError::raiseError( 403, JText::_('ALERTNOTAUTH') );
 				return;
 			}
 
@@ -98,41 +105,27 @@ class NewsfeedsModelNewsfeed extends JModel
 	/**
 	 * Method to load newsfeed data
 	 *
+	 * @access	private
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	protected function _loadData()
+	function _loadData()
 	{
 		// Lets load the content if it doesn't already exist
-		if (empty($this->_data)) {
-
-			$db = $this->getDbo();
-			$query = $db->getQuery(true);
-			$query->select('f.*');
-			$query->select('cc.title AS category, cc.published AS cat_pub, cc.access AS cat_access');
-			$query->select('CASE WHEN CHAR_LENGTH(cc.alias) THEN CONCAT_WS(\':\', cc.id, cc.alias) ELSE cc.id END as catslug');
-			$query->from('#__newsfeeds AS f');
-			$query->leftJoin('#__categories AS cc ON cc.id = f.catid');
-			$query->where('f.id = '.(int) $this->_id);
-
-			// Filter by start and end dates.
-			$nullDate = $db->quote($db->getNullDate());
-			$nowDate = $db->quote(JFactory::getDate()->toMySQL());
-
-			$query->where('(f.publish_up = '.$nullDate . ' OR f.publish_up <= '.$nowDate.')');
-			$query->where('(f.publish_down = '.$nullDate . ' OR f.publish_down >= '.$nowDate.')');
-
-			$db->setQuery($query);
-			$this->_data = $db->loadObject();
-
-			// Convert metadata fields to objects.
-			$registry = new JRegistry;
-			$registry->loadJSON($this->_data->metadata);
-			$this->_data->metadata = $registry;
-
+		if (empty($this->_data))
+		{
+			$query = 'SELECT f.*, cc.title AS category,'.
+					' cc.published AS cat_pub, cc.access AS cat_access,'.
+					' CASE WHEN CHAR_LENGTH(cc.alias) THEN CONCAT_WS(\':\', cc.id, cc.alias) ELSE cc.id END as catslug'.
+					' FROM #__newsfeeds AS f' .
+					' LEFT JOIN #__categories AS cc ON cc.id = f.catid' .
+					' WHERE f.id = '.$this->_id;
+			$this->_db->setQuery($query);
+			$this->_data = $this->_db->loadObject();
 			return (boolean) $this->_data;
 		}
-
 		return true;
 	}
+
 }
+?>

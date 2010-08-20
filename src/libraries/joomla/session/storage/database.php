@@ -1,36 +1,41 @@
 <?php
 /**
- * @version		$Id:database.php 6961 2007-03-15 16:06:53Z tcp $
- * @package		Joomla.Framework
- * @subpackage	Session
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
+* @version		$Id:database.php 6961 2007-03-15 16:06:53Z tcp $
+* @package		Joomla.Framework
+* @subpackage	Session
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
-// No direct access
-defined('JPATH_BASE') or die;
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 /**
- * Database session storage handler for PHP
- *
- * @package		Joomla.Framework
- * @subpackage	Session
- * @since		1.5
- * @see			http://www.php.net/manual/en/function.session-set-save-handler.php
- */
+* Database session storage handler for PHP
+*
+* @package		Joomla.Framework
+* @subpackage	Session
+* @since		1.5
+* @see http://www.php.net/manual/en/function.session-set-save-handler.php
+*/
 class JSessionStorageDatabase extends JSessionStorage
 {
-	protected $_data = null;
+	var $_data = null;
 
 	/**
 	 * Open the SessionHandler backend.
 	 *
-	 * @param	string	The path to the session object.
-	 * @param	string	The name of the session.
-	 * @return	boolean	True on success, false otherwise.
-	 * @since	1.5
+	 * @access public
+	 * @param string $save_path     The path to the session object.
+	 * @param string $session_name  The name of the session.
+	 * @return boolean  True on success, false otherwise.
 	 */
-	public function open($save_path, $session_name)
+	function open($save_path, $session_name)
 	{
 		return true;
 	}
@@ -38,125 +43,101 @@ class JSessionStorageDatabase extends JSessionStorage
 	/**
 	 * Close the SessionHandler backend.
 	 *
-	 * @return	boolean	True on success, false otherwise.
-	 * @since	1.5
+	 * @access public
+	 * @return boolean  True on success, false otherwise.
 	 */
-	public function close()
+	function close()
 	{
 		return true;
 	}
 
-	/**
-	 * Read the data for a particular session identifier from the
-	 * SessionHandler backend.
-	 *
-	 * @param	string	The session identifier.
-	 * @return	string	The session data.
-	 * @since	1.5
-	 */
-	public function read($id)
+ 	/**
+ 	 * Read the data for a particular session identifier from the
+ 	 * SessionHandler backend.
+ 	 *
+ 	 * @access public
+ 	 * @param string $id  The session identifier.
+ 	 * @return string  The session data.
+ 	 */
+	function read($id)
 	{
-		// Get the database connection object and verify its connected.
-		$db = JFactory::getDbo();
-		if (!$db->connected()) {
+		$db =& JFactory::getDBO();
+		if(!$db->connected()) {
 			return false;
 		}
 
-		// Get the session data from the database table.
-		$db->setQuery(
-			'SELECT `data`' .
-			' FROM `#__session`' .
-			' WHERE `session_id` = '.$db->quote($id)
-		);
-		return (string) $db->loadResult();
+		$session = & JTable::getInstance('session');
+		$session->load($id);
+		return (string)$session->data;
 	}
 
 	/**
 	 * Write session data to the SessionHandler backend.
 	 *
-	 * @param	string	The session identifier.
-	 * @param	string	The session data.
-	 * @return	boolean	True on success, false otherwise.
-	 * @since	1.5
+	 * @access public
+	 * @param string $id            The session identifier.
+	 * @param string $session_data  The session data.
+	 * @return boolean  True on success, false otherwise.
 	 */
-	public function write($id, $data)
+	function write($id, $session_data)
 	{
-		// Get the database connection object and verify its connected.
-		$db = JFactory::getDbo();
-		if (!$db->connected()) {
+		$db =& JFactory::getDBO();
+		if(!$db->connected()) {
 			return false;
 		}
 
-		// Try to update the session data in the database table.
-		$db->setQuery(
-			'UPDATE `#__session`' .
-			' SET `data` = '.$db->quote($data).',' .
-			'	  `time` = '.(int) time() .
-			' WHERE `session_id` = '.$db->quote($id)
-		);
-		if (!$db->query()) {
-			return false;
- 		}
-
-		if ($db->getAffectedRows()) {
-			return true;
+		$session = & JTable::getInstance('session');
+		if ($session->load($id)) {
+			$session->data = $session_data;
+			$session->store();
 		} else {
-			// If the session does not exist, we need to insert the session.
-			$db->setQuery(
-				'INSERT INTO `#__session` (`session_id`, `data`, `time`)' .
-				' VALUES ('.$db->quote($id).', '.$db->quote($data).', '.(int) time().')'
-			);
-			return (boolean) $db->query();
+			// if load failed then we assume that it is because
+			// the session doesn't exist in the database
+			// therefore we use insert instead of store
+			$app = &JFactory::getApplication();
+			$session->data = $session_data;
+			$session->insert($id, $app->getClientId());
 		}
+
+		return true;
 	}
 
 	/**
-	 * Destroy the data for a particular session identifier in the
-	 * SessionHandler backend.
-	 *
-	 * @param	string	The session identifier.
-	 * @return	boolean	True on success, false otherwise.
-	 * @since	1.5
-	 */
-	public function destroy($id)
+	  * Destroy the data for a particular session identifier in the
+	  * SessionHandler backend.
+	  *
+	  * @access public
+	  * @param string $id  The session identifier.
+	  * @return boolean  True on success, false otherwise.
+	  */
+	function destroy($id)
 	{
-		// Get the database connection object and verify its connected.
-		$db = JFactory::getDbo();
-		if (!$db->connected()) {
+		$db =& JFactory::getDBO();
+		if(!$db->connected()) {
 			return false;
 		}
 
-		// Remove a session from the database.
-		$db->setQuery(
-			'DELETE FROM `#__session`' .
-			' WHERE `session_id` = '.$db->quote($id)
-		);
-		return (boolean) $db->query();
+		$session = & JTable::getInstance('session');
+		$session->delete($id);
+		return true;
 	}
 
 	/**
 	 * Garbage collect stale sessions from the SessionHandler backend.
 	 *
-	 * @param	integer	The maximum age of a session.
-	 * @return	boolean	True on success, false otherwise.
-	 * @since	1.5
+	 * @access public
+	 * @param integer $maxlifetime  The maximum age of a session.
+	 * @return boolean  True on success, false otherwise.
 	 */
-	function gc($lifetime = 1440)
+	function gc($maxlifetime)
 	{
-		// Get the database connection object and verify its connected.
-		$db = JFactory::getDbo();
-		if (!$db->connected()) {
+		$db =& JFactory::getDBO();
+		if(!$db->connected()) {
 			return false;
 		}
 
-		// Determine the timestamp threshold with which to purge old sessions.
-		$past = time() - $lifetime;
-
-		// Remove expired sessions from the database.
-		$db->setQuery(
-			'DELETE FROM `#__session`' .
-			' WHERE `time` < '.(int) $past
-		);
-		return (boolean) $db->query();
+		$session = & JTable::getInstance('session');
+		$session->purge($maxlifetime);
+		return true;
 	}
 }

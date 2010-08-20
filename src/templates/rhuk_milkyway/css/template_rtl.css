@@ -1,7 +1,23 @@
 /**
- * @version		$Id: template_rtl.css 14276 2010-01-18 14:20:28Z louis $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @version $Id: template_rtl.css 9141 2007-10-04 08:23:14Z mtk $
+ * @package Joomla
+ * @subpackage Template-rhuk_milkway
+ * @copyright Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant to the
+ * GNU General Public License, and as distributed it includes or is derivative
+ * of works licensed under the GNU General Public License or other free or open
+ * source software licenses. See COPYRIGHT.php for copyright notices and
+ * details.
+ */
+ 
+ /**
+ * Joomla! 1.5 rhuk_milkway template RTL css file
+ *
+ * @author 		Mati Kochen
+ * @package		Joomla
+ * @since		1.5
+ * @version     1.0
  */
 
 body{
@@ -98,9 +114,9 @@ div.module_menu ul{
 }
 
 h1 {
-	text-align: right;
+	text-align: right;	
 }
-
+	
 h2, .contentheading{
 	text-align: right;
 }

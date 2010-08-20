@@ -1,26 +1,28 @@
 <?php
 /**
- * @version		$Id: menu.php 17857 2010-06-23 17:50:46Z eddieajau $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @version		$Id: menu.php 14401 2010-01-26 14:10:00Z louis $
+ * @package		Joomla
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant to the
+ * GNU General Public License, and as distributed it includes or is derivative
+ * of works licensed under the GNU General Public License or other free or open
+ * source software licenses. See COPYRIGHT.php for copyright notices and
+ * details.
  */
 
-// No direct access
-defined('_JEXEC') or die;
+// Check to ensure this file is included in Joomla!
+defined('_JEXEC') or die( 'Restricted access' );
 
 jimport('joomla.base.tree');
 
-/**
- * @package		Joomla.Administrator
- * @subpackage	mod_menu
- */
-class JAdminCssMenu extends JTree
+class JAdminCSSMenu extends JTree
 {
 	/**
 	 * CSS string to add to document head
 	 * @var string
 	 */
-	protected $_css = null;
+	var $_css = null;
 
 	function __construct()
 	{
@@ -35,13 +37,15 @@ class JAdminCssMenu extends JTree
 
 	function renderMenu($id = 'menu', $class = '')
 	{
+		global $mainframe;
+
 		$depth = 1;
 
-		if (!empty($id)) {
+		if(!empty($id)) {
 			$id='id="'.$id.'"';
 		}
 
-		if (!empty($class)) {
+		if(!empty($class)) {
 			$class='class="'.$class.'"';
 		}
 
@@ -61,7 +65,7 @@ class JAdminCssMenu extends JTree
 
 		if ($this->_css) {
 			// Add style to document head
-			$doc = JFactory::getDocument();
+			$doc = & JFactory::getDocument();
 			$doc->addStyleDeclaration($this->_css);
 		}
 	}
@@ -76,13 +80,14 @@ class JAdminCssMenu extends JTree
 			$class = ' class="node"';
 		}
 
-		if ($this->_current->class == 'separator') {
+		if($this->_current->class == 'separator') {
 			$class = ' class="separator"';
 		}
 
-		if ($this->_current->class == 'disabled') {
+		if($this->_current->class == 'disabled') {
 			$class = ' class="disabled"';
 		}
+
 
 		/*
 		 * Print the item
@@ -92,9 +97,7 @@ class JAdminCssMenu extends JTree
 		/*
 		 * Print a link if it exists
 		 */
-		if ($this->_current->link != null && $this->_current->target != null) {
-			echo "<a class=\"".$this->getIconClass($this->_current->class)."\" href=\"".$this->_current->link."\" target=\"".$this->_current->target."\" >".$this->_current->title."</a>";
-		} elseif ($this->_current->link != null && $this->_current->target == null) {
+		if ($this->_current->link != null) {
 			echo "<a class=\"".$this->getIconClass($this->_current->class)."\" href=\"".$this->_current->link."\">".$this->_current->title."</a>";
 		} elseif ($this->_current->title != null) {
 			echo "<a>".$this->_current->title."</a>\n";
@@ -134,9 +137,11 @@ class JAdminCssMenu extends JTree
 	 */
 	function getIconClass($identifier)
 	{
+		global $mainframe;
+
 		static $classes;
 
-		// Initialise the known classes array if it does not exist
+		// Initialize the known classes array if it does not exist
 		if (!is_array($classes)) {
 			$classes = array();
 		}
@@ -151,67 +156,67 @@ class JAdminCssMenu extends JTree
 				$class = substr($identifier, 6);
 				$classes[$identifier] = "icon-16-$class";
 			} else {
-				if ($identifier == null) {
-					return null;
+				// We were passed an image path... is it a themeoffice one?
+				if (substr($identifier, 0, 15) == 'js/ThemeOffice/') {
+					// Strip the filename without extension and use that for the classname
+					$class = preg_replace('#\.[^.]*$#', '', basename($identifier));
+					$classes[$identifier] = "icon-16-$class";
+				} else {
+					if ($identifier == null) {
+						return null;
+					}
+					// Build the CSS class for the icon
+					$class = preg_replace('#\.[^.]*$#', '', basename($identifier));
+					$class = preg_replace( '#\.\.[^A-Za-z0-9\.\_\- ]#', '', $class);
+
+					$this->_css  .= "\n.icon-16-$class {\n" .
+							"\tbackground: url($identifier) no-repeat;\n" .
+							"}\n";
+
+					$classes[$identifier] = "icon-16-$class";
 				}
-				// Build the CSS class for the icon
-				$class = preg_replace('#\.[^.]*$#', '', basename($identifier));
-				$class = preg_replace('#\.\.[^A-Za-z0-9\.\_\- ]#', '', $class);
-
-				$this->_css  .= "\n.icon-16-$class {\n" .
-						"\tbackground: url($identifier) no-repeat;\n" .
-						"}\n";
-
-				$classes[$identifier] = "icon-16-$class";
 			}
 		}
 		return $classes[$identifier];
 	}
 }
 
-/**
- * @package		Joomla.Administrator
- * @subpackage	mod_menu
- */
 class JMenuNode extends JNode
 {
 	/**
 	 * Node Title
 	 */
-	public $title = null;
+	var $title = null;
 
 	/**
 	 * Node Id
 	 */
-	public $id = null;
+	var $id = null;
+
 
 	/**
 	 * Node Link
 	 */
-	public $link = null;
-
-	/**
-	 * Link Target
-	 */
-	public $target = null;
+	var $link = null;
 
 	/**
 	 * CSS Class for node
 	 */
-	public $class = null;
+	var $class = null;
 
 	/**
 	 * Active Node?
 	 */
-	public $active = false;
+	var $active = false;
 
-	public function __construct($title, $link = null, $class = null, $active = false, $target = null)
+
+	function __construct($title, $link = null, $class = null, $active = false)
 	{
 		$this->title	= $title;
 		$this->link		= JFilterOutput::ampReplace($link);
 		$this->class	= $class;
 		$this->active	= $active;
 		$this->id		= str_replace(" ","-",$title);
-		$this->target	= $target;
+
 	}
 }

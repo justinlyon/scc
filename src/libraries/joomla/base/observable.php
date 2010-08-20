@@ -1,13 +1,19 @@
 <?php
 /**
- * @version		$Id: observable.php 16858 2010-05-06 14:16:07Z chdemko $
- * @package		Joomla.Framework
- * @subpackage	Base
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
+* @version		$Id:observer.php 6961 2007-03-15 16:06:53Z tcp $
+* @package		Joomla.Framework
+* @subpackage	Base
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
-defined('JPATH_BASE') or die;
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 /**
  * Abstract observable class to implement the observer design pattern
@@ -22,31 +28,22 @@ class JObservable extends JObject
 	/**
 	 * An array of Observer objects to notify
 	 *
-	 * @access protected
+	 * @access private
 	 * @var array
 	 */
-	protected $_observers = array();
+	var $_observers = array();
 
 	/**
 	 * The state of the observable object
 	 *
-	 * @access protected
+	 * @access private
 	 * @var mixed
 	 */
-	protected $_state = null;
+	var $_state = null;
 
-	/**
-	 * A multi dimensional array of [function][] = key for observers
-	 *
-	 * @access protected
-	 * @var array
-	 */
-	protected $_methods = array();
 
 	/**
 	 * Constructor
-	 *
-	 * @access protected - Make Sure it's not directly instansiated
 	 */
 	function __construct() {
 		$this->_observers = array();
@@ -59,7 +56,7 @@ class JObservable extends JObject
 	 * @return mixed The state of the object
 	 * @since 1.5
 	 */
-	public function getState() {
+	function getState() {
 		return $this->_state;
 	}
 
@@ -70,7 +67,7 @@ class JObservable extends JObject
 	 * @return array Array of return values from the observers
 	 * @since 1.5
 	 */
-	public function notify()
+	function notify()
 	{
 		// Iterate through the _observers array
 		foreach ($this->_observers as $observer) {
@@ -87,45 +84,20 @@ class JObservable extends JObject
 	 * @return void
 	 * @since 1.5
 	 */
-	public function attach(&$observer)
+	function attach( &$observer)
 	{
-		if (is_array($observer))
+		// Make sure we haven't already attached this object as an observer
+		if (is_object($observer))
 		{
-			if (!isset($observer['handler']) || !isset($observer['event']) || !is_callable($observer['handler'])) {
-				return;
-			}
-			// Make sure we haven't already attached this array as an observer
-			foreach ($this->_observers as $check) {
-				if (is_array($check) && $check['event']==$observer['event'] && $check['handler']==$observer['handler']) {
-					return;
-				}
-			}
-			$this->_observers[] = &$observer;
-			end($this->_observers);
-			$methods = array($observer['event']);
-
-		} else {
-			if (!$observer instanceof JObserver) {
-				return;
-			}
-
-			// Make sure we haven't already attached this object as an observer
 			$class = get_class($observer);
 			foreach ($this->_observers as $check) {
-				if ($check instanceof $class) {
+				if (is_a($check, $class)) {
 					return;
 				}
 			}
-			$this->_observers[] = &$observer;
-			$methods = array_diff(get_class_methods($observer), get_class_methods('JPlugin'));
-		}
-		$key = key($this->_observers);
-		foreach($methods AS $method) {
-			$method = strtolower($method);
-			if (!isset($this->_methods[$method])) {
-				$this->_methods[$method] = array();
-			}
-			$this->_methods[$method][] = $key;
+			$this->_observers[] =& $observer;
+		} else {
+			$this->_observers[] =& $observer;
 		}
 	}
 
@@ -137,23 +109,17 @@ class JObservable extends JObject
 	 * @return boolean True if the observer object was detached
 	 * @since 1.5
 	 */
-	public function detach($observer)
+	function detach( $observer)
 	{
-		// Initialise variables.
+		// Initialize variables
 		$retval = false;
 
 		$key = array_search($observer, $this->_observers);
 
-		if ($key !== false)
+		if ( $key !== false )
 		{
 			unset($this->_observers[$key]);
 			$retval = true;
-			foreach($this->_methods AS &$method) {
-				$k = array_search($key, $method);
-				if ($k !== false) {
-					unset($method[$k]);
-				}
-			}
 		}
 		return $retval;
 	}

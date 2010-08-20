@@ -1,14 +1,19 @@
 <?php
 /**
- * @version		$Id: folder.php 17854 2010-06-23 17:43:55Z eddieajau $
+ * @version		$Id: folder.php 16421 2010-04-24 23:57:12Z dextercowley $
  * @package		Joomla.Framework
  * @subpackage	FileSystem
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant
+ * to the GNU General Public License, and as distributed it includes or
+ * is derivative of works licensed under the GNU General Public License or
+ * other free or open source software licenses.
+ * See COPYRIGHT.php for copyright notices and details.
  */
 
-// No direct access
-defined('JPATH_BASE') or die;
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 jimport('joomla.filesystem.path');
 
@@ -16,7 +21,7 @@ jimport('joomla.filesystem.path');
  * A Folder handling class
  *
  * @static
- * @package		Joomla.Framework
+ * @package 	Joomla.Framework
  * @subpackage	FileSystem
  * @since		1.5
  */
@@ -32,11 +37,11 @@ class JFolder
 	 * @return	mixed	JError object on failure or boolean True on success.
 	 * @since	1.5
 	 */
-	function copy($src, $dest, $path = '', $force = false, $use_streams=false)
+	function copy($src, $dest, $path = '', $force = false)
 	{
-		// Initialise variables.
+		// Initialize variables
 		jimport('joomla.client.helper');
-		$FTPOptions = JClientHelper::getCredentials('ftp');
+		$ftpOptions = JClientHelper::getCredentials('ftp');
 
 		if ($path) {
 			$src = JPath::clean($path . DS . $src);
@@ -48,29 +53,28 @@ class JFolder
 		$dest = rtrim($dest, DS);
 
 		if (!JFolder::exists($src)) {
-			return JError::raiseError(-1, JText::_('JLIB_FILESYSTEM_ERROR_FIND_SOURCE_FOLDER'));
+			return JError::raiseError(-1, JText::_('Cannot find source folder'));
 		}
 		if (JFolder::exists($dest) && !$force) {
-			return JError::raiseError(-1, JText::_('JLIB_FILESYSTEM_ERROR_FOLDER_EXISTS'));
+			return JError::raiseError(-1, JText::_('Folder already exists'));
 		}
 
 		// Make sure the destination exists
 		if (! JFolder::create($dest)) {
-			return JError::raiseError(-1, JText::_('JLIB_FILESYSTEM_ERROR_FOLDER_CREATE'));
+			return JError::raiseError(-1, JText::_('Unable to create target folder'));
 		}
 
-		// if we're using ftp and don't have streams enabled
-		if ($FTPOptions['enabled'] == 1 && !$use_streams)
+		if ($ftpOptions['enabled'] == 1)
 		{
 			// Connect the FTP client
 			jimport('joomla.client.ftp');
-			$ftp = JFTP::getInstance(
-				$FTPOptions['host'], $FTPOptions['port'], null,
-				$FTPOptions['user'], $FTPOptions['pass']
+			$ftp = &JFTP::getInstance(
+				$ftpOptions['host'], $ftpOptions['port'], null,
+				$ftpOptions['user'], $ftpOptions['pass']
 			);
 
 			if (!($dh = @opendir($src))) {
-				return JError::raiseError(-1, JText::_('JLIB_FILESYSTEM_ERROR_FOLDER_OPEN'));
+				return JError::raiseError(-1, JText::_('Unable to open source folder'));
 			}
 			// Walk through the directory copying files and recursing into folders.
 			while (($file = readdir($dh)) !== false) {
@@ -88,16 +92,16 @@ class JFolder
 
 					case 'file':
 						// Translate path for the FTP account
-						$dfid = JPath::clean(str_replace(JPATH_ROOT, $FTPOptions['root'], $dfid), '/');
+						$dfid = JPath::clean(str_replace(JPATH_ROOT, $ftpOptions['root'], $dfid), '/');
 						if (! $ftp->store($sfid, $dfid)) {
-							return JError::raiseError(-1, JText::_('JLIB_FILESYSTEM_ERROR_COPY_FAILED'));
+							return JError::raiseError(-1, JText::_('Copy failed'));
 						}
 						break;
 				}
 			}
 		} else {
 			if (!($dh = @opendir($src))) {
-				return JError::raiseError(-1, JText::_('JLIB_FILESYSTEM_ERROR_FOLDER_OPEN'));
+				return JError::raiseError(-1, JText::_('Unable to open source folder'));
 			}
 			// Walk through the directory copying files and recursing into folders.
 			while (($file = readdir($dh)) !== false) {
@@ -106,7 +110,7 @@ class JFolder
 				switch (filetype($sfid)) {
 					case 'dir':
 						if ($file != '.' && $file != '..') {
-							$ret = JFolder::copy($sfid, $dfid, null, $force, $use_streams);
+							$ret = JFolder::copy($sfid, $dfid, null, $force);
 							if ($ret !== true) {
 								return $ret;
 							}
@@ -114,15 +118,8 @@ class JFolder
 						break;
 
 					case 'file':
-						if($use_streams) {
-							$stream = JFactory::getStream();
-							if(!$stream->copy($sfid, $dfid)) {
-								return JError::raiseError(-1, JText::_('JLIB_FILESYSTEM_ERROR_COPY_FAILED').': '. $stream->getError());
-							}
-						} else {
 						if (!@copy($sfid, $dfid)) {
-							return JError::raiseError(-1, JText::_('JLIB_FILESYSTEM_ERROR_COPY_FAILED'));
-						}
+							return JError::raiseError(-1, JText::_('Copy failed'));
 						}
 						break;
 				}
@@ -141,9 +138,9 @@ class JFolder
 	 */
 	function create($path = '', $mode = 0755)
 	{
-		// Initialise variables.
+		// Initialize variables
 		jimport('joomla.client.helper');
-		$FTPOptions = JClientHelper::getCredentials('ftp');
+		$ftpOptions = JClientHelper::getCredentials('ftp');
 		static $nested = 0;
 
 		// Check to make sure the path valid and clean
@@ -157,7 +154,7 @@ class JFolder
 			if (($nested > 20) || ($parent == $path)) {
 				JError::raiseWarning(
 					'SOME_ERROR_CODE',
-					'JFolder::create: ' . JText::_('JLIB_FILESYSTEM_ERROR_FOLDER_LOOP')
+					'JFolder::create: ' . JText::_('Infinite loop detected')
 				);
 				$nested--;
 				return false;
@@ -180,16 +177,16 @@ class JFolder
 		}
 
 		// Check for safe mode
-		if ($FTPOptions['enabled'] == 1) {
+		if ($ftpOptions['enabled'] == 1) {
 			// Connect the FTP client
 			jimport('joomla.client.ftp');
-			$ftp = JFTP::getInstance(
-				$FTPOptions['host'], $FTPOptions['port'], null,
-				$FTPOptions['user'], $FTPOptions['pass']
+			$ftp = &JFTP::getInstance(
+				$ftpOptions['host'], $ftpOptions['port'], null,
+				$ftpOptions['user'], $ftpOptions['pass']
 			);
 
 			// Translate path to FTP path
-			$path = JPath::clean(str_replace(JPATH_ROOT, $FTPOptions['root'], $path), '/');
+			$path = JPath::clean(str_replace(JPATH_ROOT, $ftpOptions['root'], $path), '/');
 			$ret = $ftp->mkdir($path);
 			$ftp->chmod($path, $mode);
 		} else {
@@ -220,7 +217,7 @@ class JFolder
 					// Return false for JFolder::create because the path to be created is not in open_basedir
 					JError::raiseWarning(
 						'SOME_ERROR_CODE',
-						'JFolder::create: ' . JText::_('JLIB_FILESYSTEM_ERROR_FOLDER_PATH')
+						'JFolder::create: ' . JText::_('Path not in open_basedir paths')
 					);
 					return false;
 				}
@@ -234,7 +231,7 @@ class JFolder
 				@umask($origmask);
 				JError::raiseWarning(
 					'SOME_ERROR_CODE',
-					'JFolder::create: ' . JText::_('JLIB_FILESYSTEM_ERROR_COULD_NOT_CREATE_DIRECTORY'),
+					'JFolder::create: ' . JText::_('Could not create directory'),
 					'Path: ' . $path
 				);
 				return false;
@@ -258,25 +255,25 @@ class JFolder
 		// Sanity check
 		if (!$path) {
 			// Bad programmer! Bad Bad programmer!
-			JError::raiseWarning(500, 'JFolder::delete: ' . JText::_('JLIB_FILESYSTEM_ERROR_DELETE_BASE_DIRECTORY'));
+			JError::raiseWarning(500, 'JFolder::delete: ' . JText::_('Attempt to delete base directory') );
 			return false;
 		}
 
-		// Initialise variables.
+		// Initialize variables
 		jimport('joomla.client.helper');
-		$FTPOptions = JClientHelper::getCredentials('ftp');
+		$ftpOptions = JClientHelper::getCredentials('ftp');
 
 		// Check to make sure the path valid and clean
 		$path = JPath::clean($path);
 
 		// Is this really a folder?
 		if (!is_dir($path)) {
-			JError::raiseWarning(21, JText::sprintf('JLIB_FILESYSTEM_ERROR_PATH_IS_NOT_A_FOLDER', $path));
+			JError::raiseWarning(21, 'JFolder::delete: ' . JText::_('Path is not a folder'), 'Path: ' . $path);
 			return false;
 		}
 
-		// Remove all the files in folder if they exist; disable all filtering
-		$files = JFolder::files($path, '.', false, true, array(), array());
+		// Remove all the files in folder if they exist
+		$files = JFolder::files($path, '.', false, true, array());
 		if (!empty($files)) {
 			jimport('joomla.filesystem.file');
 			if (JFile::delete($files) !== true) {
@@ -285,8 +282,8 @@ class JFolder
 			}
 		}
 
-		// Remove sub-folders of folder; disable all filtering
-		$folders = JFolder::folders($path, '.', false, true, array(), array());
+		// Remove sub-folders of folder
+		$folders = JFolder::folders($path, '.', false, true, array());
 		foreach ($folders as $folder) {
 			if (is_link($folder)) {
 				// Don't descend into linked directories, just delete the link.
@@ -301,12 +298,12 @@ class JFolder
 			}
 		}
 
-		if ($FTPOptions['enabled'] == 1) {
+		if ($ftpOptions['enabled'] == 1) {
 			// Connect the FTP client
 			jimport('joomla.client.ftp');
-			$ftp = JFTP::getInstance(
-				$FTPOptions['host'], $FTPOptions['port'], null,
-				$FTPOptions['user'], $FTPOptions['pass']
+			$ftp = &JFTP::getInstance(
+				$ftpOptions['host'], $ftpOptions['port'], null,
+				$ftpOptions['user'], $ftpOptions['pass']
 			);
 		}
 
@@ -314,13 +311,17 @@ class JFolder
 		// as long as the owner is either the webserver or the ftp
 		if (@rmdir($path)) {
 			$ret = true;
-		} elseif ($FTPOptions['enabled'] == 1) {
+		} elseif ($ftpOptions['enabled'] == 1) {
 			// Translate path and delete
-			$path = JPath::clean(str_replace(JPATH_ROOT, $FTPOptions['root'], $path), '/');
+			$path = JPath::clean(str_replace(JPATH_ROOT, $ftpOptions['root'], $path), '/');
 			// FTP connector throws an error
 			$ret = $ftp->delete($path);
 		} else {
-			JError::raiseWarning('SOME_ERROR_CODE', JText::sprintf('JLIB_FILESYSTEM_ERROR_FOLDER_DELETE', $path));
+			JError::raiseWarning(
+				'SOME_ERROR_CODE',
+				'JFolder::delete: ' . JText::_('Could not delete folder'),
+				'Path: ' . $path
+			);
 			$ret = false;
 		}
 		return $ret;
@@ -335,41 +336,35 @@ class JFolder
 	 * @return mixed Error message on false or boolean true on success.
 	 * @since 1.5
 	 */
-	function move($src, $dest, $path = '', $use_streams=false)
+	function move($src, $dest, $path = '')
 	{
-		// Initialise variables.
+		// Initialize variables
 		jimport('joomla.client.helper');
-		$FTPOptions = JClientHelper::getCredentials('ftp');
+		$ftpOptions = JClientHelper::getCredentials('ftp');
 
 		if ($path) {
 			$src = JPath::clean($path . DS . $src);
 			$dest = JPath::clean($path . DS . $dest);
 		}
 
-		if (!JFolder::exists($src)) {
-			return JText::_('JLIB_FILESYSTEM_ERROR_FIND_SOURCE_FOLDER');
+		if (!JFolder::exists($src) && !is_writable($src)) {
+			return JText::_('Cannot find source folder');
 		}
 		if (JFolder::exists($dest)) {
-			return JText::_('JLIB_FILESYSTEM_ERROR_FOLDER_EXISTS');
+			return JText::_('Folder already exists');
 		}
-		if($use_streams) {
-			$stream = JFactory::getStream();
-			if(!$stream->move($src, $dest)) {
-				return JText::sprintf('JLIB_FILESYSTEM_ERROR_FOLDER_RENAME', $stream->getError());
-			}
-			$ret = true;
-		} else {
-		if ($FTPOptions['enabled'] == 1) {
+
+		if ($ftpOptions['enabled'] == 1) {
 			// Connect the FTP client
 			jimport('joomla.client.ftp');
-			$ftp = JFTP::getInstance(
-				$FTPOptions['host'], $FTPOptions['port'], null,
-				$FTPOptions['user'], $FTPOptions['pass']
+			$ftp = &JFTP::getInstance(
+				$ftpOptions['host'], $ftpOptions['port'], null,
+				$ftpOptions['user'], $ftpOptions['pass']
 			);
 
 			//Translate path for the FTP account
-			$src = JPath::clean(str_replace(JPATH_ROOT, $FTPOptions['root'], $src), '/');
-			$dest = JPath::clean(str_replace(JPATH_ROOT, $FTPOptions['root'], $dest), '/');
+			$src = JPath::clean(str_replace(JPATH_ROOT, $ftpOptions['root'], $src), '/');
+			$dest = JPath::clean(str_replace(JPATH_ROOT, $ftpOptions['root'], $dest), '/');
 
 			// Use FTP rename to simulate move
 			if (!$ftp->rename($src, $dest)) {
@@ -382,7 +377,6 @@ class JFolder
 			}
 			$ret = true;
 		}
-		}
 		return $ret;
 	}
 
@@ -393,7 +387,7 @@ class JFolder
 	 * @return boolean True if path is a folder
 	 * @since 1.5
 	 */
-	public static function exists($path)
+	function exists($path)
 	{
 		return is_dir(JPath::clean($path));
 	}
@@ -411,9 +405,9 @@ class JFolder
 	 * @return	array	Files in the given folder.
 	 * @since 1.5
 	 */
-	public static function files($path, $filter = '.', $recurse = false, $fullpath = false, $exclude = array('.svn', 'CVS','.DS_Store','__MACOSX'), $excludefilter = array('^\..*','.*~'))
+	function files($path, $filter = '.', $recurse = false, $fullpath = false, $exclude = array('.svn', 'CVS'))
 	{
-		// Initialise variables.
+		// Initialize variables
 		$arr = array();
 
 		// Check to make sure the path valid and clean
@@ -421,20 +415,15 @@ class JFolder
 
 		// Is the path a folder?
 		if (!is_dir($path)) {
-			JError::raiseWarning(21, JText::sprintf('JLIB_FILESYSTEM_ERROR_PATH_IS_NOT_A_FOLDER_FILES', $path));
+			JError::raiseWarning(21, 'JFolder::files: ' . JText::_('Path is not a folder'), 'Path: ' . $path);
 			return false;
 		}
 
 		// read the source directory
 		$handle = opendir($path);
-		if(count($excludefilter)) {
-			$excludefilter = '/('. implode('|', $excludefilter) .')/';
-		} else {
-			$excludefilter = '';
-		}
 		while (($file = readdir($handle)) !== false)
 		{
-			if (($file != '.') && ($file != '..') && (!in_array($file, $exclude)) && (!$excludefilter || !preg_match($excludefilter, $file))) {
+			if (($file != '.') && ($file != '..') && (!in_array($file, $exclude))) {
 				$dir = $path . DS . $file;
 				$isDir = is_dir($dir);
 				if ($isDir) {
@@ -444,7 +433,7 @@ class JFolder
 						} else {
 							$arr2 = JFolder::files($dir, $filter, $recurse, $fullpath);
 						}
-
+						
 						$arr = array_merge($arr, $arr2);
 					}
 				} else {
@@ -474,14 +463,12 @@ class JFolder
 	 * @param	boolean	True to return the full path to the folders.
 	 * @param	array	Array with names of folders which should not be shown in
 	 * the result.
-	 * @param	array	Array with regular expressions matching folders which
-	 * should not be shown in the result.
 	 * @return	array	Folders in the given folder.
 	 * @since 1.5
 	 */
-	public static function folders($path, $filter = '.', $recurse = false, $fullpath = false, $exclude = array('.svn', 'CVS','.DS_Store','__MACOSX'), $excludefilter = array('^\..*'))
+	function folders($path, $filter = '.', $recurse = false, $fullpath = false, $exclude = array('.svn', 'CVS'))
 	{
-		// Initialise variables.
+		// Initialize variables
 		$arr = array();
 
 		// Check to make sure the path valid and clean
@@ -489,20 +476,15 @@ class JFolder
 
 		// Is the path a folder?
 		if (!is_dir($path)) {
-			JError::raiseWarning(21, JText::sprintf('JLIB_FILESYSTEM_ERROR_PATH_IS_NOT_A_FOLDER_FOLDER', $path));
+			JError::raiseWarning(21, 'JFolder::folder: ' . JText::_('Path is not a folder'), 'Path: ' . $path);
 			return false;
 		}
 
 		// read the source directory
 		$handle = opendir($path);
-		if(count($excludefilter)) {
-			$excludefilter_string = '/('. implode('|', $excludefilter) .')/';
-		} else {
-			$excludefilter_string = '';
-		}
 		while (($file = readdir($handle)) !== false)
 		{
-			if (($file != '.') && ($file != '..') && (!in_array($file, $exclude)) && (empty($excludefilter_string) || !preg_match($excludefilter_string, $file))) {
+			if (($file != '.') && ($file != '..') && (!in_array($file, $exclude))) {
 				$dir = $path . DS . $file;
 				$isDir = is_dir($dir);
 				if ($isDir) {
@@ -516,11 +498,11 @@ class JFolder
 					}
 					if ($recurse) {
 						if (is_integer($recurse)) {
-						$arr2 = JFolder::folders($dir, $filter, $recurse - 1, $fullpath, $exclude, $excludefilter);
+							$arr2 = JFolder::folders($dir, $filter, $recurse - 1, $fullpath);
 						} else {
-						$arr2 = JFolder::folders($dir, $filter, $recurse, $fullpath, $exclude, $excludefilter);
+							$arr2 = JFolder::folders($dir, $filter, $recurse, $fullpath);
 						}
-
+						
 						$arr = array_merge($arr, $arr2);
 					}
 				}
@@ -581,8 +563,8 @@ class JFolder
 	 */
 	function makeSafe($path)
 	{
-		//$ds = (DS == '\\') ? '\\' . DS : DS;
-		$regex = array('#[^A-Za-z0-9:_\\\/-]#');
+		$ds = (DS == '\\') ? '\\' . DS : DS;
+		$regex = array('#[^A-Za-z0-9:\_\-' . $ds . ' ]#');
 		return preg_replace($regex, '', $path);
 	}
 

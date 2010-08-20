@@ -1,15 +1,19 @@
 <?php
 /**
- * @version		$Id:storage.php 6961 2007-03-15 16:06:53Z tcp $
- * @package		Joomla.Framework
- * @subpackage	Cache
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
+* @version		$Id:storage.php 6961 2007-03-15 16:06:53Z tcp $
+* @package		Joomla.Framework
+* @subpackage	Cache
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
-// No direct access
-defined('JPATH_BASE') or die;
-
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 /**
  * Abstract cache storage handler
@@ -22,55 +26,18 @@ defined('JPATH_BASE') or die;
 class JCacheStorage extends JObject
 {
 	/**
-	 * @since	1.6
-	 */
-	protected $rawname;
-
-	/**
-	 * @since	1.6
-	 */
-	public $_now;
-
-	/**
-	 * @since	1.6
-	 */
-	public $_lifetime;
-
-	/**
-	 * @since	1.6
-	 */
-	public $_locking;
-
-	/**
-	 * @since	1.6
-	 */
-	public $_language;
-
-	/**
-	 * @since	1.6
-	 */
-	public $_application;
-
-	/**
-	 * @since	1.6
-	 */
-	public $_hash;
-
-	/**
-	 * Constructor
-	 *
-	 * @param	array	$options optional parameters
-	 * @since	1.5
-	 */
-	public function __construct($options = array())
+	* Constructor
+	*
+	* @access protected
+	* @param array $options optional parameters
+	*/
+	function __construct( $options = array() )
 	{
-		$config				= JFactory::getConfig();
-		$this->_hash		= md5($config->get('secret'));
 		$this->_application	= (isset($options['application'])) ? $options['application'] : null;
 		$this->_language	= (isset($options['language'])) ? $options['language'] : 'en-GB';
 		$this->_locking		= (isset($options['locking'])) ? $options['locking'] : true;
-		$this->_lifetime	= (isset($options['lifetime'])) ? $options['lifetime']*60 : $config->get('cachetime')*60;
-		$this->_now			= (isset($options['now'])) ? $options['now'] : time();
+		$this->_lifetime	= (isset($options['lifetime'])) ? $options['lifetime'] : null;
+		$this->_now		= (isset($options['now'])) ? $options['now'] : time();
 
 		// Set time threshold value.  If the lifetime is not set, default to 60 (0 is BAD)
 		// _threshold is now available ONLY as a legacy (it's deprecated).  It's no longer used in the core.
@@ -80,11 +47,10 @@ class JCacheStorage extends JObject
 		} else {
 			$this->_threshold = $this->_now - $this->_lifetime;
 		}
-
 	}
 
 	/**
-	 * Returns a cache storage handler object, only creating it
+	 * Returns a reference to a cache storage hanlder object, only creating it
 	 * if it doesn't already exist.
 	 *
 	 * @static
@@ -92,80 +58,57 @@ class JCacheStorage extends JObject
 	 * @return	object	A JCacheStorageHandler object
 	 * @since	1.5
 	 */
-	public static function getInstance($handler=null, $options = array())
+	function &getInstance($handler = 'file', $options = array())
 	{
 		static $now = null;
-
-		JCacheStorage::addIncludePath(JPATH_LIBRARIES.DS.'joomla'.DS.'cache'.DS.'storage');
-
-		if (!isset($handler)) {
-			$conf = JFactory::getConfig();
-			$handler = $conf->get('cache_handler');
-			if (empty($handler)) {
-				return JError::raiseWarning(500, JText::_('JLIB_CACHE_ERROR_CACHE_HANDLER_NOT_SET'));
-			}
-		}
-
-		if (is_null($now)) {
+		if(is_null($now)) {
 			$now = time();
 		}
-
 		$options['now'] = $now;
 		//We can't cache this since options may change...
 		$handler = strtolower(preg_replace('/[^A-Z0-9_\.-]/i', '', $handler));
-
-		$class = 'JCacheStorage'.ucfirst($handler);
-		if (!class_exists($class)) {
-			// Search for the class file in the JCacheStorage include paths.
-			jimport('joomla.filesystem.path');
-			if ($path = JPath::find(JCacheStorage::addIncludePath(), strtolower($handler).'.php')) {
-				require_once $path;
+		$class   = 'JCacheStorage'.ucfirst($handler);
+		if(!class_exists($class))
+		{
+			$path = dirname(__FILE__).DS.'storage'.DS.$handler.'.php';
+			if (file_exists($path) ) {
+				require_once($path);
 			} else {
-				return JError::raiseWarning(500, JText::sprintf('JLIB_CACHE_ERROR_CACHE_STORAGE_LOAD', $handler));
+				return JError::raiseWarning(500, 'Unable to load Cache Storage: '.$handler);
 			}
 		}
-
-		return new $class($options);
+		$return = new $class($options);
+		return $return;
 	}
 
 	/**
 	 * Get cached data by id and group
 	 *
+	 * @abstract
+	 * @access	public
 	 * @param	string	$id			The cache data id
 	 * @param	string	$group		The cache data group
 	 * @param	boolean	$checkTime	True to verify cache time expiration threshold
-	 * @return	mixed	Boolean false on failure or a cached data object
+	 * @return	mixed	Boolean false on failure or a cached data string
 	 * @since	1.5
 	 */
-	public function get($id, $group, $checkTime)
+	function get($id, $group, $checkTime)
 	{
-		return false;
-	}
-
-	/**
-	 * Get all cached data
-	 *
-	 * @return	mixed	Boolean false on failure or a cached data object
-	 * @since	1.6
-	 */
-	public function getAll()
-	{
-		if (!class_exists('JCacheStorageHelper', false)) {
-			require_once JPATH_ROOT.DS.'libraries'.DS.'joomla'.DS.'cache'.DS.'storage'.DS.'helpers'.DS.'helper.php';
-		}
 		return;
 	}
 
 	/**
 	 * Store the data to cache by id and group
 	 *
+	 * @abstract
+	 * @access	public
 	 * @param	string	$id		The cache data id
 	 * @param	string	$group	The cache data group
 	 * @param	string	$data	The data to store in cache
 	 * @return	boolean	True on success, false otherwise
 	 * @since	1.5
 	 */
-	public function store($id, $group, $data)
+	function store($id, $group, $data)
 	{
 		return true;
 	}
@@ -173,12 +116,14 @@ class JCacheStorage extends JObject
 	/**
 	 * Remove a cached data entry by id and group
 	 *
+	 * @abstract
+	 * @access	public
 	 * @param	string	$id		The cache data id
 	 * @param	string	$group	The cache data group
 	 * @return	boolean	True on success, false otherwise
 	 * @since	1.5
 	 */
-	public function remove($id, $group)
+	function remove($id, $group)
 	{
 		return true;
 	}
@@ -189,12 +134,14 @@ class JCacheStorage extends JObject
 	 * group mode		: cleans all cache in the group
 	 * notgroup mode	: cleans all cache not in the group
 	 *
+	 * @abstract
+	 * @access	public
 	 * @param	string	$group	The cache data group
 	 * @param	string	$mode	The mode for cleaning cache [group|notgroup]
 	 * @return	boolean	True on success, false otherwise
 	 * @since	1.5
 	 */
-	public function clean($group, $mode)
+	function clean($group, $mode)
 	{
 		return true;
 	}
@@ -202,9 +149,11 @@ class JCacheStorage extends JObject
 	/**
 	 * Garbage collect expired cache data
 	 *
+	 * @abstract
+	 * @access public
 	 * @return boolean  True on success, false otherwise.
 	 */
-	public function gc()
+	function gc()
 	{
 		return true;
 	}
@@ -212,76 +161,13 @@ class JCacheStorage extends JObject
 	/**
 	 * Test to see if the storage handler is available.
 	 *
+	 * @abstract
+	 * @static
+	 * @access public
 	 * @return boolean  True on success, false otherwise.
 	 */
-	public static function test()
+	function test()
 	{
 		return true;
-	}
-
-	/**
-	 * Lock cached item
-	 *
-	 * @param	string	$id		The cache data id
-	 * @param	string	$group	The cache data group
-	 * @param	integer	$locktime Cached item max lock time
-	 * @return	boolean	True on success, false otherwise.
-	 * @since	1.6
-	 */
-	public function lock($id,$group,$locktime)
-	{
-		return false;
-	}
-
-	/**
-	 * Unlock cached item
-	 *
-	 * @param	string	$id		The cache data id
-	 * @param	string	$group	The cache data group
-	 * @return	boolean	True on success, false otherwise.
-	 * @since	1.6
-	 */
-	public function unlock($id,$group)
-	{
-		return false;
-	}
-
-	/**
-	 * Get a cache_id string from an id/group pair
-	 *
-	 * @param	string	$id		The cache data id
-	 * @param	string	$group	The cache data group
-	 * @return	string	The cache_id string
-	 * @since	1.6
-	 */
-	protected function _getCacheId($id, $group)
-	{
-		$name	= md5($this->_application.'-'.$id.'-'.$this->_language);
-		$this->rawname = $this->_hash.'-'.$name;
-		return $this->_hash.'-cache-'.$group.'-'.$name;
-	}
-
-	/**
-	 * Add a directory where JCacheStorage should search for handlers. You may
-	 * either pass a string or an array of directories.
-	 *
-	 * @param	string	A path to search.
-	 * @return	array	An array with directory elements
-	 * @since	1.6
-	 */
-	public static function addIncludePath($path='')
-	{
-		static $paths;
-
-		if (!isset($paths)) {
-			$paths = array();
-		}
-
-		if (!empty($path) && !in_array($path, $paths)) {
-			jimport('joomla.filesystem.path');
-			array_unshift($paths, JPath::clean($path));
-		}
-
-		return $paths;
 	}
 }

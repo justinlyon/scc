@@ -1,111 +1,123 @@
 <?php
 /**
- * @version		$Id: menu.php 17291 2010-05-27 03:53:00Z pasamio $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
+* @version		$Id: menu.php 14401 2010-01-26 14:10:00Z louis $
+* @package		Joomla.Framework
+* @subpackage	Table
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
-// No direct access
-defined('JPATH_BASE') or die;
-
-jimport('joomla.database.tablenested');
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 /**
  * Menu table
  *
- * @package		Joomla.Framework
- * @subpackage	Table
- * @since		1.0
+ * @package 	Joomla.Framework
+ * @subpackage		Table
+ * @since	1.0
  */
-class JTableMenu extends JTableNested
+class JTableMenu extends JTable
 {
+	/** @var int Primary key */
+	var $id					= null;
+	/** @var string */
+	var $menutype			= null;
+	/** @var string */
+	var $name				= null;
+	/** @var string */
+	var $alias				= null;
+	/** @var string */
+	var $link				= null;
+	/** @var int */
+	var $type				= null;
+	/** @var int */
+	var $published			= null;
+	/** @var int */
+	var $componentid		= null;
+	/** @var int */
+	var $parent				= null;
+	/** @var int */
+	var $sublevel			= null;
+	/** @var int */
+	var $ordering			= null;
+	/** @var boolean */
+	var $checked_out		= 0;
+	/** @var datetime */
+	var $checked_out_time	= 0;
+	/** @var boolean */
+	var $pollid				= null;
+	/** @var string */
+	var $browserNav			= null;
+	/** @var int */
+	var $access				= null;
+	/** @var int */
+	var $utaccess			= null;
+	/** @var string */
+	var $params				= null;
+	/** @var int Pre-order tree traversal - left value */
+	var $lft				= null;
+	/** @var int Pre-order tree traversal - right value */
+	var $rgt				= null;
+	/** @var int */
+	var $home				= null;
+
 	/**
 	 * Constructor
 	 *
+	 * @access protected
 	 * @param database A database connector object
 	 */
-	public function __construct(&$db)
-	{
-		parent::__construct('#__menu', 'id', $db);
-
-		// Set the default access level.
-		$this->access = (int) JFactory::getConfig()->get('access');
-	}
-
-	/**
-	 * Overloaded bind function
-	 *
-	 * @param	array $hash		named array
-	 * @return	mixed			null is operation was satisfactory, otherwise returns an error
-	 * @see		JTable:bind
-	 * @since	1.5
-	 */
-	public function bind($array, $ignore = '')
-	{
-		// Verify that the default home menu is not unset
-		if ($this->home=='1' && $this->language=='*' && ($array['home']=='0' || $array['language']!='*' || $array['published']=='0')) {
-			$this->setError(JText::_('JLIB_DATABASE_ERROR_MENU_CANNOT_UNSET_DEFAULT'));
-			return false;
-		}
-
-		if (isset($array['params']) && is_array($array['params']))
-		{
-			$registry = new JRegistry();
-			$registry->loadArray($array['params']);
-			$array['params'] = (string)$registry;
-		}
-
-		return parent::bind($array, $ignore);
+	function __construct( &$db ) {
+		parent::__construct( '#__menu', 'id', $db );
 	}
 
 	/**
 	 * Overloaded check function
 	 *
-	 * @return	boolean
-	 * @see		JTable::check
-	 * @since	1.5
+	 * @access public
+	 * @return boolean
+	 * @see JTable::check
+	 * @since 1.5
 	 */
-	public function check()
+	function check()
 	{
-		if (empty($this->alias)) {
-			$this->alias = $this->title;
+		if(empty($this->alias)) {
+			$this->alias = $this->name;
 		}
-		$this->alias = JApplication::stringURLSafe($this->alias);
-		if (trim(str_replace('-','',$this->alias)) == '') {
-			$this->alias = JFactory::getDate()->format('Y-m-d-H-i-s');
+		$this->alias = JFilterOutput::stringURLSafe($this->alias);
+		if(trim(str_replace('-','',$this->alias)) == '') {
+			$datenow =& JFactory::getDate();
+			$this->alias = $datenow->toFormat("%Y-%m-%d-%H-%M-%S");
 		}
 
 		return true;
 	}
+
 	/**
-	 * Overloaded store function
-	 *
-	 * @return	boolean
-	 * @see		JTable::store
-	 * @since	1.6
-	 */
-	public function store($updateNulls = false)
+	* Overloaded bind function
+	*
+	* @access public
+	* @param array $hash named array
+	* @return null|string	null is operation was satisfactory, otherwise returns an error
+	* @see JTable:bind
+	* @since 1.5
+	*/
+
+	function bind($array, $ignore = '')
 	{
-		// Verify that the home page for this language is unique
-		if ($this->home=='1') {
-			$table = JTable::getInstance('Menu','JTable');
-			if ($table->load(array('home'=>'1','language'=>$this->language))) {
-				if ($table->checked_out && $table->checked_out!=$this->checked_out) {
-					$this->setError(JText::_('JLIB_DATABASE_ERROR_MENU_DEFAULT_CHECKIN_USER_MISMATCH'));
-					return false;
-				}
-				$table->home=0;
-				$table->checked_out=0;
-				$table->checked_out_time='0000-00-00 00:00:00';
-				$table->store();
-			}
+		if (is_array( $array['params'] ))
+		{
+			$registry = new JRegistry();
+			$registry->loadArray($array['params']);
+			$array['params'] = $registry->toString();
 		}
-		// Verify that the alias is unique
-		$table = JTable::getInstance('Menu','JTable');
-		if ($table->load(array('alias'=>$this->alias,'parent_id'=>$this->parent_id)) && ($table->id != $this->id || $this->id==0)) {
-			$this->setError(JText::_('JLIB_DATABASE_ERROR_MENU_UNIQUE_ALIAS'));
-			return false;
-		}
-		return parent::store($updateNulls);
+
+		return parent::bind($array, $ignore);
 	}
 }

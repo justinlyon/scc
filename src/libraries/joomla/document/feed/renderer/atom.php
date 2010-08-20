@@ -1,14 +1,19 @@
 <?php
 /**
- * @version		$Id: atom.php 18244 2010-07-25 15:22:04Z infograf768 $
+ * @version		$Id: atom.php 15105 2010-02-27 14:59:11Z ian $
  * @package		Joomla.Framework
  * @subpackage	Document
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant
+ * to the GNU General Public License, and as distributed it includes or
+ * is derivative of works licensed under the GNU General Public License or
+ * other free or open source software licenses.
+ * See COPYRIGHT.php for copyright notices and details.
  */
 
-// No direct access
-defined('JPATH_BASE') or die;
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 
 
@@ -19,7 +24,7 @@ defined('JPATH_BASE') or die;
  * produce valid atom files. For example, you have to specify either an editor
  * for the feed or an author for every single feed item.
  *
- * @package		Joomla.Framework
+ * @package 	Joomla.Framework
  * @subpackage	Document
  * @see http://www.atomenabled.org/developers/syndication/atom-format-spec.php
  * @since	1.5
@@ -33,7 +38,7 @@ defined('JPATH_BASE') or die;
 	 * @var		string
 	 * @access	private
 	 */
-	var $_mime = "application/atom+xml";
+	 var $_mime = "application/atom+xml";
 
 	/**
 	 * Render the feed
@@ -43,12 +48,12 @@ defined('JPATH_BASE') or die;
 	 */
 	function render()
 	{
-		$now	= JFactory::getDate();
-		$data	= &$this->_doc;
+		$now	=& JFactory::getDate();
+		$data	=& $this->_doc;
 
-		$uri = JFactory::getURI();
+		$uri =& JFactory::getURI();
 		$url = $uri->toString(array('scheme', 'user', 'pass', 'host', 'port'));
-		$syndicationURL = JRoute::_('&format=feed&type=atom');
+		$syndicationURL =& JRoute::_('&format=feed&type=atom');
 
 		$feed = "<feed xmlns=\"http://www.w3.org/2005/Atom\" ";
 		if ($data->language!="") {
@@ -68,7 +73,7 @@ defined('JPATH_BASE') or die;
 			}
 			$feed.= "	</author>\n";
 		}
-		$feed.= "	<generator uri=\"http://joomla.org\" version=\"1.6\">".$data->getGenerator()."</generator>\n";
+		$feed.= "	<generator uri=\"http://joomla.org\" version=\"1.5\">".$data->getGenerator()."</generator>\n";
 		$feed.= '<link rel="self" type="application/atom+xml" href="'.str_replace(' ','%20',$url.$syndicationURL). "\" />\n";
 
 		for ($i=0;$i<count($data->items);$i++)
@@ -80,7 +85,7 @@ defined('JPATH_BASE') or die;
 			if ($data->items[$i]->date=="") {
 				$data->items[$i]->date = $now->toUnix();
 			}
-			$itemDate = JFactory::getDate($data->items[$i]->date);
+			$itemDate =& JFactory::getDate($data->items[$i]->date);
 			$feed.= "		<published>".htmlspecialchars($itemDate->toISO8601(), ENT_COMPAT, 'UTF-8')."</published>\n";
 			$feed.= "		<updated>".htmlspecialchars($itemDate->toISO8601(),ENT_COMPAT, 'UTF-8')."</updated>\n";
 			$feed.= "		<id>".str_replace(' ', '%20', $url.$data->items[$i]->link)."</id>\n";
@@ -95,8 +100,8 @@ defined('JPATH_BASE') or die;
 				$feed.= "		</author>\n";
 			}
 			if ($data->items[$i]->description!="") {
-				$feed.= "		<summary type=\"html\">".htmlspecialchars($data->items[$i]->description, ENT_COMPAT, 'UTF-8')."</summary>\n";
-				$feed.= "		<content type=\"html\">".htmlspecialchars($data->items[$i]->description, ENT_COMPAT, 'UTF-8')."</content>\n";
+				$feed.= "		<summary type=\"html\">".htmlspecialchars($this->_relToAbs($data->items[$i]->description))."</summary>\n";
+				$feed.= "		<content type=\"html\">".htmlspecialchars($this->_relToAbs($data->items[$i]->description))."</content>\n";
 			}
 			if ($data->items[$i]->enclosure != NULL) {
 			$feed.="		<link rel=\"enclosure\" href=\"". $data->items[$i]->enclosure->url ."\" type=\"". $data->items[$i]->enclosure->type."\"  length=\"". $data->items[$i]->enclosure->length . "\" />\n";
@@ -105,5 +110,13 @@ defined('JPATH_BASE') or die;
 		}
 		$feed.= "</feed>\n";
 		return $feed;
+	}
+
+	function _relToAbs($text)
+	{
+		$base = JURI::base();
+  		$text = preg_replace("/(href|src)=\"(?!http|ftp|https|mailto)([^\"]*)\"/", "$1=\"$base\$2\"", $text);
+
+		return $text;
 	}
 }

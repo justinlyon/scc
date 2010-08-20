@@ -1,241 +1,101 @@
 <?php
 /**
- * @version		$Id: menu.php 17854 2010-06-23 17:43:55Z eddieajau $
- * @package		Joomla.Framework
- * @subpackage		HTML
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
+* @version		$Id: menu.php 14401 2010-01-26 14:10:00Z louis $
+* @package		Joomla.Framework
+* @subpackage		HTML
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
 // no direct access
-defined('_JEXEC') or die;
+defined( '_JEXEC' ) or die( 'Restricted access' );
 
 /**
  * Utility class working with menu select lists
  *
  * @static
- * @package		Joomla.Framework
+ * @package 	Joomla.Framework
  * @subpackage	HTML
  * @since		1.5
  */
-abstract class JHtmlMenu
+class JHTMLMenu
 {
 	/**
-	 * @var	array	Cached array of the menus.
-	 */
-	protected static $menus = null;
-
-	/**
-	 * @var	array	Cached array of the menus items.
-	 */
-	protected static $items = null;
-
-	/**
-	 * Get a list of the available menus.
-	 *
-	 * @return	string
-	 * @since	1.6
-	 */
-	public static function menus()
+	* Build the select list for Menu Ordering
+	*/
+	function ordering( &$row, $id )
 	{
-		if (empty(self::$menus))
+		$db =& JFactory::getDBO();
+
+		if ( $id )
 		{
-			$db = JFactory::getDbo();
-			$db->setQuery(
-				'SELECT menutype As value, title As text' .
-				' FROM #__menu_types' .
-				' ORDER BY title'
-			);
-			self::$menus = $db->loadObjectList();
-		}
-
-		return self::$menus;
-	}
-
-	/**
-	 * Returns an array of menu items groups by menu.
-	 *
-	 * @param	array	An array of configuration options.
-	 *
-	 * @return	array
-	 */
-	public static function menuitems($config = array())
-	{
-		if (empty(self::$items))
-		{
-			$db = JFactory::getDbo();
-			$db->setQuery(
-				'SELECT menutype AS value, title AS text' .
-				' FROM #__menu_types' .
-				' ORDER BY title'
-			);
-			$menus = $db->loadObjectList();
-
-			$query	= $db->getQuery(true);
-			$query->select('a.id AS value, a.title AS text, a.level, a.menutype');
-			$query->from('#__menu AS a');
-			$query->where('a.parent_id > 0');
-			$query->where('a.type <> '.$db->quote('url'));
-			$query->where('a.menutype <> '.$db->quote('_adminmenu'));
-
-			// Filter on the published state
-			if (isset($config['published'])) {
-				if (is_numeric($config['published'])) {
-					$query->where('a.published = '.(int) $config['published']);
-				} else if ($config['published'] === '') {
-					$query->where('a.published IN (0,1)');
-				}
-			}
-
-			$query->order('a.lft');
-
-			$db->setQuery($query);
-			$items = $db->loadObjectList();
-
-			// Collate menu items based on menutype
-			$lookup = array();
-			foreach ($items as &$item) {
-				if (!isset($lookup[$item->menutype])) {
-					$lookup[$item->menutype] = array();
-				}
-				$lookup[$item->menutype][] = &$item;
-
-				$item->text = str_repeat('- ',$item->level).$item->text;
-			}
-			self::$items = array();
-
-			foreach ($menus as &$menu) {
-				self::$items[] = JHtml::_('select.optgroup',	$menu->text);
-				self::$items[] = JHtml::_('select.option', $menu->value.'.0', JText::_('JLIB_HTML_ADD_TO_THIS_MENU'));
-
-				if (isset($lookup[$menu->value])) {
-					foreach ($lookup[$menu->value] as &$item) {
-						self::$items[] = JHtml::_('select.option', $menu->value.'.'.$item->value, $item->text);
-					}
-				}
-			}
-		}
-
-		return self::$items;
-	}
-
-	/**
-	 * Displays an HTML select list of menu items.
-	 *
-	 * @param	string	The name of the control.
-	 * @param	string	The value of the selected option.
-	 * @param	string	Attributes for the control.
-	 * @param	array	An array of options for the control.
-	 *
-	 * @return	string
-	 */
-	public static function menuitemlist($name, $selected = null, $attribs = null, $config = array())
-	{
-		static $count;
-
-		$options = self::menuitems($config);
-
-		return JHtml::_(
-			'select.genericlist',
-			$options,
-			$name,
-			array(
-				'id' =>				isset($config['id']) ? $config['id'] : 'assetgroups_'.++$count,
-				'list.attr' =>		(is_null($attribs) ? 'class="inputbox" size="1"' : $attribs),
-				'list.select' =>	(int) $selected,
-				'list.translate' => false
-			)
-		);
-	}
-
-
-	/**
-	 * Build the select list for Menu Ordering
-	 */
-	public static function ordering(&$row, $id)
-	{
-		$db = JFactory::getDbo();
-
-		if ($id)
-		{
-			$query = 'SELECT ordering AS value, title AS text'
+			$query = 'SELECT ordering AS value, name AS text'
 			. ' FROM #__menu'
 			. ' WHERE menutype = '.$db->Quote($row->menutype)
-			. ' AND parent_id = '.(int) $row->parent_id
+			. ' AND parent = '.(int) $row->parent
 			. ' AND published != -2'
 			. ' ORDER BY ordering';
-			$order = JHtml::_('list.genericordering',  $query);
-			$ordering = JHtml::_(
-				'select.genericlist',
-				$order,
-				'ordering',
-				array('list.attr' => 'class="inputbox" size="1"', 'list.select' => intval($row->ordering))
-			);
+			$order = JHTML::_('list.genericordering',  $query );
+			$ordering = JHTML::_('select.genericlist',   $order, 'ordering', 'class="inputbox" size="1"', 'value', 'text', intval( $row->ordering ) );
 		}
 		else
 		{
-			$ordering = '<input type="hidden" name="ordering" value="'. $row->ordering .'" />'. JText::_('JGLOBAL_NEWITEMSLAST_DESC');
+			$ordering = '<input type="hidden" name="ordering" value="'. $row->ordering .'" />'. JText::_( 'DESCNEWITEMSLAST' );
 		}
 		return $ordering;
 	}
 
 	/**
-	 * Build the multiple select list for Menu Links/Pages
-	 */
-	public static function linkoptions($all=false, $unassigned=false)
+	* Build the multiple select list for Menu Links/Pages
+	*/
+	function linkoptions( $all=false, $unassigned=false )
 	{
-		$db = JFactory::getDbo();
+		$db =& JFactory::getDBO();
 
 		// get a list of the menu items
-		$query = 'SELECT m.id, m.parent_id, m.title, m.menutype'
+		$query = 'SELECT m.id, m.parent, m.name, m.menutype'
 		. ' FROM #__menu AS m'
 		. ' WHERE m.published = 1'
-		. ' ORDER BY m.menutype, m.parent_id, m.ordering'
+		. ' ORDER BY m.menutype, m.parent, m.ordering'
 		;
-		$db->setQuery($query);
-
+		$db->setQuery( $query );
 		$mitems = $db->loadObjectList();
-
-		// Check for a database error.
-		if ($db->getErrorNum()) {
-			JError::raiseNotice(500, $db->getErrorMsg());
-		}
-
-		if (!$mitems) {
-			$mitems = array();
-		}
-
 		$mitems_temp = $mitems;
 
 		// establish the hierarchy of the menu
 		$children = array();
 		// first pass - collect children
-		foreach ($mitems as $v)
+		foreach ( $mitems as $v )
 		{
 			$id = $v->id;
-			$pt = $v->parent_id;
+			$pt = $v->parent;
 			$list = @$children[$pt] ? $children[$pt] : array();
-			array_push($list, $v);
+			array_push( $list, $v );
 			$children[$pt] = $list;
 		}
 		// second pass - get an indent list of the items
-		$list = JHtmlMenu::TreeRecurse(intval($mitems[0]->parent_id), '', array(), $children, 9999, 0, 0);
+		$list = JHTMLMenu::TreeRecurse( intval( $mitems[0]->parent ), '', array(), $children, 9999, 0, 0 );
 
 		// Code that adds menu name to Display of Page(s)
-		$mitems_spacer	= $mitems_temp[0]->menutype;
+		$mitems_spacer 	= $mitems_temp[0]->menutype;
 
 		$mitems = array();
 		if ($all | $unassigned) {
-			$mitems[] = JHtml::_('select.option',  '<OPTGROUP>', JText::_('JOPTION_MENUS'));
+			$mitems[] = JHTML::_('select.option',  '<OPTGROUP>', JText::_( 'Menus' ) );
 
-			if ($all) {
-				$mitems[] = JHtml::_('select.option',  0, JText::_('JALL'));
+			if ( $all ) {
+				$mitems[] = JHTML::_('select.option',  0, JText::_( 'All' ) );
 			}
-			if ($unassigned) {
-				$mitems[] = JHtml::_('select.option',  -1, JText::_('JOPTION_UNASSIGNED'));
+			if ( $unassigned ) {
+				$mitems[] = JHTML::_('select.option',  -1, JText::_( 'Unassigned' ) );
 			}
 
-			$mitems[] = JHtml::_('select.option',  '</OPTGROUP>');
+			$mitems[] = JHTML::_('select.option',  '</OPTGROUP>' );
 		}
 
 		$lastMenuType	= null;
@@ -245,23 +105,23 @@ abstract class JHtmlMenu
 			if ($list_a->menutype != $lastMenuType)
 			{
 				if ($tmpMenuType) {
-					$mitems[] = JHtml::_('select.option',  '</OPTGROUP>');
+					$mitems[] = JHTML::_('select.option',  '</OPTGROUP>' );
 				}
-				$mitems[] = JHtml::_('select.option',  '<OPTGROUP>', $list_a->menutype);
+				$mitems[] = JHTML::_('select.option',  '<OPTGROUP>', $list_a->menutype );
 				$lastMenuType = $list_a->menutype;
 				$tmpMenuType  = $list_a->menutype;
 			}
 
-			$mitems[] = JHtml::_('select.option',  $list_a->id, $list_a->title);
+			$mitems[] = JHTML::_('select.option',  $list_a->id, $list_a->treename );
 		}
 		if ($lastMenuType !== null) {
-			$mitems[] = JHtml::_('select.option',  '</OPTGROUP>');
+			$mitems[] = JHTML::_('select.option',  '</OPTGROUP>' );
 		}
 
 		return $mitems;
 	}
 
-	public static function treerecurse($id, $indent, $list, &$children, $maxlevel=9999, $level=0, $type=1)
+	function treerecurse( $id, $indent, $list, &$children, $maxlevel=9999, $level=0, $type=1 )
 	{
 		if (@$children[$id] && $level <= $maxlevel)
 		{
@@ -269,24 +129,24 @@ abstract class JHtmlMenu
 			{
 				$id = $v->id;
 
-				if ($type) {
-					$pre	= '<sup>|_</sup>&#160;';
-					$spacer = '.&#160;&#160;&#160;&#160;&#160;&#160;';
+				if ( $type ) {
+					$pre 	= '<sup>|_</sup>&nbsp;';
+					$spacer = '.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 				} else {
-					$pre	= '- ';
-					$spacer = '&#160;&#160;';
+					$pre 	= '- ';
+					$spacer = '&nbsp;&nbsp;';
 				}
 
-				if ($v->parent_id == 0) {
-					$txt	= $v->title;
+				if ( $v->parent == 0 ) {
+					$txt 	= $v->name;
 				} else {
-					$txt	= $pre . $v->title;
+					$txt 	= $pre . $v->name;
 				}
-				$pt = $v->parent_id;
+				$pt = $v->parent;
 				$list[$id] = $v;
 				$list[$id]->treename = "$indent$txt";
-				$list[$id]->children = count(@$children[$id]);
-				$list = JHtmlMenu::TreeRecurse($id, $indent . $spacer, $list, $children, $maxlevel, $level+1, $type);
+				$list[$id]->children = count( @$children[$id] );
+				$list = JHTMLMenu::TreeRecurse( $id, $indent . $spacer, $list, $children, $maxlevel, $level+1, $type );
 			}
 		}
 		return $list;

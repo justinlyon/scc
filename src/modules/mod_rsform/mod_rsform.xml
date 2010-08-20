@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<install type="module" version="1.5.0">
+	<name>RSForm! Pro Module</name>
+	<author>www.rsjoomla.com</author>
+	<creationDate>May 2008</creationDate>
+	<copyright>(C) 2007-2009 www.rsjoomla.com. All rights reserved.</copyright>
+	<license>Commercial License, http://www.rsjoomla.com/terms-and-conditions.html</license>
+	<authorEmail>support@rsjoomla.com</authorEmail>
+	<authorUrl>www.rsjoomla.com</authorUrl>
+	<version>1.2.0</version>
+	<description>This module is used to display forms created with RSForm! Pro.</description>
+	<files>
+	<filename module="mod_rsform">mod_rsform.php</filename>
+	</files>
+	<params>
+		<param name="formId" type="text" default="1" label="Form id" description="The id of the Form. You can find it in your Manage Forms screen (the last column)." />
+		<param name="moduleclass_sfx" type="text" default="" label="Module Class Suffix" description="" />
+	</params>
+</install>

@@ -1,115 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
-	<fieldset name="component"
-		label="COM_WEBLINKS_COMPONENT_LABEL"
-		description="COM_WEBLINKS_COMPONENT_DESC"
-	>
-
-		<field name="show_comp_description" type="radio"
-			default="1"
-			description="COM_WEBLINKS_FIELD_CONFIG_DESCRIPTION_DESC"
-			label="JGLOBAL_DESCRIPTION"
-		>
-			<option value="0">JHIDE</option>
-			<option value="1">JSHOW</option>
-		</field>
-
-		<field name="comp_description" type="textarea"
-			cols="50"
-			description="COM_WEBLINKS_FIELD_CONFIG_INTRO_DESC"
-			label="COM_WEBLINKS_FIELD_CONFIG_INTRO_LABEL"
-			rows="3"
-		/>
-
-		<field name="show_link_hits" type="radio"
-			default="1"
-			description="COM_WEBLINKS_FIELD_CONFIG_HITS_DESC"
-			label="JGLOBAL_HITS"
-		>
-			<option value="0">JHIDE</option>
-			<option value="1">JSHOW</option>
-		</field>
-
-		<field name="show_link_description" type="radio"
-			default="1"
-			description="COM_WEBLINKS_FIELD_CONFIG_LINKDESCRIPTION_DESC"
-			label="COM_WEBLINKS_FIELD_CONFIG_LINKDESCRIPTION_LABEL"
-		>
-			<option value="0">JHIDE</option>
-			<option value="1">JSHOW</option>
-		</field>
-
-		<field name="show_other_cats" type="radio"
-			default="1"
-			description="COM_WEBLINKS_FIELD_CONFIG_OTHERCATS_DESC"
-			label="COM_WEBLINKS_FIELD_CONFIG_OTHERCATS_LABEL"
-		>
-			<option value="0">JHIDE</option>
-			<option value="1">JSHOW</option>
-		</field>
-
-		<field name="show_headings" type="radio"
-			default="1"
-			description="COM_WEBLINKS_FIELD_CONFIG_SHOWHEADINGS_DESC"
-			label="COM_WEBLINKS_FIELD_CONFIG_SHOWHEADINGS_LABEL"
-		>
-			<option value="0">JHIDE</option>
-			<option value="1">JSHOW</option>
-		</field>
-
-		<field name="show_numbers" type="radio"
-			default="1"
-			description="COM_WEBLINKS_FIELD_CONFIG_SHOWNUMBERS_DESC"
-			label="COM_WEBLINKS_FIELD_CONFIG_SHOWNUMBERS_LABEL"
-		>
-			<option value="0">JHIDE</option>
-			<option value="1">JSHOW</option>
-		</field>
-
-		<field name="show_report" type="radio"
-			default="1"
-			description="COM_WEBLINKS_FIELD_CONFIG_SHOWREPORT_DESC"
-			label="COM_WEBLINKS_FIELD_CONFIG_SHOWREPORT_LABEL"
-		>
-			<option value="0">JHIDE</option>
-			<option value="1">JSHOW</option>
-		</field>
-
-		<field name="count_clicks" type="radio"
-			default="1"
-			description="COM_WEBLINKS_FIELD_CONFIG_COUNTCLICKS_DESC"
-			label="COM_WEBLINKS_FIELD_CONFIG_COUNTCLICKS_LABEL"
-		>
-			<option value="0">JNO</option>
-			<option value="1">JYES</option>
-		</field>
-
-		<field name="target" type="list"
-			default="0"
-			description="COM_WEBLINKS_FIELD_TARGET_DESC"
-			label="COM_WEBLINKS_FIELD_TARGET_LABEL"
-		>
-			<option value="0">JBROWSERTARGET_PARENT</option>
-			<option value="1">JBROWSERTARGET_NEW</option>
-			<option value="2">JBROWSERTARGET_POPUP</option>
-			<option value="3">JBROWSERTARGET_MODAL</option>
-		</field>
-
-		<field name="link_icons" type="media"
-			description="COM_WEBLINKS_FIELD_CONFIG_ICON_DESC"
-			label="COM_WEBLINKS_FIELD_CONFIG_ICON_LABEL"
-		/>
-	</fieldset>
-
-	<fieldset name="permissions"
-		description="JCONFIG_PERMISSIONS_DESC"
-		label="JCONFIG_PERMISSIONS_LABEL"
-	>
-
-		<field name="rules" type="rules"
-			component="com_weblinks"
-			filter="rules"
-			label="JCONFIG_PERMISSIONS_LABEL"
-			section="component" />
-	</fieldset>
+	<params>
+		<param name="show_comp_description" type="radio" default="1" label="Description" description="Show/Hide the Description below">
+			<option value="0">Hide</option>
+			<option value="1">Show</option>
+		</param>
+		<param name="comp_description" type="textarea" default="" label="Weblinks Intro" rows="3" cols="50" description="WEBLINKS_INTRO_DESC" />
+		<param name="@spacer" type="spacer" default="" label="" description="" />
+		<param name="show_link_hits" type="radio" default="1" label="Hits" description="TIPIFSETTOSHOWHITS">
+			<option value="0">Hide</option>
+			<option value="1">Show</option>
+		</param>
+		<param name="show_link_description" type="radio" default="1" label="Link Descriptions" description="PARAMSHOWHIDELINKS">
+			<option value="0">Hide</option>
+			<option value="1">Show</option>
+		</param>
+		<param name="show_other_cats" type="radio" default="1" label="Other Categories" description="PARAMWHENVIEWCAT">
+			<option value="0">Hide</option>
+			<option value="1">Show</option>
+		</param>
+		<param name="show_headings" type="radio" default="1" label="Table Headings" description="Show/Hide the Table Headings">
+			<option value="0">Hide</option>
+			<option value="1">Show</option>
+		</param>
+		<param name="@spacer" type="spacer" default="" label="" description="" />
+		<param name="target" type="list" default="0" label="Target" description="Target window when the link is clicked">
+			<option value="0">Parent Window With Browser Navigation</option>
+			<option value="1">New Window With Browser Navigation</option>
+			<option value="2">New Window Without Browser Navigation</option>
+		</param>
+		<param name="link_icons" type="imagelist" directory="/images/M_images" default="" label="Icon" description="PARAMICONIMG" />
+	</params>
 </config>

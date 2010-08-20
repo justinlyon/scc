@@ -1,1015 +1,792 @@
 <?php
 /**
- * @version		$Id: item.php 18212 2010-07-22 06:02:54Z eddieajau $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @version		$Id: item.php 18162 2010-07-16 07:00:47Z ian $
+ * @package		Joomla
+ * @subpackage	Menus
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant to the
+ * GNU General Public License, and as distributed it includes or is derivative
+ * of works licensed under the GNU General Public License or other free or open
+ * source software licenses. See COPYRIGHT.php for copyright notices and
+ * details.
  */
 
-// No direct access
-defined('_JEXEC') or die;
+// Check to ensure this file is included in Joomla!
+defined('_JEXEC') or die( 'Restricted access' );
 
-// Include dependancies.
-jimport('joomla.application.component.modeladmin');
-require_once JPATH_COMPONENT.'/helpers/menus.php';
+jimport( 'joomla.application.component.model' );
 
 /**
- * Menu Item Model for Menus.
- *
- * @package		Joomla.Administrator
- * @subpackage	com_menus
- * @version		1.6
+ * @package		Joomla
+ * @subpackage	Menus
  */
-class MenusModelItem extends JModelAdmin
+class MenusModelItem extends JModel
 {
 	/**
-	 * @var		string	The prefix to use with controller messages.
-	 * @since	1.6
-	 */
-	protected $text_prefix = 'COM_MENUS_ITEM';
+	* Menu Item ID
+	* 
+	* @var int
+	*/
+	var $_id = null;
+	
+	/** @var object JTable object */
+	var $_table = null;
+
+	/** @var object JTable object */
+	var $_url = null;
 
 	/**
-	 * @var		string	The help screen key for the menu item.
-	 * @since	1.6
+	 * Overridden constructor
+	 * @access	protected
 	 */
-	protected $helpKey = 'JHELP_MENUS_MENU_ITEM_MANAGER_EDIT';
-
-	/**
-	 * @var		string	The help screen base URL for the menu item.
-	 * @since	1.6
-	 */
-	protected $helpURL;
-
-	/**
-	 * @var		boolean	True to use local lookup for the help screen.
-	 * @since	1.6
-	 */
-	protected $helpLocal = false;
-
-	/**
-	 * Method to perform batch operations on an item or a set of items.
-	 *
-	 * @param	array	An array of commands to perform.
-	 * @param	array	An array of category ids.
-	 *
-	 * @return	boolean	Returns true on success, false on failure.
-	 * @since	1.6
-	 */
-	function batch($commands, $pks)
+	function __construct()
 	{
-		// Sanitize user ids.
-		$pks = array_unique($pks);
-		JArrayHelper::toInteger($pks);
-
-		// Remove any values of zero.
-		if (array_search(0, $pks, true)) {
-			unset($pks[array_search(0, $pks, true)]);
-		}
-
-		if (empty($pks)) {
-			$this->setError(JText::_('COM_MENUS_NO_ITEM_SELECTED'));
-			return false;
-		}
-
-		$done = false;
-
-		if (!empty($commands['assetgroup_id'])) {
-			if (!$this->batchAccess($commands['assetgroup_id'], $pks)) {
-				return false;
-			}
-			$done = true;
-		}
-
-		if (!empty($commands['menu_id'])) {
-			$cmd = JArrayHelper::getValue($commands, 'move_copy', 'c');
-
-			if ($cmd == 'c' && !$this->batchCopy($commands['menu_id'], $pks)) {
-				return false;
-			} else if ($cmd == 'm' && !$this->batchMove($commands['menu_id'], $pks)) {
-				return false;
-			}
-			$done = true;
-		}
-
-		if (!$done) {
-			$this->setError('COM_MENUS_ERROR_INSUFFICIENT_BATCH_INFORMATION');
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Batch access level changes for a group of rows.
-	 *
-	 * @param	int		The new value matching an Asset Group ID.
-	 * @param	array	An array of row IDs.
-	 *
-	 * @return	booelan	True if successful, false otherwise and internal error is set.
-	 * @since	1.6
-	 */
-	protected function batchAccess($value, $pks)
-	{
-		$table = $this->getTable();
-		foreach ($pks as $pk) {
-			$table->reset();
-			$table->load($pk);
-			$table->access = (int) $value;
-
-			if (!$table->store()) {
-				$this->setError($table->getError());
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Batch copy menu items to a new menu or parent.
-	 *
-	 * @param	int		The new menu or sub-item.
-	 * @param	array	An array of row IDs.
-	 *
-	 * @return	booelan	True if successful, false otherwise and internal error is set.
-	 * @since	1.6
-	 */
-	protected function batchCopy($value, $pks)
-	{
-		// $value comes as {menutype}.{parent_id}
-		$parts		= explode('.', $value);
-		$menuType	= $parts[0];
-		$parentId	= (int) JArrayHelper::getValue($parts, 1, 0);
-
-		$table	= $this->getTable();
-		$db		= $this->getDbo();
-
-		// Check that the parent exists
-		if ($parentId) {
-			if (!$table->load($parentId)) {
-				if ($error = $table->getError()) {
-					// Fatal error
-					$this->setError($error);
-					return false;
-				} else {
-					// Non-fatal error
-					$this->setError(JText::_('COM_MENUS_BATCH_MOVE_PARENT_NOT_FOUND'));
-					$parentId = 0;
+		parent::__construct();
+		$url = JRequest::getVar('url', array(), '', 'array');
+		if (isset($url['option']))
+		 {
+			$this->_url = 'index.php?option='.$url['option'];
+			unset($url['option']);
+			if (count($url)) {
+				foreach ($url as $k => $v)
+				{
+					$this->_url .= '&'.$k.'='.$v;
 				}
 			}
 		}
+		
+		$this->setId();
+	}
+	
+	function setId()
+	{
+		$array = JRequest::getVar('cid', array(0), '', 'array');
+		$this->_id = (int) $array[0];
 
-		// If the parent is 0, set it to the ID of the root item in the tree
-		if (empty($parentId)) {
-			if (!$parentId = $table->getRootId()) {
-				$this->setError($db->getErrorMsg());
-				return false;
-			}
+		if (!$this->_id) {
+		$this->_id = JRequest::getInt('id', 0);
 		}
-
-		// We need to log the parent ID
-		$parents = array();
-
-		// Calculate the emergency stop count as a precaution against a runaway loop bug
-		$db->setQuery(
-			'SELECT COUNT(id)' .
-			' FROM #__menu'
-		);
-		$count = $db->loadResult();
-
-		if ($error = $db->getErrorMsg()) {
-			$this->setError($error);
-			return false;
-		}
-
-		// Parent exists so we let's proceed
-		while (!empty($pks) && $count > 0) {
-			// Pop the first id off the stack
-			$pk = array_shift($pks);
-
-			$table->reset();
-
-			// Check that the row actually exists
-			if (!$table->load($pk)) {
-				if ($error = $table->getError()) {
-					// Fatal error
-					$this->setError($error);
-					return false;
-				} else {
-					// Not fatal error
-					$this->setError(JText::sprintf('COM_MENUS_BATCH_MOVE_ROW_NOT_FOUND', $pk));
-					continue;
-				}
-			}
-
-			// Copy is a bit tricky, because we also need to copy the children
-			$db->setQuery(
-				'SELECT id' .
-				' FROM #__menu' .
-				' WHERE lft > '.(int) $table->lft.' AND rgt < '.(int) $table->rgt
-			);
-			$childIds = $db->loadResultArray();
-
-			// Add child ID's to the array only if they aren't already there.
-			foreach ($childIds as $childId) {
-				if (!in_array($childId, $pks)) {
-					array_push($pks, $childId);
-				}
-			}
-
-			// Make a copy of the old ID and Parent ID
-			$oldId				= $table->id;
-			$oldParentId		= $table->parent_id;
-
-			// Reset the id because we are making a copy.
-			$table->id			= 0;
-
-			// If we a copying children, the Old ID will turn up in the parents list
-			// otherwise it's a new top level item
-			$table->parent_id	= isset($parents[$oldParentId]) ? $parents[$oldParentId] : $parentId;
-			$table->menutype	= $menuType;
-			// TODO: Deal with ordering?
-			//$table->ordering	= 1;
-			$table->level		= null;
-			$table->lft		= null;
-			$table->rgt	= null;
-
-			// Store the row.
-			if (!$table->store()) {
-				$this->setError($table->getError());
-				return false;
-			}
-
-			// Now we log the old 'parent' to the new 'parent'
-			$parents[$oldId] = $table->id;
-			$count--;
-		}
-
-		// Rebuild the hierarchy.
-		if (!$table->rebuild()) {
-			$this->setError($table->getError());
-			return false;
-		}
-
-		// Rebuild the tree path.
-		if (!$table->rebuildPath($table->id)) {
-			$this->setError($table->getError());
-			return false;
-		}
-
-		// Clear the component's cache
-		$cache = JFactory::getCache('com_modules');
-		$cache->clean();
-		$cache->clean('mod_menu');
-
-		return true;
 	}
 
-	/**
-	 * Batch move menu items to a new menu or parent.
-	 *
-	 * @param	int		The new menu or sub-item.
-	 * @param	array	An array of row IDs.
-	 *
-	 * @return	booelan	True if successful, false otherwise and internal error is set.
-	 * @since	1.6
-	 */
-	protected function batchMove($value, $pks)
+	function &getItem()
 	{
-		// $value comes as {menutype}.{parent_id}
-		$parts		= explode('.', $value);
-		$menuType	= $parts[0];
-		$parentId	= (int) JArrayHelper::getValue($parts, 1, 0);
-
-		$table	= $this->getTable();
-		$db		= $this->getDbo();
-
-		// Check that the parent exists.
-		if ($parentId) {
-			if (!$table->load($parentId)) {
-				if ($error = $table->getError()) {
-					// Fatal error
-					$this->setError($error);
-					return false;
-				} else {
-					// Non-fatal error
-					$this->setError(JText::_('COM_MENUS_BATCH_MOVE_PARENT_NOT_FOUND'));
-					$parentId = 0;
-				}
-			}
+		static $item;
+		if (isset($item)) {
+			return $item;
 		}
 
-		// We are going to store all the children and just moved the menutype
-		$children = array();
+		$table =& $this->_getTable();
 
-		// Parent exists so we let's proceed
-		foreach ($pks as $pk) {
-			// Check that the row actually exists
-			if (!$table->load($pk)) {
-				if ($error = $table->getError()) {
-					// Fatal error
-					$this->setError($error);
-					return false;
-				} else {
-					// Not fatal error
-					$this->setError(JText::sprintf('COM_MENUS_BATCH_MOVE_ROW_NOT_FOUND', $pk));
-					continue;
-				}
-			}
-
-			// Set the new location in the tree for the node.
-			$table->setLocation($parentId, 'last-child');
-
-			// Check if we are moving to a different menu
-			if ($menuType != $table->menutype) {
-				// Add the child node ids to the children array.
-				$db->setQuery(
-					'SELECT `id`' .
-					' FROM `#__menu`' .
-					' WHERE `lft` BETWEEN '.(int) $table->lft.' AND '.(int) $table->rgt
-				);
-				$children = array_merge($children, (array) $db->loadResultArray());
-			}
-
-			// Store the row.
-			if (!$table->store()) {
-				$this->setError($table->getError());
-				return false;
-			}
-
-			// Rebuild the tree path.
-			if (!$table->rebuildPath()) {
-				$this->setError($table->getError());
-				return false;
-			}
+		// Load the current item if it has been defined
+		$edit	= JRequest::getVar('edit',true);
+		$cid = JRequest::getVar( 'cid', array(0), '', 'array' );
+		JArrayHelper::toInteger($cid, array(0));
+		if ($edit) {
+			$table->load($cid[0]);
 		}
 
-		// Process the child rows
-		if (!empty($children)) {
-			// Remove any duplicates and sanitize ids.
-			$children = array_unique($children);
-			JArrayHelper::toInteger($children);
-
-			// Update the menutype field in all nodes where necessary.
-			$db->setQuery(
-				'UPDATE `#__menu`' .
-				' SET `menutype` = '.$db->quote($menuType).
-				' WHERE `id` IN ('.implode(',', $children).')'
-			);
-			$db->query();
-
-			// Check for a database error.
-			if ($db->getErrorNum()) {
-				$this->setError($db->getErrorMsg());
-				return false;
-			}
-		}
-
-		// Clear the component's cache
-		$cache = JFactory::getCache('com_modules');
-		$cache->clean();
-		$cache->clean('mod_menu');
-
-		return true;
-	}
-
-	/**
-	 * Method to check if you can save a record.
-	 *
-	 * @param	array	An array of input data.
-	 * @param	string	The name of the key for the primary key.
-	 *
-	 * @return	boolean
-	 * @since	1.6
-	 */
-	protected function canSave($data = array(), $key = 'id')
-	{
-		return JFactory::getUser()->authorise('core.edit', $this->option);
-	}
-
-	/**
-	 * Method to get the row form.
-	 *
-	 * @param	array	$data		Data for the form.
-	 * @param	boolean	$loadData	True if the form is to load its own data (default case), false if not.
-	 * @return	mixed	A JForm object on success, false on failure
-	 * @since	1.6
-	 */
-	public function getForm($data = array(), $loadData = true)
-	{
-		// The folder and element vars are passed when saving the form.
-		if (empty($data)) {
-			$item		= $this->getItem();
-			$this->setState('item.link', $item->link);
-			// The type should already be set.
-		} else {
-			$this->setState('item.link', JArrayHelper::getValue($data, 'link'));
-			$this->setState('item.type', JArrayHelper::getValue($data, 'type'));
-		}
-
-		// Get the form.
-		$form = $this->loadForm('com_menus.item', 'item', array('control' => 'jform', 'load_data' => $loadData), true);
-		if (empty($form)) {
-			return false;
-		}
-
-		return $form;
-	}
-
-	/**
-	 * Method to get the data that should be injected in the form.
-	 *
-	 * @return	mixed	The data for the form.
-	 * @since	1.6
-	 */
-	protected function loadFormData()
-	{
-		// Check the session for previously entered form data.
-		$data = JFactory::getApplication()->getUserState('com_menus.edit.item.data', array());
-
-		if (empty($data)) {
-			$data = $this->getItem();
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Get the necessary data to load an item help screen.
-	 *
-	 * @return	object	An object with key, url, and local properties for loading the item help screen.
-	 * @since	1.6
-	 */
-	public function getHelp()
-	{
-		return (object) array('key' => $this->helpKey, 'url' => $this->helpURL, 'local' => $this->helpLocal);
-	}
-
-	/**
-	 * Method to get a menu item.
-	 *
-	 * @param	integer	An optional id of the object to get, otherwise the id from the model state is used.
-	 *
-	 * @return	mixed	Menu item data object on success, false on failure.
-	 * @since	1.6
-	 */
-	public function &getItem($pk = null)
-	{
-		// Initialise variables.
-		$pk = (!empty($pk)) ? $pk : (int)$this->getState('item.id');
-
-		// Get a level row instance.
-		$table = $this->getTable();
-
-		// Attempt to load the row.
-		$table->load($pk);
-
-		// Check for a table object error.
-		if ($error = $table->getError()) {
-			$this->setError($error);
-			$false = false;
-			return $false;
-		}
-
-		// Prime required properties.
-
-		if ($type = $this->getState('item.type')) {
+		// Override the current item's type field if defined in the request
+		if ($type = JRequest::getString('type')) {
 			$table->type = $type;
 		}
 
-		if (empty($table->id)) {
-			$table->parent_id	= $this->getState('item.parent_id');
-			$table->menutype	= $this->getState('item.menutype');
-			$table->params		= '{}';
+		// Override the current item's menutype field if defined in the request
+		if ($menutype = JRequest::getVar('menutype', '', '', 'menutype')) {
+			$table->menutype = $menutype;
 		}
 
-		// If the link has been set in the state, possibly changing link type.
-		if ($link = $this->getState('item.link')) {
-			// Check if we are changing away from the actual link type.
-			if (MenusHelper::getLinkKey($table->link) != MenusHelper::getLinkKey($link)) {
-				$table->link = $link;
-			}
-		}
-
-
-		switch ($table->type) {
-			case 'alias':
-				$table->component_id = 0;
-				$args = array();
-
-				parse_str(parse_url($table->link, PHP_URL_QUERY), $args);
-				break;
-
+		switch ($table->type)
+		{
 			case 'separator':
-				$table->link = '';
-				$table->component_id = 0;
+				$table->link = null;
+				$table->componentid = 0;
 				break;
-
 			case 'url':
-				$table->component_id = 0;
-
-				parse_str(parse_url($table->link, PHP_URL_QUERY));
+				$table->componentid = 0;
 				break;
-
+			case 'menulink':
+				$table->componentid = 0;
+				break;
 			case 'component':
-			default:
-				// Enforce a valid type.
-				$table->type = 'component';
-
-				// Ensure the integrity of the component_id field is maintained, particularly when changing the menu item type.
-				$args = array();
-				parse_str(parse_url($table->link, PHP_URL_QUERY), $args);
-
-				if (isset($args['option'])) {
-					// Load the language file for the component.
-					$lang = JFactory::getLanguage();
-						$lang->load($args['option'], JPATH_ADMINISTRATOR, null, false, false)
-					||	$lang->load($args['option'], JPATH_ADMINISTRATOR.'/components/'.$args['option'], null, false, false)
-					||	$lang->load($args['option'], JPATH_ADMINISTRATOR, $lang->getDefault(), false, false)
-					||	$lang->load($args['option'], JPATH_ADMINISTRATOR.'/components/'.$args['option'], $lang->getDefault(), false, false);
-
-					// Determine the component id.
-					$component = JComponentHelper::getComponent($args['option']);
-					if (isset($component->id)) {
-						$table->component_id = $component->id;
-					}
+				// Override the current item's link field if defined in the request
+				if (!is_null($this->_url)) {
+					$table->link = $this->_url;
+				}
+				$url = str_replace('index.php?', '', $table->link);
+				$url = str_replace('&amp;', '&', $url);
+				$table->linkparts = null;
+				if(strpos($url, '&amp;') !== false)
+				{
+				   $url = str_replace('&amp;','&',$url);
 				}
 
-				// Set the parsed request arguments to the object.
-				$table->request = $args;
+				parse_str($url, $table->linkparts);
 
+				$db = &$this->getDBO();
+				if ($component = @$table->linkparts['option']) {
+					$query = 'SELECT `id`' .
+							' FROM `#__components`' .
+							' WHERE `link` <> \'\'' .
+							' AND `parent` = 0' .
+							' AND `option` = "'.$db->getEscaped($component).'"';
+					$db->setQuery( $query );
+					$table->componentid = $db->loadResult();
+				}
 				break;
 		}
 
-		// We have a valid type, inject it into the state for forms to use.
-		$this->setState('item.type', $table->type);
+		$item = $table;
+		return $item;
+	}
 
-		// Convert to the JObject before adding the params.
-		$result = JArrayHelper::toObject($table->getProperties(1), 'JObject');
+	function &getExpansion()
+	{
+		$item				= &$this->getItem();
+		$return['option']	= JRequest::getCmd('expand');
+		$menutype			= JRequest::getVar('menutype', '', '', 'menutype');
 
-		// Convert the params field to an array.
-		$registry = new JRegistry;
-		$registry->loadJSON($table->params);
-		$result->params = $registry->toArray();
-
-		// Merge the request arguments in to the params for a component.
-		if ($table->type == 'component') {
-			// Note that all request arguments become reserved parameter names.
-			$args = array();
-			parse_str(parse_url($table->link, PHP_URL_QUERY), $args);
-			$result->params = array_merge($result->params, $args);
+		if ($return['option'])
+		{
+			require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_menus'.DS.'classes'.DS.'ilink.php');
+			$handler		= new iLink($return['option'], $item->id, $menutype);
+			$return['html'] = $handler->getTree();
+			return $return;
+		} else {
+			$return['html'] = null;
 		}
+		return $return;
+	}
 
-		if ($table->type == 'alias') {
-			// Note that all request arguments become reserved parameter names.
-			$args = array();
-			parse_str(parse_url($table->link, PHP_URL_QUERY), $args);
-			$result->params = array_merge($result->params, $args);
+	function &getUrlParams()
+	{
+		// Get the state parameters
+		$item	=& $this->getItem();
+		$params	= new JParameter('');
 
+		if ($state =& $this->_getStateXML())
+		{
+			if (is_a($state, 'JSimpleXMLElement'))
+			{
+				$sp =& $state->getElementByPath('url');
+				$params->setXML($sp);
+				if (isset($item->linkparts) && is_array($item->linkparts)) {
+					$params->loadArray($item->linkparts);
+				}
+			}
 		}
+		return $params;
+	}
 
-		if ($table->type == 'url') {
-			// Note that all request arguments become reserved parameter names.
-			$args = array();
-			parse_str(parse_url($table->link, PHP_URL_QUERY), $args);
-			$result->params = array_merge($result->params, $args);
+	function &getStateParams()
+	{
+		// Get the state parameters
+		$item	=& $this->getItem();
+		$params	= new JParameter($item->params);
+
+		if ($state =& $this->_getStateXML())
+		{
+			if (is_a($state, 'JSimpleXMLElement'))
+			{
+				$sp =& $state->getElementByPath('params');
+				$params->setXML($sp);
+			}
 		}
+		return $params;
+	}
 
-		return $result;
+	function &getAdvancedParams()
+	{
+		// Get the state parameters
+		$item	=& $this->getItem();
+		$params	= new JParameter($item->params);
+
+		if ($state =& $this->_getStateXML())
+		{
+			if (is_a($state, 'JSimpleXMLElement'))
+			{
+				$ap =& $state->getElementByPath('advanced');
+				$params->setXML($ap);
+			}
+		}
+		return $params;
+	}
+
+	function &getComponentParams()
+	{
+		// Initialize variables
+		$params	= null;
+		$item	= &$this->getItem();
+
+		if ($item->type == 'component')
+		{
+			$comp	= &$this->getComponent();
+			$option	= preg_replace( '#\W#', '', $comp->option );
+			$path	= JPATH_ADMINISTRATOR.DS.'components'.DS.$option.DS.'config.xml';
+
+			$params = new JParameter( $item->params );
+			if (file_exists( $path ))
+			{
+				$xml =& JFactory::getXMLParser('Simple');
+				if ($xml->loadFile($path))
+				{
+					$document =& $xml->document;
+
+					// if hide is set, don't show the component configuration while editing menu item
+					$menu = $document->attributes('menu');
+					if ( isset($menu) && $menu == 'hide' )
+					{
+						$params = null;
+						return $params;
+					}
+
+					if (isset($document->params[0]->param))
+					{
+						// We will collect the hidden elements in an array
+						// loop will mess up if we do it within the loop
+						$hide	= array();
+						for ($i=0,$n=count($document->params[0]->param); $i<$n; $i++)
+						{
+							if ($document->params[0]->param[$i]->attributes('menu') == 'hide')
+							{
+								$hide[]	= &$document->params[0]->param[$i];
+							}
+							else if ($document->params[0]->param[$i]->attributes('type') == 'radio' || $document->params[0]->param[$i]->attributes('type') == 'list') {
+								$document->params[0]->param[$i]->addAttribute('default', '');
+								$document->params[0]->param[$i]->addAttribute('type', 'list');
+								$child = &$document->params[0]->param[$i]->addChild('option', array('value' => ''));
+								$child->setData('Use Global');
+							}
+						}
+						// Now remove any hidden elements
+						for ($i = 0, $n = count( $hide ); $i < $n; $i++) {
+							$document->params[0]->removeChild( $hide[$i] );
+						}
+					}
+					$params->setXML( $document->params[0] );
+				}
+			}
+		}
+		return $params;
+	}
+
+	function &getSystemParams()
+	{
+		// Initialize variables
+		$params	= null;
+		$item	= &$this->getItem();
+
+		$params = new JParameter( $item->params );
+		if ($item->type == 'component') {
+			$path = JPATH_BASE.DS.'components'.DS.'com_menus'.DS.'models'.DS.'metadata'.DS.'component.xml';
+			if (file_exists( $path )) {
+				$xml =& JFactory::getXMLParser('Simple');
+				if ($xml->loadFile($path)) {
+					$document =& $xml->document;
+					$params->setXML($document->getElementByPath('state/params'));
+				}
+			}
+		}
+		return $params;
 	}
 
 	/**
-	 * Get the list of modules not in trash.
+	 * Get the name of the current menu item
 	 *
-	 * @return	mixed	An array of module records (id, title, position), or false on error.
-	 * @since	1.6
+	 * @return	string
+	 * @access	public
+	 * @since	1.5
 	 */
-	public function getModules()
+	function getStateName()
 	{
-		$db = $this->getDbo();
-		$query = $db->getQuery(true);
+		$state =& $this->_getStateXML();
 
-		$query->select('a.id, a.title, a.position, a.published');
-		$query->from('#__modules AS a');
+		if ( ! is_a($state, 'JSimpleXMLElement'))
+		{
+			return null;
+		}
 
-		// Join on the module-to-menu mapping table.
-		// We are only interested if the module is displayed on ALL or THIS menu item (or the inverse ID number).
-		$query->select('map.menuid');
-		$query->join('LEFT', '#__modules_menu AS map ON map.moduleid = a.id AND (map.menuid = 0 OR ABS(map.menuid) = '.(int) $this->getState('item.id').')');
+		$name = null;
+		$sn =& $state->getElementByPath('name');
+		if ($sn) {
+			$name = $sn->data();
+		}
 
-		// Join on the asset groups table.
-		$query->select('ag.title AS access_title');
-		$query->join('LEFT', '#__viewlevels AS ag ON ag.id = a.access');
-		$query->where('a.published >= 0');
-		$query->where('a.client_id = 0');
-		$query->order('a.position, a.ordering');
+		return JText::_($name);
+	}
 
-		$db->setQuery($query);
-		$result = $db->loadObjectList();
+	/**
+	 * Get the description of the current menu item
+	 *
+	 * @return	string
+	 * @access	public
+	 * @since	1.5
+	 */
+	function getStateDescription()
+	{
+		$state =& $this->_getStateXML();
 
-		if ($error = $db->getError()) {
-			$this->setError($error);
+
+		if ( ! is_a($state, 'JSimpleXMLElement'))
+		{
+			return null;
+		}
+
+		$description = null;
+		$sd =& $state->getElementByPath('description');
+		if ($sd) {
+			$description = $sd->data();
+		}
+
+		return JText::_($description);
+	}
+
+	/**
+	 * Gets the componet table object related to this menu item
+	 */
+	function &getComponent()
+	{
+		$item		=& $this->getItem();
+		$id			= $item->componentid;
+		$component	= & JTable::getInstance( 'component');
+		$component->load( $id );
+		return $component;
+	}
+
+	function checkout($uid = null)
+	{
+		$id = JRequest::getVar('cid', array(0), '', 'array');
+		JArrayHelper::toInteger( $id, array(0) );
+
+		// Make sure we have a user id to checkout the article with
+		if (is_null($uid)) {
+			$user	=& JFactory::getUser();
+			$uid	= $user->get('id');
+		}
+
+		// Lets get to it and checkout the thing...
+		$item	=& $this->getItem();
+		if(!$item->checkout($uid, $id[0])) {
+			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
 
-		return $result;
+		return true;
 	}
-
-	/**
-	 * Returns a Table object, always creating it
-	 *
-	 * @param	type	The table type to instantiate
-	 * @param	string	A prefix for the table class name. Optional.
-	 * @param	array	Configuration array for model. Optional.
-	 *
-	 * @return	JTable	A database object
-	 * @since	1.6
-	*/
-	public function getTable($type = 'Menu', $prefix = 'JTable', $config = array())
+	
+	function checkin()
 	{
-		return JTable::getInstance($type, $prefix, $config);
-	}
+		if ($this->_id) {
+			$item =& $this->_getTable();
 
-	/**
-	 * Auto-populate the model state.
-	 *
-	 * Note. Calling getState in this method will result in recursion.
-	 *
-	 * @since	1.6
-	 */
-	protected function populateState()
-	{
-		$app = JFactory::getApplication('administrator');
-
-		// Load the User state.
-		if (!($pk = (int) $app->getUserState('com_menus.edit.item.id'))) {
-			$pk = (int) JRequest::getInt('item_id');
-		}
-		$this->setState('item.id', $pk);
-
-		if (!($parentId = $app->getUserState('com_menus.edit.item.parent_id'))) {
-			$parentId = JRequest::getInt('parent_id');
-		}
-		$this->setState('item.parent_id', $parentId);
-
-		if (!($menuType = $app->getUserState('com_menus.edit.item.menutype'))) {
-			$menuType = JRequest::getCmd('menutype', 'mainmenu');
-		}
-		$this->setState('item.menutype', $menuType);
-
-		if (!($type = $app->getUserState('com_menus.edit.item.type'))){
-			$type = JRequest::getCmd('type');
-			// Note a new menu item will have no field type.
-			// The field is required so the user has to change it.
-		}
-		$this->setState('item.type', $type);
-
-		if ($link = $app->getUserState('com_menus.edit.item.link')) {
-			$this->setState('item.link', $link);
-		}
-
-		// Load the parameters.
-		$params	= JComponentHelper::getParams('com_menus');
-		$this->setState('params', $params);
-	}
-
-	/**
-	 * @param	object	A form object.
-	 * @param	mixed	The data expected for the form.
-	 *
-	 * @return	void
-	 * @throws	Exception if there is an error in the form event.
-	 * @since	1.6
-	 */
-	protected function preprocessForm($form, $data)
-	{
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
-
-		// Initialise variables.
-		$link = $this->getState('item.link');
-		$type = $this->getState('item.type');
-
-		// Initialise form with component view params if available.
-		if ($type == 'component') {
-
-			$link = htmlspecialchars_decode($link);
-
-			// Parse the link arguments.
-			$args = array();
-			parse_str(parse_url(htmlspecialchars_decode($link), PHP_URL_QUERY), $args);
-
-			// Confirm that the option is defined.
-			$option = '';
-			if (isset($args['option'])) {
-				// The option determines the base path to work with.
-				$option = $args['option'];
-				$base	= JPATH_SITE.'/components/'.$option;
+			if(!$item->checkin($this->_id)) {
+				$this->setError($this->_db->getErrorMsg());
+				return false;
 			}
 
-			// Confirm a view is defined.
-			$formFile = false;
-			if (isset($args['view'])) {
-				$view = $args['view'];
+			return true;
+		}
 
-				// Determine the layout to search for.
-				if (isset($args['layout'])) {
-					$layout = $args['layout'];
+		return false;
+	}
+
+	function store()
+	{
+		// Initialize variables
+		$db		=& JFactory::getDBO();
+		$row	=& $this->getItem();
+		$post	= $this->_state->get( 'request' );
+
+		switch ($post['type'])
+		{
+			case 'separator':
+				break;
+			case 'url':
+				break;
+			case 'menulink':
+				$post['link'] = 'index.php?Itemid='.$post['params']['menu_item'];
+				break;
+			case 'component':
+				break;
+		}
+		if (!$row->bind( $post )) {
+			echo "<script> alert('".$row->getError(true)."'); window.history.go(-1); </script>\n";
+			return false;
+		}
+
+		if ($row->id > 0)
+		{
+			// existing item
+			$query		= 'SELECT menutype FROM #__menu WHERE id = '.(int) $row->id;
+			$this->_db->setQuery( $query );
+			$oldType	= $this->_db->loadResult();
+			if ($oldType != $row->menutype) {
+				// moved to another menu, disconnect the old parent
+				$row->parent = 0;
+			}
+			$query		= 'SELECT parent FROM #__menu WHERE id = '.(int) $row->id;
+			$this->_db->setQuery( $query );
+			$oldParent	= $this->_db->loadResult();
+			if ($oldParent != $row->parent) {
+				// we have changed parents, so we have to fix the submenu values
+				if ($row->parent != 0) {
+					$query	= 'SELECT sublevel FROM #__menu WHERE id = '.(int) $row->parent;
+					$this->_db->setQuery( $query );
+					$sublevel = $this->_db->loadResult() + 1;
 				} else {
-					$layout = 'default';
+					$sublevel = 0;
+				}
+				$row->sublevel = $sublevel;
+				$this->_setSubLevel( array( (int) $row->id ), $sublevel );
+			}
+		}
+		else
+		{
+			// if new item order last in appropriate group
+			$where = "menutype = " . $db->Quote($row->menutype) . " AND published >= 0 AND parent = ".(int) $row->parent;
+			$row->ordering = $row->getNextOrder( $where );
+
+			if( $row->parent != 0 ) {
+				$query = 'SELECT sublevel FROM #__menu WHERE id = '. (int) $row->parent;
+				$this->_db->setQuery($query);
+				$row->sublevel = $this->_db->loadResult() + 1;
+			}
+		}
+
+		if (isset($post['urlparams']) && is_array($post['urlparams']))
+		{
+			$pos = strpos( $row->link, '?' );
+			if ($pos !== false)
+			{
+				$prefix = substr( $row->link, 0, $pos );
+				$query	= substr( $row->link, $pos+1 );
+
+				$temp = array();
+				if(strpos($query, '&amp;') !== false) {
+					$query = str_replace('&amp;', '&', $query);
+				}
+				parse_str( $query, $temp );
+				$temp2 = array_merge( $temp, $post['urlparams'] );
+
+				$temp3 = array();
+				foreach ($temp2 as $k => $v)
+				{
+					if ( $k && strlen($v) )
+					{
+						$temp3[] = $k.'='.$v;
+					}
+				}
+				$url = null;
+				$row->link = $prefix . '?' . implode( '&', $temp3 );
+			}
+		}
+
+		if (!$row->check())
+		{
+			echo "<script> alert('".$row->getError(true)."'); window.history.go(-1); </script>\n";
+			return false;
+		}
+
+		if (!$row->store())
+		{
+			echo "<script> alert('".$row->getError(true)."'); window.history.go(-1); </script>\n";
+			return false;
+		}
+
+		$row->checkin();
+		$row->reorder( 'menutype='.$db->Quote( $row->menutype ).' AND parent='.(int)$row->parent );
+
+		// clean cache
+		MenusHelper::cleanCache();
+
+		return true;
+	}
+
+
+
+	/**
+	 * Delete one or more menu items
+	 * @param mixed int or array of id values
+	 */
+	function delete( $ids )
+	{
+		JArrayHelper::toInteger($ids);
+
+		$db = &$this->getDBO();
+
+		if (count( $ids ))
+		{
+			// Delete associated module and template mappings
+			$where = 'WHERE menuid = ' . implode( ' OR menuid = ', $ids );
+
+			$query = 'DELETE FROM #__modules_menu '
+				. $where;
+			$db->setQuery( $query );
+			if (!$db->query()) {
+				$this->setError( $menuTable->getErrorMsg() );
+				return false;
+			}
+
+			$query = 'DELETE FROM #__templates_menu '
+				. $where;
+			$db->setQuery( $query );
+			if (!$db->query()) {
+				$this->setError( $menuTable->getErrorMsg() );
+				return false;
+			}
+
+			// Set any alias menu types to not point to missing menu items
+			$query = 'UPDATE #__menu SET link = 0 WHERE type = \'menulink\' AND (link = '.implode( ' OR id = ', $ids ).')';
+			$db->setQuery( $query );
+			if (!$db->query()) {
+				$this->setError( $db->getErrorMsg() );
+				return false;
+			}
+
+			// Delete the menu items
+			$where = 'WHERE id = ' . implode( ' OR id = ', $ids );
+
+			$query = 'DELETE FROM #__menu ' . $where;
+			$db->setQuery( $query );
+			if (!$db->query()) {
+				$this->setError( $db->getErrorMsg() );
+				return false;
+			}
+		}
+
+		// clean cache
+		MenusHelper::cleanCache();
+		
+		return true;
+	}
+
+	/**
+	 * Delete menu items by type
+	 */
+	function deleteByType( $type = '' )
+	{
+		$db = &$this->getDBO();
+
+		$query = 'SELECT id' .
+				' FROM #__menu' .
+				' WHERE menutype = ' . $db->Quote( $type );
+		$db->setQuery( $query );
+		$ids = $db->loadResultArray();
+
+		if ($db->getErrorNum())
+		{
+			$this->setError( $db->getErrorMsg() );
+			return false;
+		}
+
+		return $this->delete( $ids );
+	}
+
+	/**
+	 * Returns the internal table object
+	 * @return JTable
+	 */
+	function &_getTable()
+	{
+		if ($this->_table == null) {
+			$this->_table =& JTable::getInstance( 'menu');
+		}
+		return $this->_table;
+	}
+
+	function &_getStateXML()
+	{
+		static $xml;
+
+		if (isset($xml)) {
+			return $xml;
+		}
+		$xml = null;
+		$xmlpath = null;
+		$item 	= &$this->getItem();
+
+		switch ($item->type)
+		{
+			case 'separator':
+				$xmlpath = JPATH_BASE.DS.'components'.DS.'com_menus'.DS.'models'.DS.'metadata'.DS.'separator.xml';
+				break;
+			case 'url':
+				$xmlpath = JPATH_BASE.DS.'components'.DS.'com_menus'.DS.'models'.DS.'metadata'.DS.'url.xml';
+				break;
+			case 'menulink':
+				$xmlpath = JPATH_BASE.DS.'components'.DS.'com_menus'.DS.'models'.DS.'metadata'.DS.'menulink.xml';
+				break;
+			case 'component':
+			default:
+				if (isset($item->linkparts['view']))
+				{
+					// View is set... so we konw to look in view file
+					if (isset($item->linkparts['layout'])) {
+						$layout = $item->linkparts['layout'];
+					} else {
+						$layout = 'default';
+					}
+					$lpath = JPATH_ROOT.DS.'components'.DS.$item->linkparts['option'].DS.'views'.DS.$item->linkparts['view'].DS.'tmpl'.DS.$layout.'.xml';
+					$vpath = JPATH_ROOT.DS.'components'.DS.$item->linkparts['option'].DS.'views'.DS.$item->linkparts['view'].DS.'metadata.xml';
+					if (file_exists($lpath)) {
+						$xmlpath = $lpath;
+					} elseif (file_exists($vpath)) {
+						$xmlpath = $vpath;
+					}
+				}
+				if (!$xmlpath && isset($item->linkparts['option'])) {
+					$xmlpath = JPATH_ROOT.DS.'components'.DS.$item->linkparts['option'].DS.'metadata.xml';
+					if(!file_exists($xmlpath)) {
+						$xmlpath = JApplicationHelper::getPath('com_xml', $item->linkparts['option']);
+					}
+				}
+				break;
+		}
+
+		if (file_exists($xmlpath))
+		{
+			$xml =& JFactory::getXMLParser('Simple');
+			if ($xml->loadFile($xmlpath)) {
+				$this->_xml = &$xml;
+				$document =& $xml->document;
+
+				/*
+				 * HANDLE NO OPTION CASE
+				 */
+				$menus =& $document->getElementByPath('menu');
+				if (is_a($menus, 'JSimpleXMLElement') && $menus->attributes('options') == 'none') {
+					$xml =& $menus->getElementByPath('state');
+				} else {
+					$xml =& $document->getElementByPath('state');
 				}
 
-				$formFile = false;
-
-				// Check for the layout XML file. Use standard xml file if it exists.
-				$path = JPath::clean($base.'/views/'.$view.'/tmpl/'.$layout.'.xml');
-				if (JFile::exists($path)) {
-					$formFile = $path;
+				// Handle error case... path doesn't exist
+				if (!is_a($xml, 'JSimpleXMLElement')) {
+					return $document;
 				}
 
-				// if custom layout, get the xml file from the template folder
-				// TODO: only look in the template folder for the menu item's template
-				if (!$formFile) {
-					$folders = JFolder::folders(JPATH_SITE.'/templates','',false,true);
-					foreach($folders as $folder) {
-						if (JFile::exists($folder.'/html/'.$option.'/'.$view.'/'.$layout.'.xml')) {
-							$formFile = $folder.'/html/'.$option.'/'.$view.'/'.$layout.'.xml';
+				/*
+				 * HANDLE A SWITCH IF IT EXISTS
+				 */
+				if ($switch = $xml->attributes('switch'))
+				{
+					$default = $xml->attributes('default');
+					// Handle switch
+					$switchVal = (isset($item->linkparts[$switch]))? $item->linkparts[$switch] : 'default';
+					$found = false;
+
+					foreach ($xml->children() as $child) {
+						if ($child->name() == $switchVal) {
+							$xml =& $child;
+							$found = true;
 							break;
 						}
 					}
-				}
 
-				// TODO: Now check for a view manifest file
-				// TODO: Now check for a component manifest file
-			}
-
-			if ($formFile) {
-				// If an XML file was found in the component, load it first.
-				// We need to qualify the full path to avoid collisions with component file names.
-
-				if ($form->loadFile($formFile, false, '/metadata') == false) {
-					throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
-				}
-
-				// Attempt to load the xml file.
-				if (!$xml = simplexml_load_file($formFile)) {
-					throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
-				}
-
-				// Get the help data from the XML file if present.
-				$help = $xml->xpath('/metadata/layout/help');
-				if (!empty($help)) {
-					$helpKey = trim((string) $help[0]['key']);
-					$helpURL = trim((string) $help[0]['url']);
-					$helpLoc = trim((string) $help[0]['local']);
-
-					$this->helpKey = $helpKey ? $helpKey : $this->helpKey;
-					$this->helpURL = $helpURL ? $helpURL : $this->helpURL;
-					$this->helpLocal = (($helpLoc == 'true') || ($helpLoc == '1') || ($helpLoc == 'local')) ? true : false;
-				}
-
-			}
-
-			// Now load the component params.
-			// TODO: Work out why 'fixing' this breaks JForm
-			if ($isNew = false) {
-				$path = JPath::clean(JPATH_ADMINISTRATOR.'/components/'.$option.'/config.xml');
-			} else {
-				$path='null';
-			}
-
-			if (JFile::exists($path)) {
-				// Add the component params last of all to the existing form.
-				if (!$form->load($path, true, '/config')) {
-					throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
-				}
-			}
-		}
-
-		// Load the specific type file
-		if (!$form->loadFile('item_'.$type, false, false)) {
-			throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
-		}
-
-		// Trigger the default form events.
-		parent::preprocessForm($form, $data);
-	}
-
-	/**
-	 * Method rebuild the entire nested set tree.
-	 *
-	 * @return	boolean	False on failure or error, true otherwise.
-	 * @since	1.6
-	 */
-	public function rebuild()
-	{
-		// Initialiase variables.
-		$db = $this->getDbo();
-		$table = $this->getTable();
-
-		if (!$table->rebuild()) {
-			$this->setError($table->getError());
-			return false;
-		}
-
-		// Convert the parameters not in JSON format.
-		$db->setQuery(
-			'SELECT id, params' .
-			' FROM #__menu' .
-			' WHERE params NOT LIKE '.$db->quote('{%') .
-			'  AND params <> '.$db->quote('')
-		);
-
-		$items = $db->loadObjectList();
-		if ($error = $db->getErrorMsg()) {
-			$this->setError($error);
-			return false;
-		}
-
-		foreach ($items as &$item) {
-			$registry = new JRegistry;
-			$registry->loadJSON($item->params);
-			$params = (string)$registry;
-
-			$db->setQuery(
-				'UPDATE #__menu' .
-				' SET params = '.$db->quote($params).
-				' WHERE id = '.(int) $item->id
-			);
-			if (!$db->query()) {
-				$this->setError($error);
-				return false;
-			}
-			unset($registry);
-		}
-
-		return true;
-	}
-
-	/**
-	 * Method to save the form data.
-	 *
-	 * @param	array	The form data.
-	 * @return	boolean	True on success.
-	 * @since	1.6
-	 */
-	public function save($data)
-	{
-		// Initialise variables.
-		$pk		= (!empty($data['id'])) ? $data['id'] : (int)$this->getState('item.id');
-		$isNew	= true;
-		$db		= $this->getDbo();
-		$table	= $this->getTable();
-
-		// Load the row if saving an existing item.
-		if ($pk > 0) {
-			$table->load($pk);
-			$isNew = false;
-		}
-
-		// Set the new parent id if set.
-		if ($table->parent_id != $data['parent_id']) {
-			$table->setLocation($data['parent_id'], 'last-child');
-		}
-
-		// Bind the data.
-		if (!$table->bind($data)) {
-			$this->setError($table->getError());
-			return false;
-		}
-
-		// Check the data.
-		if (!$table->check()) {
-			$this->setError($table->getError());
-			return false;
-		}
-
-		// Store the data.
-		if (!$table->store()) {
-			$this->setError($table->getError());
-			return false;
-		}
-
-		// Rebuild the tree path.
-		if (!$table->rebuildPath($table->id)) {
-			$this->setError($table->getError());
-			return false;
-		}
-
-		$this->setState('item.id', $table->id);
-
-		// Clear the component's cache
-		$cache = JFactory::getCache('com_modules');
-		$cache->clean();
-		$cache->clean('mod_menu');
-
-		return true;
-	}
-
-	/**
-	 * Method to save the reordered nested set tree.
-	 * First we save the new order values in the lft values of the changed ids.
-	 * Then we invoke the table rebuild to implement the new ordering.
-	 *
-	 * @param	array	id's of rows to be reordered
-	 * @param	array	lft values of rows to be reordered
-	 * @return	boolean false on failuer or error, true otherwise
-	 * @since	1.6
-	*/
-	public function saveorder($idArray = null, $lft_array = null)
-	{
-		// Get an instance of the table object.
-		$table = $this->getTable();
-
-		if (!$table->saveorder($idArray, $lft_array)) {
-			$this->setError($table->getError());
-			return false;
-		}
-
-		return true;
-
-	}
-
-
-	/**
-	 * Method to change the home state of one or more items.
-	 *
-	 * @param	array	A list of the primary keys to change.
-	 * @param	int		The value of the home state.
-	 * @return	boolean	True on success.
-	 * @since	1.6
-	 */
-	function setHome(&$pks, $value = 1)
-	{
-		// Initialise variables.
-		$table		= $this->getTable();
-		$pks		= (array) $pks;
-		$user		= JFactory::getUser();
-
-		$languages = array();
-		$onehome=false;
-		foreach ($pks as $i => $pk) {
-			if ($table->load($pk)) {
-				if (!array_key_exists($table->language,$languages)) {
-					$languages[$table->language] = true;
-					if ($table->home==$value) {
-						unset($pks[$i]);
-						JError::raiseNotice(403, JText::_('COM_MENUS_ERROR_ALREADY_HOME'));
-					}
-					else {
-						$table->home = $value;
-						if ($table->language=='*') {
-							$table->published=1;
-						}
-						if (!$this->canSave($table)) {
-							// Prune items that you can't change.
-							unset($pks[$i]);
-							JError::raiseWarning(403, JText::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'));
-						}
-						if (!$table->store()) {
-							$this->setError($table->getError());
-							return false;
+					if (!$found) {
+						foreach ($xml->children() as $child) {
+							if ($child->name() == $default) {
+								$xml =& $child;
+								break;
+							}
 						}
 					}
 				}
-				else {
-					unset($pks[$i]);
-					if (!$onehome) {
-						$onehome = true;
-						JError::raiseNotice(403, JText::sprintf('COM_MENUS_ERROR_ONE_HOME'));
+
+				/*
+				 * HANDLE INCLUDED PARAMS
+				 */
+				$children = $xml->children();
+				if (count($children) == 1)
+				{
+					if ($children[0]->name() == 'include') {
+						$ret =& $this->_getIncludedParams($children[0]);
+						if ($ret) {
+							$xml =& $ret;
+						}
+					}
+				}
+
+				if ($switch = $xml->attributes('switch'))
+				{
+					$default = $xml->attributes('default');
+					// Handle switch
+					$switchVal = ($item->linkparts[$switch])? $item->linkparts[$switch] : 'default';
+					$found = false;
+
+					foreach ($xml->children() as $child) {
+						if ($child->name() == $switchVal) {
+							$xml =& $child;
+							$found = true;
+							break;
+						}
+					}
+
+					if (!$found) {
+						foreach ($xml->children() as $child) {
+							if ($child->name() == $default) {
+								$xml =& $child;
+								break;
+							}
+						}
 					}
 				}
 			}
 		}
-
-		return true;
+		return $xml;
 	}
 
-	/**
-	 * Method to change the published state of one or more records.
-	 *
-	 * @param	array	A list of the primary keys to change.
-	 * @param	int		The value of the published state.
-	 * @return	boolean	True on success.
-	 * @since	1.6
-	 */
-	function publish(&$pks, $value = 1)
+	function &_getIncludedParams($include)
 	{
-		// Initialise variables.
-		$table		= $this->getTable();
-		$pks		= (array) $pks;
+		$tags	= array();
+		$state	= null;
+		$source	= $include->attributes('source');
+		$path	= $include->attributes('path');
+		$item 	= &$this->getItem();
 
-		// Default menu item existence checks.
-		if ($value != 1) {
-			foreach ($pks as $i => $pk) {
-				if ($table->load($pk) && $table->home && $table->language=='*') {
-					// Prune items that you can't change.
-					JError::raiseWarning(403, JText::_('COM_MENUS_ERROR_UNPUBLISH_DEFAULT_HOME'));
-					unset($pks[$i]);
-					break;
-				}
+		preg_match_all( "/{([A-Za-z\-_]+)}/", $source, $tags);
+		if (isset($tags[1])) {
+			for ($i=0;$i<count($tags[1]);$i++) {
+				$source = str_replace($tags[0][$i], @$item->linkparts[$tags[1][$i]], $source);
 			}
 		}
 
-		return parent::publish($pks,$value);
+		// load the source xml file
+		if (file_exists( JPATH_ROOT.$source ))
+		{
+			$xml = & JFactory::getXMLParser('Simple');
+
+			if ($xml->loadFile(JPATH_ROOT.$source)) {
+				$document = &$xml->document;
+				$state = $document->getElementByPath($path);
+			}
+		}
+		return $state;
+	}
+
+	/**
+	 * Sets the sublevel for menu items
+	 *
+	 * @param array id values to set
+	 * @param int level to assign to the sublevel
+	 */
+	function _setSubLevel( $cid, $level )
+	{
+		JArrayHelper::toInteger($cid, array(0));
+
+		$ids = implode( ',', $cid );
+
+		$query	= 'UPDATE #__menu SET sublevel = '.(int) $level
+				.' WHERE id IN ('.$ids.')';
+		$this->_db->setQuery( $query );
+		$this->_db->query();
+
+		$query	= 'SELECT id FROM #__menu WHERE parent IN ('.$ids.')';
+		$this->_db->setQuery( $query );
+		$cids = $this->_db->loadResultArray( 0 );
+
+		if (!empty( $cids )) {
+			$this->_setSubLevel( $cids, $level + 1 );
+		}
 	}
 }

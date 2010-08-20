@@ -1,0 +1,420 @@
+/**
+* @copyright Copyright (C) 2009 JoomlaPraise.com. All rights reserved.
+* @license GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+*/
+
+/**
+ * Joomla! 1.5 AdminPraise Lite Admin template main css file
+ *
+ * @author		Kyle Ledbetter <support@joomlapraise.com>
+ * @package		Joomla
+ * @since		1.5
+ * @version  	1.0
+ */
+
+/* Reset */
+html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,code,del,dfn,em,img,q,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{border:0;font-weight:inherit;font-style:inherit;font-size:100%;font-family:inherit;vertical-align:baseline;margin:0;padding:0;}body{line-height:1.5;}table{border-collapse:separate;border-spacing:0;}caption,th,td{font-weight:400;}table,td,th{vertical-align:top;}blockquote:before,blockquote:after,q:before,q:after{content:"";}blockquote,q{quotes:"" "";}a img{border:none;}
+
+/* Grid */
+
+.main{text-align:left;margin:0 auto;}
+.clear,.clr{clear:both;}
+.dl1,.dl2,.dl5,.dl10,.dl15,.dl20,.dl25,.dl30,.dl35,.dl40,.dl45,.dl50,.dl55,.dl60,.dl65,.dl70,.dl75{float:left;display:inline;}
+.dr1,.dr2,.dr5,.dr10,.dr15,.dr20,.dr25,.dr30,.dr35,.dr40,.dr45,.dr50,.dr55,.dr60,.dr65,.dr70,.dr75{float:right;display:inline;}
+.dl1,.dr1{width:1em;}.dl2,.dr2{width:2em;}.dl5,.dr5{width:5em;}.dl10,.dr10{width:10em;}
+.dl15,.dr15{width:15em;}.dl20,.dr20{width:20em;}
+.dl25,.dr25{width:25em;}.dl30,.dr30{width:30em;}.dl35,.dr35{width:35em;}.dl40,.dr40{width:40em;}.dl45,.dr45{width:45em;}.dl50,.dr50{width:50em;}
+.dl55,.dr55{width:55em;}.dl60,.dr60{width:60em;}.dl65,.dr65{width:65em;}.dl70,.dr70{width:70em;}.dl75,.dr75{width:75em;}
+.ml5{margin-left:5em;}.ml10{margin-left:10em;}.ml15{margin-left:15em;}.ml20{margin-left:20em;}.ml25{margin-left:25em;}.ml30{margin-left:30em;}
+.ml35{margin-left:35em;}.ml40{margin-left:40em;}.ml45{margin-left:45em;}.ml50{margin-left:50em;}.ml55{margin-left:55em;}.ml60{margin-left:60em;}
+.ml65{margin-left:65em;}.ml70{margin-left:70em;}.ml75{margin-left:75em;}
+.mr5{margin-right:5em;}.mr10{margin-right:10em;}.mr15{margin-right:15em;}.mr20{margin-right:20em;}.mr25{margin-right:25em;}
+.mr30{margin-right:30em;}.mr35{margin-right:35em;}.mr40{margin-right:40em;}.mr45{margin-right:45em;}.mr50{margin-right:50em;}
+.mr55{margin-right:55em;}.mr60{margin-right:60em;}.mr65{margin-right:65em;}.mr70{margin-right:70em;}.mr75{margin-right:75em;}
+.mt1{margin-top:1em;}.mt5{margin-top:5em;}.mt10{margin-top:10em;}.mt20{margin-top:20em;}.mt30{margin-top:30em;}
+.mt40{margin-top:40em;}.mt50{margin-top:50em;}
+.fluid{width:auto;float:none;}
+.hp{width:100%;float:left;}
+.clearfix,.main{display:block;}
+.clearfix:after,.main:after{visibility:hidden;display:block;font-size:0;content:" ";clear:both;height:0;}
+/* IE5/MAC hack \*/
+* html .clearfix{ display: inline;  height: 1px;}
+/* close */
+
+/* Type */
+body{font:75%/1.5em Verdana, Arial, Helvetica, sans-serif;font-size-adjust:none;font-style:normal;font-variant:normal;font-weight:400;}
+p{color:#111;word-spacing:.08em;letter-spacing:.03em;padding:0 0 1.5em 1em;}
+p img{float:left;margin:0 1em 1em 0;padding:0;}
+p img.right{float:right;margin:0 0 1em 1em;}
+h1,h2{font-weight:400;color:#333;letter-spacing:2px;word-spacing:.1em;}
+h3,h4,h5,h6{font-weight:400;color:#333;}
+h1{font-size:2.2em;margin-bottom:.682em;}
+h2{font-size:1.9em;margin-bottom:.79em;}
+h3,legend{font-size:1.5em;margin-bottom:.882em;}
+h4{font-size:1.4em;margin-bottom:1.071em;}
+h5,h6{font-size:1.3em;margin-bottom:1em;}
+li ul,li ol{margin:0 1.5em;}
+ul,ol{margin:0 1.5em 1.5em;}
+dl{margin:0 0 1.5em;}
+/*
+dl dd{margin-left:1.5em;}
+*/
+a{color:#035292;text-decoration:none;}
+a:hover,#ap-topright a:hover{text-decoration:underline;}
+table{margin-bottom:1.5em;border-collapse:collapse;}
+tr,th,td{height:18px;margin:0;/*padding:0 1.5em 0 1em;*/}
+caption{text-align:center;font-family:Georgia, serif;}
+abbr,acronym{border-bottom:1px dotted #000;}
+address{margin-top:1.5em;font-style:italic;}
+del{color:#000;}
+blockquote{padding-left:1.5em;border-left:3px solid #ccc;font-style:italic;margin:1.5em;}
+pre,code{white-space:pre;margin:1.5em 0;}
+pre,code,tt{font:1em monospace;line-height:1.5;}
+tt{display:block;margin:1.5em 0;}
+hr{margin-bottom:1.5em;}
+dl dt,th,strong,dfn{font-weight:700;}
+tfoot,em,dfn{font-style:italic;}
+input,select,.adminlist{font-size:10px;}
+.header{font-size:1.5em !important;font-weight:normal !important;color:inherit !important;padding:0 !important;line-height:18px !important;}
+
+/* Layout */
+hr{height:1px;display:block;}
+#minwidth-body{min-width: 1150px;}
+#ap-header{padding:10px 20px 0 20px;}
+.ap-padding{padding:20px 20px 0 20px;}
+#ap-submenu{padding: 5px 20px 5px 20px;}
+#ap-submenu ul{float:left;}
+#ap-submenu a:hover,.jpane-toggler:hover,.jpane-toggler-down:hover{cursor:pointer;}
+#ap-submenu .active{font-weight:bold;}
+.ap-inside,div .fluid.ap-inside,#ap-content-inner{padding:10px;}
+#ap-sidebar{padding:0 10px 10px 10px;}
+#ap-sidebar{width:19em;}
+#ap-mainbody .mr20,#ap-footer .mr20{margin-right:22em;}
+#ap-mainbody .ml20,#ap-footer .ml20{margin-left:22em;}
+#ap-mainbody{padding:0 20px;}
+#ap-header a,.button1 a:hover{text-decoration:none;}
+#ap-header ul,#ap-header li,#ap-submenu ul,#ap-submenu li{margin:0;padding:0;list-style:none;}
+#ap-header #myeditor_selection{float:right;width:165px;margin:14px 0 0 0;}
+#ap-topright li {padding:0 5px 0 2px;}
+#ap-submenu li {padding:10px;}
+#ap-header li,#ap-submenu li{display:inline;}
+#ap-mainmenu li a{display:block;float:left;padding:5px 10px;margin-right:2px;}
+#ap-sidemenu li a{display:block;float:right;padding:5px 10px;margin-left:2px;}
+#ap-topright{text-align:right;font-size:11px;}
+#ap-logo{height:auto;float:left;}
+#ap-logo img{margin:10px 0;}
+#ap-logo a{font-size:24px;line-height:46px;}
+#ap-footer{text-align:center;font-size:11px;}
+#ap-title{margin: -10px -10px 10px -10px;overflow:hidden;padding:5px 10px;}
+.panel h3{padding:5px 10px;}
+#ap-sidebar .panel h3{margin-left:-10px;margin-right:-10px;}
+div.col .panel h3{margin-left:0px;margin-right:0px;}
+.header{float:left;width:auto;}
+#toolbar{}
+.toolbar{margin:0;float:right;}
+.toolbar a{margin:0 7px;}
+.tool-tip {float: left;padding: 5px;max-width: 200px;}
+.tool-title {padding: 0;margin:-5px -5px 0 -5px;padding:5px;font-size:100%;font-weight:bold;}
+.tool-text {margin: 0;font-size: 100%;}
+.list-footer{padding:10px;text-align:center;}
+.adminform,.admintable,.adminlist{width:100%;}
+.adminform td{padding:2px;}
+.admintable td,.adminlist td,.adminlist th{padding:4px 4px;}
+.adminlist th{vertical-align:bottom;}
+.order{white-space:nowrap;}
+.order span{display:block;float:left;width:12px;padding:0 2px 0 0;}
+.order .text_area{width:20px;}
+.button2-left a,.button1 a{display:block;padding:4px 8px;margin:0 5px 0 0;float:left;cursor:pointer;}
+.button1{float:right;}
+.login .button1{margin:0 20px 10px 0;}
+#cpanel div.icon{margin:0 5px 5px 0;float:left;text-align:center;font-size:9px;}
+#cpanel div.icon a{display:block;float:left;height:80px;text-decoration:none;vertical-align:middle;width:108px;}
+#cpanel div.icon span{display:block;}
+#cpanel div.icon img{margin:5px 0;}
+#cpanel div.icon span.icon{height:55px;}
+#ap-quicklink h3{padding:0;}
+#ap-quicklink h3 a{font-weight:bold;display:block;text-align:center;padding:4px 9px 5px 9px;}
+#ap-quicklink h3 a:hover{text-decoration:none;}
+#search{width:120px;}
+#toolbar-new a,#toolbar-delete a,#toolbar-trash a,#toolbar-edit a,
+#toolbar-save a,#toolbar-apply a,#toolbar-cancel a,#toolbar-default a{}
+input.system-openid, input.com-system-openid {padding-left: 18px;}
+#system-message {margin-bottom: 0px;padding: 0;}
+#system-message dt {font-weight: bold;}
+#system-message dd {margin: 0;font-weight: bold;}
+#system-message dd ul {list-style: none;margin: 0px;padding: 10px;}
+#system-message dd.message,#system-message dt.error,#system-message dt.notice {margin:10px 0;}
+#system-message dt.message{display:none;}
+#system-message dd.error ul {margin: 0px;list-style: none;}
+#system-message dd.notice ul {margin: 0px;list-style: none;}
+#treecellhelp {display:block;float:left;margin:0;overflow:hidden;padding:2px;position:relative;width:25%;}
+#datacellhelp {display:block;float:left;margin:0;padding:2px 0 0;width:73%;}
+.helpFrame {height:800px;padding:0 5px 0 10px;width:100%;}
+#editor-xtd-buttons{margin:5px 0 0 0;}
+#cpanel{display:table;margin:0 0 5px 0;}
+.login-desc,.home-page{font-size:9px;text-align:center;padding:0;}
+#ap-submenu .sess_bar_outer{float:right;width:246px;}
+#ap-content-inner{overflow:hidden;}
+#ap-content .module{clear:both;}
+#ap-content #component-list{margin:0;}
+#ap-content #component-list .parent-link{display:block;width:99%;}
+#ap-content #component-list li.parent{float:left;margin:0 10px 10px 0;height:auto;overflow:auto;padding:4px 0 4px 6px;font-weight:bold;display:block;width:99%;}
+#ap-content .child-list{margin:5px 0;}
+#ap-content #component-list li.child{list-style:none;font-weight:normal;float:left;margin:0 10px 0 0;}
+#ap-sidebar #component-list{list-style:none;margin:0 0 10px 0;}
+#ap-sidebar #component-list li{margin:0 0 5px 0;padding:2px;position:relative;}
+#ap-sidebar #component-list li img{margin:2px 5px 0 0;}
+#ap-sidebar #component-list li a{display:block;}
+#ap-sidebar #component-list li:hover{cursor:pointer;}
+#ap-sidebar ul.child-list{display:none;padding:10px;}
+#ap-sidebar li.parent:hover ul.child-list{display:block;position:absolute;left:-198px;top:0px;width:160px;padding:10px;list-style:none;filter:alpha(opacity=80);-moz-opacity:0.8;-khtml-opacity: 0.8;opacity: 0.8;
+}
+#login{margin:40px 10px 10px 10px;}
+.login{padding:20px;margin:0 auto;border-bottom:1px solid #000;width:430px;}
+#form-login-password input{margin:0 0 0 6px;}
+#form-login-lang select{margin:0 0 0 5px;}
+#form-login-password input,#form-login-username input{font-size:16px;width:320px;}
+#form-login-lang select{font-size:16px;width:322px;}
+#login h3{width:450px;padding:10px;margin:0 auto;}
+.ap-status{text-align:right;padding:5px 0;height:auto;white-space:nowrap;overflow:auto;z-index:40;}
+.status-bottom{position:fixed;width:100%;bottom:0;}
+.ap-status span{margin:0 8px;padding:0 0 0 18px;}
+.ap-status .ap-icons span{padding:0;}
+.icon-32-default,.icon-32-edit,.icon-32-delete,.icon-32-new,.icon-32-trash,.icon-32-save,.icon-32-apply,.icon-32-cancel,#ap-quicklink h3 span{width:20px;display:block;height:20px;float:left;}
+#menutype_form{float:right;margin:2px 0 0 0;}
+#ap-quickadd,#ap-crumbs{padding:5px 25px 5px 7px;margin:0 -10px 10px -10px;}
+#ap-quickadd select,#ap-crumbs select{width:100%;}
+#editorarea iframe,#editorarea #codearea_cp {width:100% !important;height:600px !important;}
+#menu{margin:0;}
+#menu li.node{margin:0 0 10px 0;list-style:none;padding:10px;}
+#menu li.node li.node{padding:0;}
+#ap-crumbs span {padding:0 10px;}
+#ap-crumbs span.first,#ap-crumbs span span{padding:0;}
+dl.tabs{float:left;margin:10px 0 -1px 0;z-index:50;}
+dl.tabs dt{float:left;padding:4px 10px;margin-left:3px;}
+dl.tabs dt.open{z-index:100;}
+div.current{clear:both;padding:10px 10px;}
+div.current dd{padding:0;margin:0;}
+div.col {float:left;padding:0 0 0 10px;}
+div.width-45{width:44%;}
+div.width-55{width:54%;}
+div.width-50{width:49%;}
+div.width-70{width:69%;}
+div.width-30{width:29%;}
+div.width-60{width:59%;}
+div.width-40{width:39%;}
+#ext-gen17{padding:10px;}
+#vmPage{width:79% !important;}
+#vmPage .header{font-size:1em !important;}
+#vmPage .header h2{line-height:46px;}
+.toolbar td.spacer{width:0;display:none;}
+#vmPage .header img{float:left;}
+#vmPage .x-tab-panel{clear:both;}
+.tool-tip{z-index:200;}
+.ap-status .aplite-icons span{padding:0;}
+.aplite-icons a{text-decoration:none;}
+#menu-container{display:block !important;position:relative;height:30px;width:99%;}
+#menu-container li{margin:4px;}
+#minwidth-body.full-mode .ap-status,#minwidth-body.full-mode #ap-header,#minwidth-body.full-mode #ap-submenu,#minwidth-body.full-mode #ap-footer{display:none;}
+#minwidth-body.full-mode #ap-mainbody{padding:0;}
+#minwidth-body.full-mode #toolbar a{margin:4px 6px;}
+.footer-links li{margin:0 25px 0 0;}
+.com_configurator #toolbar a,.footer-links li a{text-decoration:none;}
+.footer-links li ul{margin:0;}
+#tips p{padding-bottom:0;}
+#install-type label{font-size:13px;}
+#visual-refs h3 span{padding-left:10px;}
+
+/* Theme 1 */
+body,#ap-mainmenu li a:hover,#ap-mainmenu li.active a,#ap-sidemenu li a:hover,#ap-sidemenu li.active a{color:#333;}
+a{color:#21759B;}
+a:hover,.ap-status a:hover{color:#D54E21;}
+#ap-header a,#ap-quicklink h3 a,.button1 a,#login #ap-footer p,#login #ap-footer a,.ap-status a,.ap-status,.ap-status a:visited,.ap-status a:active,.ap-status a:link,#ap-sidebar #component-list li:hover a,#minwidth-body.full-mode #toolbar a{color: #FFF;}
+input.system-openid, input.com-system-openid {color: #000;}
+#system-message dd ul {color: #0055BB;}
+#system-message dd.error ul {color: #C00;}
+#system-message dd.notice ul {color: #DCA33C;}
+dl.tabs dt {color: #666;}
+dl.tabs dt.open {color: #000;}
+
+hr{background-color:transparent;}
+.adminlist tr:hover td,#component-list li.parent:hover,#ap-content #menu .node:hover{background-color:#F1F1F1;}
+body,#ap-mainmenu li.active a,#ap-mainmenu li a:hover,#ap-sidemenu li a:hover,#ap-sidemenu li.active a,.button2-left a,.login{background-color:#E5E5E5;}
+body#login,#ap-header{background-color:#333;}
+.ap-status{background-color:#222;}
+#ap-mainmenu li a,#ap-sidemenu li a,#ap-sidebar #component-list li.parent:hover,#ap-sidebar li.parent:hover ul.child-list{background-color:#666;}
+#ap-content{background-color:#FFF;}
+.com_configurator #ap-content{background-color:#111;}
+#ap-title,.panel h3,.tool-title,#login h3{background-color:#ABDA50;}
+#ap-quicklink h3 a,#ap-quickadd,#ap-crumbs{background-color:#1A83A5;}
+#ap-quicklink h3 a:hover,#ap-quickadd:hover,ap-crumbs:hover{background-color:#14596F;}
+.tool-tip{background-color:#E0EFC2;}
+.header,#menu li a{background:none !important;}
+input.system-openid, input.com-system-openid {background:#FFF url(http://openid.net/login-bg.gif) no-repeat 0 50%;}
+#system-message dd ul {background-color:#D8E5F8;}
+#system-message dd.error ul {background-color:#FFD6D6;}
+#system-message dd.notice ul {background-color:#FEF6D8;}
+.button1 a{background-color:#21759B;}
+.button1 a:hover{background-color:#004D6F;}
+dl.tabs dt {background: #f0f0f0;}
+dl.tabs dt.open {background: #F9F9F9;}
+
+.ap-status .preview{background: url(..//images/menu/olive/zoom_in_16x16.png) no-repeat;}
+.ap-status .unread-messages,
+.ap-status .no-unread-messages{background: url(../images/menu/olive/mail_16x16.png) no-repeat;}
+.ap-status .loggedin-users{background: url(../images/menu/olive/user_16x16.png) no-repeat;}
+.ap-status .logout{background: url(../images/menu/olive/delete_16x16.png) no-repeat;}
+.icon-32-default{background: url(../images/menu/yellow/star_16x16.png) no-repeat;}
+.icon-32-edit{background: url(../images/menu/yellow/edit_16x16.png) no-repeat;}
+.icon-32-save{background: url(../images/menu/green/save_16x16.png) no-repeat;}
+.icon-32-new{background: url(../images/menu/green/add_16x16.png) no-repeat;}
+.icon-32-apply{background: url(../images/menu/blue/push_pin_16x16.png) no-repeat;}
+.icon-32-cancel{background: url(../images/menu/red/cancel_16x16.png) no-repeat;}
+.icon-32-trash,.icon-32-delete{background: url(../images/menu/red/error_16x16.png) no-repeat;}
+#ap-quicklink h3 span{background: url(../images/menu/blue/add_16x16.png) 0 70% no-repeat;}
+#ap-quickadd{background-image:url(../images/menu/blue/add_16x16.png);background-position:98% 50%;background-repeat:no-repeat;}
+#ap-crumbs{background-image:url(../images/menu/blue/alert_16x16.png);background-position:98% 50%;background-repeat:no-repeat;}
+
+div.icon span.icon{background-image:url(../images/header/header.png);}
+.icon-48-article-add{background-position:2px -20px;}
+.icon-48-article{background-position:2px -110px;}
+.icon-48-section{background-position:2px -878px;}
+.icon-48-category{background-position:2px -206px;}
+.icon-48-media{background-position:2px -590px;}
+.icon-48-menumgr{background-position:2px -686px;}
+.icon-48-frontpage{background-position:2px -402px;}
+.icon-48-language{background-position:2px -494px;}
+.icon-48-user{background-position:2px -782px;}
+.icon-48-config{background-position:2px -302px;}
+
+hr,#ap-topright li.last,.pf_navigation #submenu,#ap-sidebar #component-list li.parent,#ap-content #menu .node,#ap-content #menu li.node li.node,.toolbar a,.toolbar a:hover,.ap-status span.messages{border:0;}
+#myeditor_selection{border-width:1px !important;}
+#ap-content{border-bottom:1px solid #CCC;}
+hr,.admintable td,.adminlist th,.adminlist .row0,.adminlist .row1,.adminlist tr,#cpanel{border-bottom:1px solid #E5E5E5;}
+#cpanel div.icon a,#component-list li.parent,#ap-content #menu .node{border:1px solid #E5E5E5;}
+input,select,.button2-left a,table.adminform{border:1px solid #CCC;}
+table.adminform{border-collapse:collapse;}
+table{border-style:solid !important;}
+.button1 a{border:1px solid #004D6F;}
+#ap-title,.panel h3,.tool-title,#login h3{border-bottom:1px solid #759538;}
+#ap-quicklink h3,#minwidth-body.full-mode #ap-content{border-bottom:none;}
+#ap-quicklink h3 a,#ap-quickadd,#ap-crumbs{border:1px solid #14596F;}
+#ap-quicklink h3 a:hover{border:1px solid #14596F;}
+.tool-tip{border:1px solid #759538;}
+#ap-topright li{border-right:1px solid #444;}
+#system-message dd ul {border-top: 3px solid #629DE3;border-bottom: 3px solid #629DE3;}
+#system-message dd.error ul {border-top: 3px solid #DE7A7B;border-bottom: 3px solid #DE7A7B;}
+#system-message dd.notice ul {border-top: 3px solid #F0DC7E;border-bottom: 3px solid #F0DC7E;}
+dl.tabs dt {border-left: 1px solid #ccc;border-right: 1px solid #ccc;border-top: 1px solid #ccc;}
+dl.tabs dt.open {border-bottom: 1px solid #F9F9F9;}
+div.current {border: 1px solid #ccc;}
+#ap-sidebar li.parent:hover ul.child-list{border-bottom:1px solid #000;}
+
+#ap-logo{text-shadow:0px 1px 1px #000;}
+#ap-quicklink h3 a{text-shadow:0px 1px 1px #0066FF;}
+
+/* Component */
+body.contentpane{background-color:#FFF;margin:10px;}
+
+/* Theme 2 */
+.theme2 #ap-title,.theme2 .panel h3,.theme2 .tool-title,#login.theme2 h3,.theme2 .toolbar a,.theme2 #ap-sidebar #component-list li:hover a{color:#FFF;}
+.theme2 .ap-status a:hover{color:#E7F1FD;}
+
+body.theme2,.theme2 #ap-mainmenu li.active a,.theme2 #ap-mainmenu li a:hover,.theme2 #ap-sidemenu li a:hover,.theme2 #ap-sidemenu li.active a,.theme2 .button2-left a,.theme2 .login,.theme2 .tool-tip{background-color:#E7F1FD;}
+body#login.theme2,.theme2 #ap-header{background-color:#063261;}
+.theme2 #ap-mainmenu li a,.theme2 #ap-sidemenu li a{background-color:#0D509E;}
+.theme2 #ap-title,.theme2 .panel h3,.theme2 .tool-title,#login.theme2 h3,.theme2 #ap-sidebar #component-list li.parent:hover,.theme2 #ap-sidebar li.parent:hover ul.child-list{background-color:#1386FF;}
+.theme2 #ap-quicklink h3 a,.theme2 #ap-quickadd,.theme2 #ap-crumbs{background-color:#359F15;}
+.theme2 #ap-quicklink h3 a:hover,.theme2 #ap-quickadd:hover,.theme2 #ap-crumbs:hover{background-color:#206F07;}
+.theme2 .ap-status{background-color:#03192F;}
+
+.theme2 #ap-quickadd{background-image:url(../images/menu/green/add_16x16.png);}
+.theme2 #ap-crumbs{background-image:url(../images/menu/green/alert_16x16.png);}
+
+.theme2 #ap-title,.theme2 .panel h3,.theme2 .tool-title,#login.theme2 h3,.theme2 .tool-tip,.theme2 #ap-sidebar li.parent:hover ul.child-list{border-color:#0D509E;}
+.theme2 #ap-quicklink h3 a,.theme2 #ap-quickadd,.theme2 #ap-crumbs{border-color:#206F07;}
+.theme2 #ap-topright li{border-color:#03192F;}
+/* End Theme 2 */
+
+/* Theme 3 */
+.theme3 #ap-logo{text-shadow:none;font-weight:bold;}
+.theme3 #ap-submenu{margin:0 0 10px 0;}
+.theme3 #ap-sidebar{padding-bottom:0;}
+.theme3 #ap-quickadd,.theme3 #ap-crumbs{margin:0 -10px 10px -10px;}
+.theme3 a{color:#555;}
+.theme3 #ap-mainmenu li a,.theme3 #ap-sidemenu li a{color:#7E0000;}
+.theme3 #ap-topright a,.theme3 #ap-topleft a,.theme3 #ap-logo a,#login.theme3 #ap-footer p,#login.theme3 #ap-footer a{color: #333;}
+.theme3 #ap-title,.theme3 .panel h3,.theme3 .tool-title,#login.theme3 h3,.theme3 .toolbar a,.theme3 .button1 a,.theme3 #ap-submenu a,.theme3 #ap-mainmenu li.active a,.theme3 #ap-sidemenu li.active a,.theme3 #ap-mainmenu li a:hover,.theme3 #ap-sidemenu li a:hover{color:#FFF;}
+.theme3 .ap-status a:hover{color:#E7F1FD;}
+
+body.theme3,.theme3 .button2-left a,.theme3 .login,.theme3 .tool-tip{background-color:#FFF;}
+body#login.theme3,.theme3 #ap-header,.theme3 #ap-sidebar{background-color:#E7E4C7;}
+.theme3 #ap-mainmenu li a,.theme3 #ap-sidemenu li a{background-color:#BFBB8F;}
+.theme3 #ap-title,.theme3 .panel h3,.theme3 .tool-title,#login.theme3 h3,.theme3 #ap-submenu,.theme3 #ap-mainmenu li.active a,.theme3 #ap-sidemenu li.active a,.theme3 #ap-mainmenu li a:hover,.theme3 #ap-sidemenu li a:hover,.theme3 #ap-quicklink h3 a:hover,.theme3 #ap-quickadd:hover,.theme3 #ap-crumbs:hover,.theme3 #ap-sidebar #component-list li.parent:hover,.theme3 #ap-sidebar li.parent:hover ul.child-list{background-color:#7E0000;}
+.theme3 #ap-quicklink h3 a,.theme3 #ap-quickadd,.theme3 #ap-crumbs{background-color:#AF0A0A;}
+.theme3 .ap-status{background-color:#1F0000;}
+
+.theme3 #ap-quickadd{background-image:url(../images/menu/red/add_16x16.png);}
+.theme3 #ap-crumbs{background-image:url(../images/menu/red/alert_16x16.png);}
+
+.theme3 #ap-content{border-bottom:0;}
+.theme3 #ap-mainbody,.theme3 .login{border-bottom:1px solid #CCC;}
+.theme3 #ap-title,.theme3 .panel h3,.theme3 .tool-title,#login.theme3 h3,.theme3 .tool-tip,.theme3 #ap-sidebar li.parent:hover ul.child-list{border-color:#3F0000;}
+.theme3 #ap-quicklink h3 a,.theme3 #ap-quickadd,.theme3 #ap-crumbs{border-color:#7E0000;}
+.theme3 #ap-topright li{border-color:#03192F;}
+/* End Theme 3 */
+
+/* Theme 4 */
+.theme4 #ap-logo{text-shadow:none;font-weight:bold;}
+.theme4 #ap-submenu{margin:0 0 10px 0;}
+.theme4 #component-list li:hover a{color:#21759B !important;}
+.theme4 #ap-mainmenu li a,.theme4 #ap-sidemenu li a,.theme4 #ap-header a,#login.theme4 #ap-footer p,#login.theme4 #ap-footer a{color:#333;}
+.theme4 #ap-submenu,.theme4 #ap-mainmenu li.active a,.theme4 #ap-sidemenu li.active a,.theme4 #ap-mainmenu li a:hover,.theme4 #ap-sidemenu li a:hover,.theme4 #ap-submenu a{color:#F1F1F1;}
+.theme4 .ap-status a:hover{color:#FFF;}
+.theme4 .sess_bar_outer{background-color:#555;}
+
+body#login.theme4,.theme4 #ap-header,.theme4 .tool-tip,.theme4 #ap-sidebar #component-list li.parent:hover,.theme4 #ap-sidebar li.parent:hover ul.child-list{background-color:#F1F1F1;}
+.theme4 #ap-mainmenu li a,.theme4 #ap-sidemenu li a{background-color:#CCC;}
+.theme4 #ap-submenu,.theme4 #ap-mainmenu li.active a,.theme4 #ap-sidemenu li.active a,.theme4 #ap-mainmenu li a:hover,.theme4 #ap-sidemenu li a:hover{background-color:#333;}
+.theme4 #ap-title,.theme4 .panel h3,.theme4 .tool-title,#login.theme4 h3{background-color:#c5e2e9;}
+.theme4 #ap-quicklink h3 a,.theme4 #ap-quickadd,.theme4 #ap-crumbs{background-color:#50b4c9;}
+.theme4 #ap-quicklink h3 a:hover,.theme4 #ap-quickadd:hover,.theme4 #ap-crumbs:hover{background-color:#397f8e;}
+.theme4 .ap-status{background-color:#444;}
+
+.theme4 .login,.theme4 #ap-sidebar li.parent:hover ul.child-list{border-bottom:1px solid #CCC;}
+.theme4 #ap-title,.theme4 .panel h3,.theme4 .tool-title,#login.theme4 h3,.theme4 .tool-tip{border-color:#a1bfc5;}
+.theme4 #ap-quicklink h3 a,.theme4 #ap-quickadd{border-color:#397f8e;}
+/* End Theme 4 */
+
+/* Theme 5 */
+.theme5 #ap-logo{text-shadow:none;font-weight:bold;}
+.theme5 #ap-submenu{margin:0 0 10px 0;}
+.theme5 #ap-mainmenu li a,.theme5 #ap-sidemenu li a{color:#333;}
+.theme5 #ap-submenu,.theme5 #ap-header a,.theme5 #ap-mainmenu li a,.theme5 #ap-sidemenu li a,.theme5 #ap-sidebar,.theme5 #ap-sidebar a,.theme5 #ap-footer p,.theme5 #ap-footer a,.theme5 .toolbar a,.theme5 .toolbar a,.theme5 #ap-title,.theme5 .panel h3,.theme5 .tool-title,#login.theme5 h3,.theme5 #form-login label,.theme5#login a,.theme5#login p{color:#F1F1F1;}
+.theme5 #ap-mainmenu li.active a,.theme5 #ap-sidemenu li.active a,.theme5 #ap-mainmenu li a:hover,.theme5 #ap-sidemenu li a:hover,.theme5 #ap-submenu a{color:#111;}
+.theme5 .ap-status a:hover{color:#FFF;}
+.theme5 .sess_bar_outer{background-color:#555;}
+
+body.theme5,.theme5 .login{background-color:#444;}
+body#login.theme5,.theme5 #ap-header,.theme5 #ap-sidebar .adminlist tr:hover td,.theme5 #ap-sidebar #component-list li.parent:hover,.theme5 #ap-sidebar li.parent:hover ul.child-list{background-color:#222;}
+.theme5 #ap-content{background-color:#FAFAFA;}
+.theme5 #ap-mainmenu li a,.theme5 #ap-sidemenu li a{background-color:#4F4F4F;}
+.theme5 #ap-submenu,.theme5 #ap-mainmenu li.active a,.theme5 #ap-sidemenu li.active a,.theme5 #ap-mainmenu li a:hover,.theme5 #ap-sidemenu li a:hover,.theme5 .tool-tip{background-color:#D1D1D1;}
+.theme5 #ap-title,.theme5 .panel h3,.theme5 .tool-title,#login.theme5 h3{background-color:#121212;}
+.theme5 #ap-quicklink h3 a,.theme5 #ap-quickadd,.theme5 #ap-crumbs{background-color:#000;}
+.theme5 #ap-quicklink h3 a:hover,.theme5 #ap-quickadd:hover,.theme5 #ap-crumbs:hover{background-color:#222;}
+.theme5 .ap-status{background-color:#000;}
+
+.theme5 #ap-quickadd{background-image:url(../images/menu/black/add_16x16.png);}
+.theme5 #ap-crumbs{background-image:url(../images/menu/black/alert_16x16.png);}
+
+.theme5 #ap-title,.theme5 .panel h3,.theme5 .tool-title,#login.theme5 h3,.theme5 .tool-tip,.theme5 #ap-content,
+.theme5 #ap-sidebar hr,.theme5 #ap-sidebar .admintable td,.theme5 #ap-sidebar .adminlist th,.theme5 #ap-sidebar .adminlist .row0,.theme5 #ap-sidebar .adminlist .row1,.theme5 #ap-sidebar .adminlist tr,.theme5 .login,.theme5 #ap-sidebar li.parent:hover ul.child-list{border-color:#000;}
+.theme5 #ap-quicklink h3 a,.theme5 #ap-quickadd,.theme5 #ap-crumbs{border-color:#222;}
+.theme2 #ap-topright li{border-color:#03192F;}
+/* End Theme 5 */
+

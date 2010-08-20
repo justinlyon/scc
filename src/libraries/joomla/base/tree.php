@@ -1,18 +1,24 @@
 <?php
 /**
- * @version		$Id: tree.php 14644 2010-02-05 08:35:59Z chdemko $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @version		$Id:tree.php 6961 2007-03-15 16:06:53Z tcp $
+ * @package		Joomla.Framework
+ * @subpackage	Base
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant to the
+ * GNU General Public License, and as distributed it includes or is derivative
+ * of works licensed under the GNU General Public License or other free or open
+ * source software licenses. See COPYRIGHT.php for copyright notices and
+ * details.
  */
 
-// No direct access
-defined('JPATH_BASE') or die;
-require_once dirname(__FILE__).'/node.php';
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 /**
  * Tree Class.
  *
- * @package		Joomla.Framework
+ * @package 	Joomla.Framework
  * @subpackage	Base
  * @since		1.5
  */
@@ -21,12 +27,12 @@ class JTree extends JObject
 	/**
 	 * Root node
 	 */
-	protected $_root = null;
+	var $_root = null;
 
 	/**
 	 * Current working node
 	 */
-	protected $_current = null;
+	var $_current = null;
 
 	function __construct()
 	{
@@ -38,18 +44,68 @@ class JTree extends JObject
 	{
 		$this->_current->addChild($node);
 		if ($setCurrent) {
-			$this->_current = &$node;
+			$this->_current =& $node;
 		}
 	}
 
 	function getParent()
 	{
-		$this->_current = &$this->_current->getParent();
+		$this->_current =& $this->_current->getParent();
 	}
 
 	function reset()
 	{
-		$this->_current = &$this->_root;
+		$this->_current =& $this->_root;
 	}
 }
 
+/**
+ * Tree Node Class.
+ *
+ * @package 	Joomla.Framework
+ * @subpackage	Base
+ * @since		1.5
+ */
+class JNode extends JObject
+{
+	/**
+	 * Parent node
+	 */
+	var $_parent = null;
+
+	/**
+	 * Array of Children
+	 */
+	var $_children = array();
+
+	function __construct()
+	{
+		return true;
+	}
+
+	function addChild( &$node )
+	{
+		$node->setParent($this);
+		$this->_children[] = & $node;
+	}
+
+	function &getParent()
+	{
+		return $this->_parent;
+	}
+
+	function setParent( &$node )
+	{
+		$this->_parent = & $node;
+	}
+
+	function hasChildren()
+	{
+		return count($this->_children);
+	}
+
+	function &getChildren()
+	{
+		return $this->_children;
+	}
+}

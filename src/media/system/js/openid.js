@@ -1,8 +1,13 @@
 /**
- * @version		$Id: openid.js 14543 2010-02-04 04:29:34Z eddieajau $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
+* @version		$Id: modal.js 5263 2006-10-02 01:25:24Z webImagery $
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
 /**
  * JOpenID javascript behavior
@@ -11,67 +16,128 @@
  *
  * @package		Joomla
  * @since		1.5
+ * @version     1.0
  */
 var JOpenID = new Class({
-	state: false,
-	switcher: null,
-	length: null,
-	form: null,
-	passwordContainer: null,
-	username: null,
 
-	initialize: function(form) {
-		this.form = document.id(form);
-		this.username = this.form.getElement('input[name=username]');
-		this.passwordContainer = this.form.getElement('input[name=passwd]').getParent();
+	state    : false,
+	link     : null,
+	switcher : null,
 
-		var switcher = new Element('a', {
-			'styles': {'cursor': 'pointer'},
-			'id': (this.form.id == 'com-form-login' ? 'com-' : '')+'openid-link',
-			'html': Joomla.JText._('LOGIN_WITH_OPENID'),
-			'class': 'system-openid'
-		});
-		switcher.addEvent('click', (function(e) {
-			this.state = this.state ^ 1;
-			this.switch(300);
-			Cookie.write('login-openid', this.state);
-			return false;
-		}).bind(this));
-		switcher.inject(this.form);
+	initialize: function()
+	{
+		//Create dynamic elements
+		var switcher = new Element('a', { 'styles': {'cursor': 'pointer'},'id': 'openid-link'});
+		switcher.inject($('form-login'));
 
-		var link = new Element('a', {
-			'styles': {'text-align' : 'right', 'display' : 'block', 'font-size' : 'xx-small'},
-			'href' : 'http://openid.net'
-		});
-		link.set('html', Joomla.JText._('WHAT_IS_OPENID'));
-		link.inject(this.form);
+		var link = new Element('a', { 'styles': {'text-align' : 'right', 'display' : 'block', 'font-size' : 'xx-small'}, 'href' : 'http://openid.net'});
+		link.inject($('form-login'));
 
+		//Initialise members
 		this.switcher = switcher;
-		this.state	= Cookie.read('login-openid');
-		this.length   = this.passwordContainer.getSize().y;
-		if (this.state) {
-			this.switch(0);
-		}
-	},
-	switch : function(time) {
-		var effect = new Fx.Morph(this.passwordContainer, {'duration': time});
+		this.link     = link;
+		this.state    = Cookie.get('login-openid');
+		this.length   = $('form-login-password').getSize().size.y;
 
-		if (this.state == 0) {
-			this.username.removeClass('system-openid');
-			var text = Joomla.JText._('LOGIN_WITH_OPENID');
-			effect.start({
-				'height': [0, this.length],
-				'opacity': [this.state, 1-this.state]
-			});
+		this.switchID(this.state, 0);
+
+		this.switcher.addEvent('click', (function(event) {
+			this.state = this.state ^ 1;
+			this.switchID(this.state, 300);
+			Cookie.set('login-openid', this.state);
+		}).bind(this));
+	},
+
+	switchID : function(state, time)
+	{
+		var password = $('form-login-password');
+		var username = $('modlgn_username');
+
+		if(state == 0)
+		{
+			username.removeClass('system-openid');
+			var text = JLanguage.LOGIN_WITH_OPENID;
+			password.effect('height',  {duration: time}).start(0, this.length);
 		}
-		else {
-			this.username.addClass('system-openid');
-			var text = Joomla.JText._('NORMAL_LOGIN');
-			effect.start({
-				'height': [this.length, 0],
-				'opacity': [this.state, 1-this.state]
-			});
+		else
+		{
+			username.addClass('system-openid');
+			var text = JLanguage.NORMAL_LOGIN;
+			password.effect('height',  {duration: time}).start(this.length, 0);
 		}
-		this.switcher.set('html', text);
+
+		password.effect('opacity', {duration: time}).start(state,1-state);
+
+		this.switcher.setHTML(text);
+		this.link.setHTML(JLanguage.WHAT_IS_OPENID);
 	}
+});
+
+var JOpenID_com = new Class({
+
+	state    : false,
+	link     : null,
+	switcher : null,
+
+	initialize: function()
+	{
+		//Create dynamic elements
+		var switcher = new Element('a', { 'styles': {'cursor': 'pointer'},'id': 'com-openid-link'});
+		switcher.inject($('com-form-login'));
+
+		var link = new Element('a', { 'styles': {'text-align' : 'right', 'display' : 'block', 'font-size' : 'xx-small'}, 'href' : 'http://openid.net'});
+		link.inject($('com-form-login'));
+
+		//Initialise members
+		this.switcher = switcher;
+		this.link     = link;
+		this.state    = Cookie.get('login-openid');
+		this.length   = $('com-form-login-password').getSize().size.y;
+
+		this.switchID(this.state, 0);
+
+		this.switcher.addEvent('click', (function(event) {
+			this.state = this.state ^ 1;
+			this.switchID(this.state, 300);
+			Cookie.set('login-openid', this.state);
+		}).bind(this));
+	},
+
+	switchID : function(state, time)
+	{
+		var password = $('com-form-login-password');
+		var username = $('username');
+
+		if(state == 0)
+		{
+			username.removeClass('com-system-openid');
+			var text = JLanguage.LOGIN_WITH_OPENID;
+			password.effect('height',  {duration: time}).start(0, this.length);
+		}
+		else
+		{
+			username.addClass('com-system-openid');
+			var text = JLanguage.NORMAL_LOGIN;
+			password.effect('height',  {duration: time}).start(this.length, 0);
+		}
+
+		password.effect('opacity', {duration: time}).start(state,1-state);
+
+		this.switcher.setHTML(text);
+		this.link.setHTML(JLanguage.WHAT_IS_OPENID);
+	}
+});
+
+
+document.openid = null
+document.com_openid = null
+window.addEvent('domready', function(){
+  if (typeof modlogin != 'undefined' && modlogin == 1) {
+  	var openid = new JOpenID();
+  	document.openid = openid;
+  };
+  if (typeof comlogin != 'undefined' && comlogin == 1) {
+  	var com_openid = new JOpenID_com();
+  	document.com_openid = openid;
+  };
 });

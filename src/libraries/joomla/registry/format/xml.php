@@ -1,152 +1,97 @@
 <?php
 /**
- * @version		$Id: xml.php 15576 2010-03-25 12:43:26Z louis $
+ * @version		$Id: xml.php 14401 2010-01-26 14:10:00Z louis $
  * @package		Joomla.Framework
  * @subpackage	Registry
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+ * @license		GNU/GPL, see LICENSE.php
+ * Joomla! is free software. This version may have been modified pursuant
+ * to the GNU General Public License, and as distributed it includes or
+ * is derivative of works licensed under the GNU General Public License or
+ * other free or open source software licenses.
+ * See COPYRIGHT.php for copyright notices and details.
  */
 
-// No direct access
-defined('JPATH_BASE') or die;
+// Check to ensure this file is within the rest of the framework
+defined('JPATH_BASE') or die();
 
 /**
- * XML format handler for JRegistry.
+ * XML Format for JRegistry
  *
- * @package		Joomla.Framework
- * @subpackage	Registry
+ * @package 	Joomla.Framework
+ * @subpackage		Registry
  * @since		1.5
  */
-class JRegistryFormatXML extends JRegistryFormat
-{
+class JRegistryFormatXML extends JRegistryFormat {
+
 	/**
-	 * Converts an object into an XML formatted string.
-	 *	-	If more than two levels of nested groups are necessary, since INI is not
-	 *		useful, XML or another format should be used.
+	 * Converts an XML formatted string into an object
 	 *
-	 * @param	object	Data source object.
-	 * @param	array	Options used by the formatter.
-	 * @return	string	XML formatted string.
-	 * @since	1.5
+	 * @access public
+	 * @param string  XML Formatted String
+	 * @return object Data Object
 	 */
-	public function objectToString($object, $options = array())
+	function stringToObject( $data, $namespace='' ) {
+		return true;
+	}
+
+	/**
+	 * Converts an object into an XML formatted string
+	 * 	-	If more than two levels of nested groups are necessary, since INI is not
+	 * 		useful, XML or another format should be used.
+	 *
+	 * @access public
+	 * @param object $object Data Source Object
+	 * @param array  $param  Parameters used by the formatter
+	 * @return string XML Formatted String
+	 */
+	function objectToString( &$object, $params )
 	{
-		// Initialise variables.
-		$rootName = (isset($options['name'])) ? $options['name'] : 'registry';
-		$nodeName = (isset($options['nodeName'])) ? $options['nodeName'] : 'node';
-
-		// Create the root node.
-		$root = simplexml_load_string('<'.$rootName.' />');
-
-		// Iterate over the object members.
-		foreach ((array) $object as $k => $v)
+		$depth = 1;
+		$retval = "<?xml version=\"1.0\" ?>\n<config>\n";
+		foreach (get_object_vars( $object ) as $key=>$item)
 		{
-			if (is_scalar($v)) {
-				$n = $root->addChild($nodeName, $v);
-				$n->addAttribute('name', $k);
-				$n->addAttribute('type', gettype($v));
+			if (is_object($item))
+			{
+				$retval .= "\t<group name=\"".$key."\">\n";
+				$retval .= $this->_buildXMLstringLevel($item, $depth+1);
+				$retval .= "\t</group>\n";
 			} else {
-				$n = $root->addChild($nodeName);
-				$n->addAttribute('name', $k);
-				$n->addAttribute('type', gettype($v));
-
-				$this->_getXmlChildren($n, $v, $nodeName);
+				$retval .= "\t<entry name=\"".$key."\">".$item."</entry>\n";
 			}
 		}
-
-		return $root->asXML();
-	}
-
-	/**
-	 * Parse a XML formatted string and convert it into an object.
-	 *
-	 * @param	string	XML formatted string to convert.
-	 * @param	array	Options used by the formatter.
-	 * @return	object	Data object.
-	 * @since	1.5
-	 */
-	public function stringToObject($data, $options = array())
-	{
-		// Initialize variables.
-		$obj = new stdClass;
-
-		// Parse the XML string.
-		$xml = simplexml_load_string($data);
-
-		foreach ($xml->children() as $node) {
-			$obj->$node['name'] = $this->_getValueFromNode($node);
-		}
-
-		return $obj;
-	}
-
-	/**
-	 * Method to get a PHP native value for a SimpleXMLElement object. -- called recursively
-	 *
-	 * @param	object	SimpleXMLElement object for which to get the native value.
-	 * @return	mixed	Native value of the SimpleXMLElement object.
-	 * @since	2.0
-	 */
-	protected function _getValueFromNode($node)
-	{
-		switch ($node['type']) {
-			case 'integer':
-				$value = (string) $node;
-				return (int) $value;
-				break;
-			case 'string':
-				return (string) $node;
-				break;
-			case 'boolean':
-				$value = (string) $node;
-				return (bool) $value;
-				break;
-			case 'double':
-				$value = (string) $node;
-				return (float) $value;
-				break;
-			case 'array':
-				$value = array();
-				foreach ($node->children() as $child) {
-					$value[(string) $child['name']] = $this->_getValueFromNode($child);
-				}
-				break;
-			default:
-				$value = new stdClass;
-				foreach ($node->children() as $child) {
-					$value->$child['name'] = $this->_getValueFromNode($child);
-				}
-				break;
-		}
-
-		return $value;
+		$retval .= '</config>';
+		return $retval;
 	}
 
 	/**
 	 * Method to build a level of the XML string -- called recursively
 	 *
-	 * @param	object	SimpleXMLElement object to attach children.
-	 * @param	object	Object that represents a node of the xml document.
-	 * @param	string	The name to use for node elements.
-	 * @return	void
-	 * @since	2.0
+	 * @access private
+	 * @param object $object Object that represents a node of the xml document
+	 * @param int $depth The depth in the XML tree of the $object node
+	 * @return string XML string
 	 */
-	protected function _getXmlChildren(& $node, $var, $nodeName)
+	function _buildXMLstringLevel($object, $depth)
 	{
-		// Iterate over the object members.
-		foreach ((array) $var as $k => $v)
-		{
-			if (is_scalar($v)) {
-				$n = $node->addChild($nodeName, $v);
-				$n->addAttribute('name', $k);
-				$n->addAttribute('type', gettype($v));
-			} else {
-				$n = $node->addChild($nodeName);
-				$n->addAttribute('name', $k);
-				$n->addAttribute('type', gettype($v));
+		// Initialize variables
+		$retval = '';
+		$tab	= '';
+		for($i=1;$i <= $depth; $i++) {
+			$tab .= "\t";
+		}
 
-				$this->_getXmlChildren($n, $v, $nodeName);
+		foreach (get_object_vars( $object ) as $key=>$item)
+		{
+			if (is_object($item))
+			{
+				$retval .= $tab."<group name=\"".$key."\">\n";
+				$retval .= $this->_buildXMLstringLevel($item, $depth+1);
+				$retval .= $tab."</group>\n";
+			} else {
+				$retval .= $tab."<entry name=\"".$key."\">".$item."</entry>\n";
 			}
 		}
+		return $retval;
 	}
 }

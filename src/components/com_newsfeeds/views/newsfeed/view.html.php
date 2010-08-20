@@ -1,17 +1,22 @@
 <?php
 /**
- * version $Id: view.html.php 18212 2010-07-22 06:02:54Z eddieajau $
- * @package		Joomla
- * @subpackage	Newsfeeds
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- *
- */
+* version $Id: view.html.php 14401 2010-01-26 14:10:00Z louis $
+* @package		Joomla
+* @subpackage	Newsfeeds
+* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
+*
+* Joomla! is free software. This version may have been modified pursuant
+* to the GNU General Public License, and as distributed it includes or
+* is derivative of works licensed under the GNU General Public License or
+* other free or open source software licenses.
+* See COPYRIGHT.php for copyright notices and details.
+*/
 
 // Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die;
+defined('_JEXEC') or die( 'Restricted access' );
 
-jimport('joomla.application.component.view');
+jimport( 'joomla.application.component.view');
 
 /**
  * HTML View class for the Newsfeeds component
@@ -23,59 +28,55 @@ jimport('joomla.application.component.view');
  */
 class NewsfeedsViewNewsfeed extends JView
 {
-	function display($tpl = null)
+	function display( $tpl = null)
 	{
-		$app = JFactory::getApplication();
+		global $mainframe;
 
 		// check if cache directory is writeable
 		$cacheDir = JPATH_BASE.DS.'cache'.DS;
-		if (!is_writable($cacheDir)) {
-			echo JText::_('CACHE_DIRECTORY_UNWRITABLE');
+		if ( !is_writable( $cacheDir ) ) {
+			echo JText::_( 'Cache Directory Unwritable' );
 			return;
 		}
 
 		// Get some objects from the JApplication
-		$pathway  = $app->getPathway();
-		$document = JFactory::getDocument();
+		$pathway  =& $mainframe->getPathway();
+		$document =& JFactory::getDocument();
 
 		// Get the current menu item
-		$menus	= $app->getMenu();
+		$menus	= &JSite::getMenu();
 		$menu	= $menus->getActive();
-		$params	= $app->getParams();
+		$params	= &$mainframe->getParams();
 
 		//get the newsfeed
-		$newsfeed = $this->get('data');
-
-		$temp = new JRegistry();
-		$temp->loadJSON($newsfeed->params);
-		$params->merge($temp);
+		$newsfeed =& $this->get('data');
 
 		//  get RSS parsed object
 		$options = array();
 		$options['rssUrl']		= $newsfeed->link;
 		$options['cache_time']	= $newsfeed->cache_time;
 
-		$rssDoc = JFactory::getXMLparser('RSS', $options);
+		$rssDoc =& JFactory::getXMLparser('RSS', $options);
 
-		if ($rssDoc == false) {
-			$msg = JText::_('COM_NEWSFEEDS_ERRORS_FEED_NOT_RETRIEVED');
-			$app->redirect(NewsFeedsHelperRoute::getCategoryRoute($newsfeed->catslug), $msg);
+		if ( $rssDoc == false ) {
+			$msg = JText::_('Error: Feed not retrieved');
+			$mainframe->redirect('index.php?option=com_newsfeeds&view=category&id='. $newsfeed->catslug, $msg);
 			return;
 		}
 		$lists = array();
 
 		// channel header and link
-		$newsfeed->channel['title']			= $rssDoc->get_title();
-		$newsfeed->channel['link']			= $rssDoc->get_link();
-		$newsfeed->channel['description']	= $rssDoc->get_description();
-		$newsfeed->channel['language']		= $rssDoc->get_language();
+		$newsfeed->channel['title'] 	  = $rssDoc->get_title();
+		$newsfeed->channel['link'] 		  = $rssDoc->get_link();
+		$newsfeed->channel['description'] = $rssDoc->get_description();
+		$newsfeed->channel['language'] 	  = $rssDoc->get_language();
 
 		// channel image if exists
-		$newsfeed->image['url']		= $rssDoc->get_image_url();
-		$newsfeed->image['title']	= $rssDoc->get_image_title();
-		$newsfeed->image['link']	= $rssDoc->get_image_link();
-		$newsfeed->image['height']	= $rssDoc->get_image_height();
-		$newsfeed->image['width']	= $rssDoc->get_image_width();
+		$newsfeed->image['url']    = $rssDoc->get_image_url();
+		$newsfeed->image['title']  = $rssDoc->get_image_title();
+		$newsfeed->image['link']   = $rssDoc->get_image_link();
+		$newsfeed->image['height'] = $rssDoc->get_image_height();
+		$newsfeed->image['width']  = $rssDoc->get_image_width();
 
 		// items
 		$newsfeed->items = $rssDoc->get_items();
@@ -83,77 +84,51 @@ class NewsfeedsViewNewsfeed extends JView
 		// feed elements
 		$newsfeed->items = array_slice($newsfeed->items, 0, $newsfeed->numarticles);
 
-		$this->assignRef('params'  , $params  );
-		$this->assignRef('newsfeed', $newsfeed);
+		// Set page title
+		// because the application sets a default page title, we need to get it
+		// right from the menu item itself
+		if (is_object( $menu )) {
+			$menu_params = new JParameter( $menu->params );
+			if (!$menu_params->get( 'page_title')) {
+				$params->set('page_title',	$newsfeed->name);
+			}
+		} else {
+			$params->set('page_title',	$newsfeed->name);
+		}
+		$document->setTitle( $params->get( 'page_title' ) );
 
-		$this->_prepareDocument();
+		//set breadcrumbs
+		$viewname	= JRequest::getString('view');
+		if ( $viewname == 'categories' ) {
+			$pathway->addItem($newsfeed->category, 'index.php?view=category&id='.$newsfeed->catslug);
+		}
+		$pathway->addItem($newsfeed->name, '');
+
+		$this->assignRef('params'  , $params   );
+		$this->assignRef('newsfeed', $newsfeed );
 
 		parent::display($tpl);
 	}
 
-	/**
-	 * Prepares the document
-	 */
-	protected function _prepareDocument()
+	function limitText($text, $wordcount)
 	{
-		$app		= JFactory::getApplication();
-		$menus		= $app->getMenu();
-		$pathway	= $app->getPathway();
-		$title 		= null;
-
-		// Because the application sets a default page title,
-		// we need to get it from the menu item itself
-		$menu = $menus->getActive();
-		if($menu)
-		{
-			$this->params->def('page_heading', $this->params->get('page_title', $menu->title));
-		} else {
-			$this->params->def('page_heading', JText::_('COM_NEWSFEEDS_DEFAULT_PAGE_TITLE'));
+		if(!$wordcount) {
+			return $text;
 		}
-		if($menu && $menu->query['view'] != 'newsfeed')
+
+		$texts = explode( ' ', $text );
+		$count = count( $texts );
+
+		if ( $count > $wordcount )
 		{
-			$id = (int) @$menu->query['id'];
-			$path = array($this->newsfeed->name => '');
-			$category = JCategories::getInstance('Newsfeeds')->get($this->newsfeed->catid);
-			while($id != $category->id && $category->id > 1)
-			{
-				$path[$category->title] = NewsfeedsHelperRoute::getCategoryRoute($category->id);
-				$category = $category->getParent();
+			$text = '';
+			for( $i=0; $i < $wordcount; $i++ ) {
+				$text .= ' '. $texts[$i];
 			}
-			$path = array_reverse($path);
-			foreach($path as $title => $link)
-			{
-				$pathway->addItem($title, $link);
-			}
+			$text .= '...';
 		}
 
-		$title = $this->params->get('page_title', '');
-		if (empty($title)) {
-			$title = htmlspecialchars_decode($app->getCfg('sitename'));
-		}
-		elseif ($app->getCfg('sitename_pagetitles', 0)) {
-			$title = JText::sprintf('JPAGETITLE', htmlspecialchars_decode($app->getCfg('sitename')), $title);
-		}
-		$this->document->setTitle($title);
-
-		if ($this->newsfeed->metadesc)
-		{
-			$this->document->setDescription($this->newsfeed->metadesc);
-		}
-
-		if ($this->newsfeed->metakey)
-		{
-			$this->document->setMetadata('keywords', $this->newsfeed->metakey);
-		}
-
-		$mdata = $this->newsfeed->metadata->toArray();
-		foreach ($mdata as $k => $v)
-		{
-			if ($v)
-			{
-				$this->document->setMetadata($k, $v);
-			}
-		}
-
+		return $text;
 	}
 }
+?>

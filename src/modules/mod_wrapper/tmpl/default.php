@@ -1,22 +1,12 @@
-<?php
-/**
- * @version		$Id: default.php 18117 2010-07-13 18:09:01Z infograf768 $
- * @package		Joomla.Site
- * @subpackage	mod_wrapper
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
-
-// no direct access
-defined('_JEXEC') or die;
-?>
-<script type="text/javascript">
+<?php // no direct access
+defined('_JEXEC') or die('Restricted access'); ?>
+<script language="javascript" type="text/javascript">
 	function iFrameHeight() {
 		var h = 0;
-		if (!document.all) {
+		if ( !document.all ) {
 			h = document.getElementById('blockrandom').contentDocument.height;
 			document.getElementById('blockrandom').style.height = h + 60 + 'px';
-		} else if (document.all) {
+		} else if( document.all ) {
 			h = document.frames('blockrandom').document.body.scrollHeight;
 			document.all.blockrandom.style.height = h + 20 + 'px';
 		}
@@ -32,6 +22,6 @@ defined('_JEXEC') or die;
 	scrolling="<?php echo $scroll ?>"
 	align="top"
 	frameborder="0"
-	class="wrapper<?php echo $params->get('moduleclass_sfx') ?>" >
-	<?php echo JText::_('MOD_WRAPPER_NO_IFRAMES'); ?>
+	class="wrapper<?php echo $class ?>">
+	<?php echo JText::_('NO_IFRAMES'); ?>
 </iframe>

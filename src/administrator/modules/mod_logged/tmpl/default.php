@@ -1,73 +1,77 @@
 <?php
-/**
- * @version		$Id: default.php 17203 2010-05-20 17:16:37Z infograf768 $
- * @package		Joomla.Administrator
- * @subpackage	mod_logged
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
-
-// No direct access.
-defined('_JEXEC') or die;
+/** $Id: default.php 10381 2008-06-01 03:35:53Z pasamio $ */
+defined( '_JEXEC' ) or die( 'Restricted access' );
 ?>
-<table class="adminlist">
-	<thead>
-		<tr>
-			<th>
-				<?php
-				if($params->get('name', 1)) {
-					echo JText::_('MOD_LOGGED_NAME');
-				} else {
-					echo JText::_('JGLOBAL_USERNAME');
-				}; ?>
-			</th>
-			<th>
-				<strong><?php echo JText::_('JCLIENT'); ?></strong>
-			</th>
-			<th>
-				<strong><?php echo JText::_('JGRID_HEADING_ID');?></strong>
-			</th>
-			<th>
-				<strong><?php echo JText::_('MOD_LOGGED_LAST_ACTIVITY');?></strong>
-			</th>
-			<th>
-				<strong><?php echo JText::_('MOD_LOGGED_LOGOUT');?></strong>
-			</th>
-		</tr>
-	</thead>
-	<tbody>
-	<?php foreach ($users as $user) : ?>
-		<tr>
-			<td>
-				<?php if (isset($user->editLink)) :?>
-					<a href="<?php echo $user->editLink; ?>">
-						<?php echo $user->name;?></a>
-				<?php else :
-					echo $user->name;
-				endif; ?>
-			</td>
-			<td class="center">
-				<?php
-					if($user->client_id) {
-						echo JText::_('JADMINISTRATOR');
-					} else {
-						echo JText::_('JSITE');
-					}?>
-			</td>
-			<td class="center">
-				<?php echo $user->id; ?>
-			</td>
-			<td class="center">
-				<?php echo JHtml::_('date', $user->time, 'Y-m-d H:i:s'); ?>
-			</td>
-			<td class="center">
-				<?php if ($user->client_id == 0) :?>
-					<a href="<?php echo $user->logoutLink;?>">
-						<img src="templates/bluestork/images/menu/icon-16-logout.png"/>
-					</a>
+
+<form method="post" action="index.php?option=com_users">
+	<table class="adminlist">
+		<thead>
+			<tr>
+				<td class="title">
+					<strong><?php echo '#' ?></strong>
+				</td>
+				<td class="title">
+					<strong><?php echo JText::_( 'Name' ); ?></strong>
+				</td>
+				<td class="title">
+					<strong><?php echo JText::_( 'Group' ); ?></strong>
+				</td>
+				<td class="title">
+					<strong><?php echo JText::_( 'Client' ); ?></strong>
+				</td>
+				<td class="title">
+					<strong><?php echo JText::_( 'Last Activity' ); ?></strong>
+				</td>
+				<td class="title">
+					<strong><?php echo JText::_( 'Logout' ); ?></strong>
+				</td>
+			</tr>
+		</thead>
+		<tbody>
+	<?php
+		$i		= 0;
+		$now	= time();
+		foreach ($rows as $row) :
+			$auth = $user->authorize( 'com_users', 'manage' );
+			if ($auth) :
+				$link 	= 'index.php?option=com_users&amp;task=edit&amp;cid[]='. $row->userid;
+				$name 	= '<a href="'. $link .'" title="'. JText::_( 'Edit User' ) .'">'. $row->username .'</a>';
+			else :
+				$name 	= $row->username;
+			endif;
+
+			$clientInfo =& JApplicationHelper::getClientInfo($row->client_id);
+			?>
+			<tr>
+				<td width="5%">
+					<?php echo $pageNav->getRowOffset( $i ); ?>
+				</td>
+				<td>
+					<?php echo $name;?>
+				</td>
+				<td>
+					<?php echo $row->usertype;?>
+				</td>
+				<td>
+					<?php echo $clientInfo->name;?>
+				</td>
+				<td>
+					<?php echo JText::sprintf( 'activity hours', ($now - $row->time)/3600.0 );?>
+				</td>
+				<td>
+				<?php if ($auth && $user->get('gid') > 24 && $row->userid != $user->get('id')) : ?>
+					<input type="image" src="images/publish_x.png" onclick="f=this.form;f.task.value='flogout';f.client.value=<?php echo (int) $row->client_id; ?>;f.cid_value.value=<?php echo (int) $row->userid ?>" />
 				<?php endif; ?>
-			</td>
-		</tr>
-		<?php endforeach; ?>
-	</tbody>
-</table>
+				</td>
+			</tr>
+			<?php
+			$i++;
+		endforeach;
+		?>
+		</tbody>
+	</table>
+	<input type="hidden" name="task" value="" />
+	<input type="hidden" name="client" value="" />
+	<input type="hidden" name="cid[]" id="cid_value" value="" />
+	<?php echo JHTML::_( 'form.token' ); ?>
+</form>
