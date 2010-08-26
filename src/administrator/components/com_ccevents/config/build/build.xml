@@ -1,0 +1,47 @@
+<?xml version="1.0"?> 
+<project name="ccevents" default="package" basedir="../../../../../">
+ 
+	<property name="dist" value="c:\tmp\stage"/>
+	<property name="tarfile" value="joomla.tar"/>
+	<property name="tarprefix" value="joomla"/>
+	
+	<target name="package">
+		
+		<!-- prepare the directory -->
+		<delete includeemptydirs="true">
+			<fileset dir="${dist}" includes="**/*"/>
+		</delete>
+
+		
+		<tar destfile="${dist}/${tarfile}">
+			
+			<!-- CC EVENTS -->
+			<tarfileset dir="${basedir}/administrator/components/com_ccevents"
+					prefix="${tarprefix}/administrator/components/com_ccevents"
+			    	preserveLeadingSlashes="true"
+					excludes="*svn*">
+				<exclude name="WEB-INF/local.include.php" />
+				<exclude name="WEB-INF/logs" />
+				<exclude name="WEB-INF/build" />
+			</tarfileset>
+			
+			<tarfileset dir="${basedir}/components/com_ccevents"
+					prefix="${tarprefix}/components/com_ccevents"
+			    	preserveLeadingSlashes="true"
+					excludes="*svn*">
+			</tarfileset>		
+			
+		</tar>
+		
+		<!-- gzip it -->
+		<gzip zipfile="${dist}/${tarfile}.gz" src="${dist}/${tarfile}"/>
+		
+		<!-- cleanup -->
+		<delete file="${dist}/${tarfile}" />
+		
+		
+	</target>
+
+
+
+</project>

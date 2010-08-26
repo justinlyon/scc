@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<mosinstall type="theme" version="4.5.1">
+  <name>Default</name>
+  <creationDate>Aug 2006</creationDate>
+  <author>Tachometry Corporation</author>
+  <copyright>This template is released under Apache License 2.0.</copyright>
+  <authorEmail>support@tachometry.com</authorEmail>
+  <authorUrl>www.tachometry.com</authorUrl>
+  <version>1.0 Alpha 1</version>
+  <description>The default Cultural Center Events theme</description>
+  <params>
+   <param name="@heading" type="heading" label="General" description="" />
+   		<param name="cat_empty" type="radio" default="1" label="Empty categories">
+        <option value="0">Hide</option>
+        <option value="1">Show</option>
+    </param>
+   <param name="@heading" type="heading" label="Menu" description="" />
+   <param name="menu_home" type="radio" default="1" label="Home">
+        <option value="0">Hide</option>
+        <option value="1">Show</option>
+    </param>
+  </params>
+  <files>
+    <filename>index.html</filename>
+    <filename>css/index.html</filename>
+    <filename>images/index.html</filename>
+    <filename>languages/index.html</filename>
+    <filename>languages/en_us.php</filename>
+    <filename>templates/index.html</filename>
+  </files>
+  <images>
+
+  </images>
+  <css>
+    <filename>css/theme.css</filename>
+  </css>
+</mosinstall>

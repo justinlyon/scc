@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<options>
+    
+  <!-- The intput directory that contains class source files to be compiled -->
+  <!-- Use commma for multiple directories -->
+  <source_dirs>../beans</source_dirs>
+ 
+  <!-- Whether to compile subdirs recursively: true(default)|false -->
+  <recursive>true</recursive>
+ 
+  <!-- The output directory that the compiled runtime info is stored -->
+  <!-- You need to make it writable to the user who runs your web app -->
+  <compiled_dir>.</compiled_dir>
+  
+  <!-- The file to contain the compiled information: default to compiled.ezpdo --> 
+  <compiled_file>compiled.ezpdo</compiled_file>
+  
+  <!-- The default DSN to the database you want to store your objects -->
+  <!-- This will be the default DSN for classes that do not have DSN specified -->
+  <!-- <default_dsn>sqlite://composite.db</default_dsn> -->
+  <!-- <default_dsn>mysql://ezpdo_ex:pdoiseasy@localhost/ezpdo_ex</default_dsn> -->
+  <!-- <default_dsn>sqlite://./composite.db</default_dsn> -->
+  <default_dsn>mysql://autry:n9fr3dr$@localhost/autry</default_dsn>
+ 
+  <!-- Whether to enable auto-compile: true(default)|false -->
+  <!-- Class will be auto-compiled for the first time to be persisted -->
+  <auto_compile>true</auto_compile>
+ 
+  <!-- Whether to backup old compiled file: true(default)|false -->
+  <!-- Not necessary due to SVN revsion control -->
+  <backup_compiled>false</backup_compiled>
+ 
+  <!-- Whether you want to enable auto-flush: true(default)|false -->
+  <!-- All 'dirty' objects are commit before your script exits-->
+  <auto_flush>false</auto_flush>
+  
+  <!-- The database abstraction library you want to use: default to adodb-->
+  <!-- Currently available options: adodb, peardb -->
+  <!-- <db_lib>peardb</db_lib>  -->
+  <!-- <db_lib>adodb</db_lib> -->
+  <db_lib>adodb</db_lib>
+ 
+  <!-- Whether to write log on console: true(default)|false -->
+  <!-- Note that console log only works on command line)    -->
+  <log_console>true</log_console>
+ 
+  <!-- Log file name (string). If not unspecified, no log is generated. -->
+  <!-- Note that 'relative' path is relative path to this config file   -->
+  <log_file>../logs/ezpdo.log</log_file>
+  
+  <!-- Whether to split relation tables.  -->
+  <!-- If false, stores all relationships in a single table -->
+  <split_relation_table>false</split_relation_table>
+  
+</options>

@@ -1,0 +1,15 @@
+
+1. Configure Banner Module
+  a. Upload Banner to the Media Manager
+  b. Add a new client to the ClientManager
+  c. Add the new banner to the banner manager
+
+2. Configure the search module
+  a. Module Class Suffix: 
+  b. Enable cache: no
+  c. Set itemid: search
+  d. Box width: 35
+  e. Text: "Search For:"
+  f. Search Button: yes
+  g. Button Position: right
+  h. Button Text: ""

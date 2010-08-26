@@ -1,0 +1,79 @@
+/**
+ *  $Id: global.css 134 2006-07-01 07:40:29Z nchanda $: global.css, Jun 24, 2006 10:10:09 AM nchanda
+ *  Copyright (c) 2006, Tachometry Corporation
+ * 	http://www.tachometry.com
+ * 
+ *  Licensed under terms of the Apache License 2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Tachometry Applications and Professional Services (TAPS)
+ **/
+
+body {
+	padding: 0;
+	margin: 0;
+	font-family: verdana, arial, helvetica, san-serif;
+	font-size: 10pt;
+	background: #f3f3f3;
+}
+
+td {
+	padding: 0;
+	margin: 0;
+	text-align: left;
+	vertical-align: top;
+	font-size: 1em;
+}
+
+th.left, td.left, div.left {
+	text-align: left;
+}
+
+th.right, td.right, div.right {
+	text-align: right;
+}
+
+th.center, td.center, div.center {
+	text-align: center;
+}
+
+ul { 
+	padding: 0;
+}
+ 
+fieldset {
+	margin: 10px;
+}
+
+legend {
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+#content_container {
+ 	width: 100%;
+}
+ 
+#c1_container {
+	width: 50%;
+	padding: 20px;
+}
+ 
+#c2_container {
+	width: 50%;
+	text-align: center;
+	padding: 20px;
+}
+
+table#toolbar {
+    float: right;
+    border: 0;
+}
+
+table#toolbar td {
+    text-align: center;
+}
+
+
+
+

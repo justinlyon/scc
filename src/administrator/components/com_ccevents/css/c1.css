@@ -1,0 +1,79 @@
+/*  C1 Form */
+.c1_form_container {
+	width: 80%;
+	margin: 0;
+	text-align: center;
+	font-size: 0.9em;
+}
+
+.c1_form {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.c1_form ul {
+	list-style: none;
+	margin: 0;
+}
+
+.c1_form li {
+	display: block;
+	float: left;
+	width: 100%;
+	margin: 4px 0 4px 0;
+}
+
+.c1_form li.first {
+	margin-top: 10px;
+}
+
+.c1_form li label {
+	display: block; 
+	float: left;
+	width: 24%;
+	text-align: right;
+	padding-right: 3px;
+}
+
+.c1_form li label.req {
+	font-weight: bold;
+	color: #900;
+}
+
+.c1_form li label.textarea {
+	display: block; 
+	float: left;
+	width: 90%;
+	text-align: left;
+	margin-left: 6px;
+	padding-right: 0;
+}
+
+.c1_form li.separator {
+	font-size: 0;
+}
+
+.c1_form li.separator hr {
+	color: #ccc;
+	background-color: #ccc;
+	width: 96%;
+	margin-top: 6px;
+	margin-bottom: 6px;
+}
+
+.c1_form input.text, .c1_form .input_row {
+	display: block;
+	float: left;
+	width: 73%;
+	margin-left: 6px;
+	text-align: left;
+}
+
+.c1_form textarea {
+	clear: left;
+	display: block;
+	float: left;
+	width: 96%;
+	margin-left: 6px;
+}

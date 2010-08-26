@@ -1,0 +1,32 @@
+/*  Summary Lists */
+
+
+.summary_form {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.summary_container {
+	width: 80%;
+	margin: 0;
+	text-align: center;
+}
+
+.summary_container th, .summary_container td {
+	font-size: 0.8em;
+	text-align: center;
+}
+
+.summary_container tr.titlerow {
+	background-color: silver;
+}
+
+.summary_container tr.primerow {
+	background-color: #e8e8e8;
+}
+
+.summary_container tr.altrow {
+	background-color: #d8d8d8;
+}
+
