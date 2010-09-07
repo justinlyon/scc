@@ -52,7 +52,7 @@ class GalleryService
 
 	const DEFAULT_ALBUM_PATH = 'systemimages/default';
 	const CAPTION_FIELD = 'summary'; // which object field should be used for the image caption
-	const G2ALBUM_BASE_URL = '/gallery2/g2data/albums'; // relative to joomla root, where is the g2data/albums folder?
+	const G2ALBUM_BASE_URL = '../g2data/albums'; // relative to joomla root, where is the g2data/albums folder?
 	const PARENT_PROGRAM_ALBUM = "Program";
 	const PARENT_COURSE_ALBUM = "Course";
 	const PARENT_EXHIBITION_ALBUM = "Exhibition";

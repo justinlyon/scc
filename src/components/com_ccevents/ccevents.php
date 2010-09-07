@@ -1,7 +1,7 @@
 <?php
 /**
- *  $Id$: admin.ccevents.php, Jul 3, 2006 8:39:15 AM nchanda
- *  Copyright (c) 2006, Tachometry Corporation
+ *  $Id$: ccevents.php, Sep 2, 2010 11:31:15 PM jlyon
+ *  Copyright (c) 2010, Tachometry Corporation
  * 	http://www.tachometry.com
  * 
  *  Licensed under terms of the Apache License 2.0
@@ -23,7 +23,7 @@ defined('_JEXEC') or die('Restricted access');
 require_once (JPATH_COMPONENT.DS.'controller.php');
 
 // Require scoped controller
-switch (JRequest::getVar('scope')) {
+switch (JRequest::getWord('scope')) {
 	case 'cldr' : $controller = 'Calendar'; break;
 	case 'crse' : $controller = 'Course'; break;
 	case 'exbt' : $controller = 'Exhibition'; break;
@@ -34,17 +34,20 @@ switch (JRequest::getVar('scope')) {
 	default : $controller = 'HomePage';
 }
 
-require_once (JPATH_COMPONENT.DS.'controllers'.DS. strtolower($controller) .'.php');
+$path = JPATH_COMPONENT.DS.'controllers'.DS.strtolower($controller).'.php';
+if (file_exists($path)) {
+    require_once $path;
+} else {
+    $controller = '';
+}
 
 // Create the controller
-$classname	= 'CCEvents'. $controller .'Controller';
+$classname	= 'CCEventsController'. ucwords($controller);
+echo $classname;
 $controller = new $classname( );
 
-// Perform the Request task, or assign the default
-$task = (JRequest::getVar('task')) ? JRequest::getVar('task') : 'execute';
-$controller->$task();
+// Perform the Request task
+$controller->execute(JRequest::getWord('task'));
 
 // Redirect if set by the controller
 $controller->redirect();
-
-?>

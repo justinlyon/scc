@@ -66,10 +66,21 @@
       <filename>views/series/tmpl/summary.php</filename>
       <filename>views/series/view.html.php</filename>
   </files>
+
+  <install>
+    <sql>
+      <file charset="utf8" driver="mysql">install.sql</file>
+    </sql>
+  </install>
+  <uninstall>
+    <sql>
+      <file charset="utf8" driver="mysql">uninstall.sql</file>
+    </sql>
+  </uninstall>
   
   <administration>
     <!-- Administration Menu Section -->
-    <menu>Skirball Events</menu>
+    <menu>CCEvents</menu>
     <submenu>
       <!-- Note that all & must be escaped to &amp; for the file to be valid XML and be parsed by the installer -->
       <menu link="option=com_ccevents&amp;scope=home">Homepage</menu>
@@ -101,6 +112,8 @@
       <filename>graphics/cal_24.gif</filename>
       <filename>help/ccevents.help.html</filename>
       <filename>init.php</filename>
+      <filename>install.sql</filename>
+      <filename>uninstall.sql</filename>
       <filename>js/calendar.js</filename>
       <filename>js/links.js</filename>
       <filename>test/actions/PackageTestSuite.php</filename>

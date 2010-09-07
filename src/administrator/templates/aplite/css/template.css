@@ -124,7 +124,7 @@ div.col .panel h3{margin-left:0px;margin-right:0px;}
 .adminform,.admintable,.adminlist{width:100%;}
 .adminform td{padding:2px;}
 .admintable td,.adminlist td,.adminlist th{padding:4px 4px;}
-.adminlist th{vertical-align:bottom;}
+.adminlist th{vertical-align:bottom;text-align:left;}
 .order{white-space:nowrap;}
 .order span{display:block;float:left;width:12px;padding:0 2px 0 0;}
 .order .text_area{width:20px;}

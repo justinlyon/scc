@@ -6,8 +6,11 @@
  * @subpackage ccevents
  */
 
-jimport( 'joomla.application.component.view');
+// No direct access
+ 
+defined( '_JEXEC' ) or die( 'Restricted access' );
 
+jimport( 'joomla.application.component.view');
 
 class CCEventsExhibitionViewExhibition extends JView
 {

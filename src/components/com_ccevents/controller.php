@@ -1,5 +1,9 @@
 <?php
 
+// No direct access
+ 
+defined( '_JEXEC' ) or die( 'Restricted access' );
+
 jimport('joomla.application.component.controller');
 
 /**
@@ -17,7 +21,6 @@ class CCEventsController extends JController
 
 	function display()
 	{
-		echo "Justin was here";
 		parent::display();
 	}
 

@@ -252,6 +252,11 @@ class EventService
 			trigger_error("Required event type is missing", E_USER_ERROR);
 			return;
 		}
+		$db =& JFactory::getDBO();
+		$query = "SELECT * from #__cce_" . strtolower($eventType) . " as e where e.pubState is null";// or e.pubState.value != ? ";
+		$db->setQuery( $query );
+		print_r($db->loadResult());
+		
 		$pdo = epManager::instance();
 
 		$result = array();
@@ -274,7 +279,7 @@ class EventService
 		$find .=  " order by displayOrder";
 		$logger->debug("DB Query: $find");
 		$logger->debug("DB Criteria: ". implode(',',$criteria));
-		$result = $pdo->find($find,$criteria);
+		$result = $pdo->find($find,$criteria); //This is where the problem is...
 
 		// Convert PDOs to Beans
 		$p2b = strtolower($eventType) ."PdoToBean";

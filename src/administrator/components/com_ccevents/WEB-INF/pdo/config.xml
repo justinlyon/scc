@@ -20,7 +20,7 @@
   <!-- <default_dsn>sqlite://composite.db</default_dsn> -->
   <!-- <default_dsn>mysql://ezpdo_ex:pdoiseasy@localhost/ezpdo_ex</default_dsn> -->
   <!-- <default_dsn>sqlite://./composite.db</default_dsn> -->
-  <default_dsn>mysql://autry:n9fr3dr$@localhost/autry</default_dsn>
+  <default_dsn>mysql://sccuser:j@ck2olo@localhost/scc15</default_dsn>
  
   <!-- Whether to enable auto-compile: true(default)|false -->
   <!-- Class will be auto-compiled for the first time to be persisted -->

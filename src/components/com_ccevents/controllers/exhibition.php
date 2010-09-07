@@ -22,17 +22,19 @@ require_once(WEB_INF.DS.'actions'.DS.'FrontExhibitionAction.php');
  * It reuses the FrontExhibitionAction class to beuild the model, then
  * passes it to the Joomla 1.5 view engine
  */
-class CCEventsExhibitionController extends JController
+class CCEventsControllerExhibition extends CCEventsController
 {
 	public $action;
 	
 	
 	function execute()
 	{
-		$this->summary();	
+		//$this->summary();
+		echo "JUSTIN";
+		parent::execute();	
 	}
 	
-	function summary()
+    function summary()
 	{
                 global $mainframe;
                 $action = new FrontExhibitionAction();

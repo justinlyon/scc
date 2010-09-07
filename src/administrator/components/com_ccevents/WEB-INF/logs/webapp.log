@@ -541,3 +541,224 @@ Aug 25 23:23:10 com_ccevents [debug] Size of pubStates array: 0
 Aug 25 23:23:10 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
 Aug 25 23:23:10 com_ccevents [debug] DB Query: from Exhibition as e where e.pubState is null or e.pubState.value != ?  order by displayOrder
 Aug 25 23:23:10 com_ccevents [debug] DB Criteria: Archived
+Aug 29 17:29:43 com_ccevents [debug] 
+
+Aug 29 17:29:43 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 29 17:29:44 com_ccevents [debug] ExhibitionAction::execute()
+Aug 29 17:29:44 com_ccevents [debug] ExhibitionAction::summary()
+Aug 29 17:29:44 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 29 17:29:44 com_ccevents [debug] Size of pubStates array: 0
+Aug 29 17:29:44 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 29 17:29:44 com_ccevents [debug] DB Query: from Exhibition as e where e.pubState is null or e.pubState.value != ?  order by displayOrder
+Aug 29 17:29:44 com_ccevents [debug] DB Criteria: Archived
+Aug 29 17:32:37 com_ccevents [debug] 
+
+Aug 29 17:32:37 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 29 17:32:37 com_ccevents [debug] ExhibitionAction::execute()
+Aug 29 17:32:37 com_ccevents [debug] ExhibitionAction::summary()
+Aug 29 17:32:37 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 29 17:32:37 com_ccevents [debug] Size of pubStates array: 0
+Aug 29 17:32:37 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 29 17:32:37 com_ccevents [debug] DB Query: from Exhibition as e where e.pubState is null or e.pubState.value != ?  order by displayOrder
+Aug 29 17:32:37 com_ccevents [debug] DB Criteria: Archived
+Aug 29 17:32:43 com_ccevents [debug] 
+
+Aug 29 17:32:43 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 29 17:32:43 com_ccevents [debug] ExhibitionAction::execute()
+Aug 29 17:32:43 com_ccevents [debug] ExhibitionAction::summary()
+Aug 29 17:32:43 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 29 17:32:43 com_ccevents [debug] Size of pubStates array: 0
+Aug 29 17:32:43 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 29 17:32:43 com_ccevents [debug] DB Query: from Exhibition as e where e.pubState is null or e.pubState.value != ?  order by displayOrder
+Aug 29 17:32:43 com_ccevents [debug] DB Criteria: Archived
+Aug 29 17:32:54 com_ccevents [debug] 
+
+Aug 29 17:32:54 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 29 17:32:54 com_ccevents [debug] ExhibitionAction::execute()
+Aug 29 17:32:54 com_ccevents [debug] ExhibitionAction::summary()
+Aug 29 17:32:54 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 29 17:32:54 com_ccevents [debug] Size of pubStates array: 0
+Aug 29 17:32:54 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 29 17:32:54 com_ccevents [debug] DB Query: from Exhibition as e where e.pubState is null or e.pubState.value != ?  order by displayOrder
+Aug 29 17:32:54 com_ccevents [debug] DB Criteria: Archived
+Aug 29 17:34:36 com_ccevents [debug] 
+
+Aug 29 17:34:36 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 29 17:34:36 com_ccevents [debug] ExhibitionAction::execute()
+Aug 29 17:34:36 com_ccevents [debug] ExhibitionAction::summary()
+Aug 29 17:34:36 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 29 17:34:36 com_ccevents [debug] Size of pubStates array: 0
+Aug 29 17:34:36 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 29 17:34:36 com_ccevents [debug] DB Query: from Exhibition as e where e.pubState is null or e.pubState.value != ?  order by displayOrder
+Aug 29 17:34:36 com_ccevents [debug] DB Criteria: Archived
+Aug 29 17:35:54 com_ccevents [debug] 
+
+Aug 29 17:35:54 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 29 17:35:54 com_ccevents [debug] ExhibitionAction::execute()
+Aug 29 17:35:54 com_ccevents [debug] ExhibitionAction::summary()
+Aug 29 17:35:54 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 29 17:35:54 com_ccevents [debug] Size of pubStates array: 0
+Aug 29 17:35:54 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 29 17:35:54 com_ccevents [debug] DB Query: from Exhibition as e where e.pubState is null or e.pubState.value != ?  order by displayOrder
+Aug 29 17:35:54 com_ccevents [debug] DB Criteria: Archived
+Aug 29 23:56:28 com_ccevents [debug] 
+
+Aug 29 23:56:28 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 29 23:56:28 com_ccevents [debug] ExhibitionAction::execute()
+Aug 29 23:56:28 com_ccevents [debug] ExhibitionAction::summary()
+Aug 29 23:56:28 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 29 23:56:28 com_ccevents [debug] Size of pubStates array: 0
+Aug 29 23:56:28 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 29 23:56:49 com_ccevents [debug] 
+
+Aug 29 23:56:49 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 29 23:56:49 com_ccevents [debug] ExhibitionAction::execute()
+Aug 29 23:56:49 com_ccevents [debug] ExhibitionAction::summary()
+Aug 29 23:56:49 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 29 23:56:49 com_ccevents [debug] Size of pubStates array: 0
+Aug 29 23:56:49 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 29 23:57:07 com_ccevents [debug] 
+
+Aug 29 23:57:07 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 29 23:57:07 com_ccevents [debug] ExhibitionAction::execute()
+Aug 29 23:57:07 com_ccevents [debug] ExhibitionAction::summary()
+Aug 29 23:57:07 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 29 23:57:07 com_ccevents [debug] Size of pubStates array: 0
+Aug 29 23:57:07 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 29 23:57:39 com_ccevents [debug] 
+
+Aug 29 23:57:39 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 29 23:57:39 com_ccevents [debug] ExhibitionAction::execute()
+Aug 29 23:57:39 com_ccevents [debug] ExhibitionAction::summary()
+Aug 29 23:57:39 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 29 23:57:39 com_ccevents [debug] Size of pubStates array: 0
+Aug 29 23:57:39 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 29 23:57:50 com_ccevents [debug] 
+
+Aug 29 23:57:50 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 29 23:57:50 com_ccevents [debug] ExhibitionAction::execute()
+Aug 29 23:57:50 com_ccevents [debug] ExhibitionAction::summary()
+Aug 29 23:57:50 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 29 23:57:50 com_ccevents [debug] Size of pubStates array: 0
+Aug 29 23:57:50 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 30 00:00:57 com_ccevents [debug] 
+
+Aug 30 00:00:57 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 30 00:00:57 com_ccevents [debug] ExhibitionAction::execute()
+Aug 30 00:00:57 com_ccevents [debug] ExhibitionAction::summary()
+Aug 30 00:00:57 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 30 00:00:57 com_ccevents [debug] Size of pubStates array: 0
+Aug 30 00:00:57 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 30 00:00:57 com_ccevents [debug] DB Query: from Exhibition as e where e.pubState is null or e.pubState.value != ?  order by displayOrder
+Aug 30 00:00:57 com_ccevents [debug] DB Criteria: Archived
+Aug 30 00:01:32 com_ccevents [debug] 
+
+Aug 30 00:01:32 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 30 00:01:32 com_ccevents [debug] ExhibitionAction::execute()
+Aug 30 00:01:32 com_ccevents [debug] ExhibitionAction::summary()
+Aug 30 00:01:32 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 30 00:01:32 com_ccevents [debug] Size of pubStates array: 0
+Aug 30 00:01:32 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 30 00:01:32 com_ccevents [debug] DB Query: from Exhibition as e where e.pubState is null or e.pubState.value != ?  order by displayOrder
+Aug 30 00:01:32 com_ccevents [debug] DB Criteria: Archived
+Aug 30 00:01:52 com_ccevents [debug] 
+
+Aug 30 00:01:52 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 30 00:01:52 com_ccevents [debug] ExhibitionAction::execute()
+Aug 30 00:01:52 com_ccevents [debug] ExhibitionAction::summary()
+Aug 30 00:01:52 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 30 00:01:52 com_ccevents [debug] Size of pubStates array: 0
+Aug 30 00:01:52 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 30 00:01:52 com_ccevents [debug] DB Query: from Exhibition as e where e.pubState is null or e.pubState.value != ?  order by displayOrder
+Aug 30 00:01:52 com_ccevents [debug] DB Criteria: Archived
+Aug 30 00:01:57 com_ccevents [debug] 
+
+Aug 30 00:01:57 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Aug 30 00:01:57 com_ccevents [debug] ExhibitionAction::execute()
+Aug 30 00:01:57 com_ccevents [debug] ExhibitionAction::summary()
+Aug 30 00:01:57 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Aug 30 00:01:57 com_ccevents [debug] Size of pubStates array: 0
+Aug 30 00:01:57 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Aug 30 00:01:57 com_ccevents [debug] DB Query: from Exhibition as e where e.pubState is null or e.pubState.value != ?  order by displayOrder
+Aug 30 00:01:57 com_ccevents [debug] DB Criteria: Archived
+Sep 02 14:00:52 com_ccevents [debug] 
+
+Sep 02 14:00:52 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Sep 02 14:00:54 com_ccevents [debug] ExhibitionAction::execute()
+Sep 02 14:00:54 com_ccevents [debug] ExhibitionAction::summary()
+Sep 02 14:00:54 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Sep 02 14:00:54 com_ccevents [debug] Size of pubStates array: 0
+Sep 02 14:00:54 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Sep 02 14:00:54 com_ccevents [debug] DB Query: from Exhibition as e where e.pubState is null or e.pubState.value != ?  order by displayOrder
+Sep 02 14:00:54 com_ccevents [debug] DB Criteria: Archived
+Sep 02 23:40:09 com_ccevents [debug] FrontExhibitionAction::summary()
+Sep 02 23:40:09 com_ccevents [debug] GalleryService::construct()
+Sep 03 00:13:27 com_ccevents [debug] FrontExhibitionAction::summary()
+Sep 03 00:13:27 com_ccevents [debug] GalleryService::construct()
+Sep 03 18:09:24 com_ccevents [debug] FrontExhibitionAction::summary()
+Sep 03 18:09:24 com_ccevents [debug] GalleryService::construct()
+Sep 04 01:19:35 com_ccevents [debug] FrontExhibitionAction::summary()
+Sep 04 01:19:35 com_ccevents [debug] GalleryService::construct()
+Sep 04 01:29:20 com_ccevents [debug] 
+
+Sep 04 01:29:20 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Sep 04 01:29:20 com_ccevents [debug] ExhibitionAction::summary()
+Sep 04 01:29:20 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Sep 04 01:29:20 com_ccevents [debug] Size of pubStates array: 0
+Sep 04 01:29:20 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Sep 04 01:29:40 com_ccevents [debug] 
+
+Sep 04 01:29:40 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Sep 04 01:29:40 com_ccevents [debug] ExhibitionAction::execute()
+Sep 04 01:29:40 com_ccevents [debug] ExhibitionAction::summary()
+Sep 04 01:29:40 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Sep 04 01:29:40 com_ccevents [debug] Size of pubStates array: 0
+Sep 04 01:29:40 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Sep 04 01:29:44 com_ccevents [debug] 
+
+Sep 04 01:29:44 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Sep 04 01:29:44 com_ccevents [debug] ExhibitionAction::execute()
+Sep 04 01:29:44 com_ccevents [debug] ExhibitionAction::summary()
+Sep 04 01:29:44 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Sep 04 01:29:44 com_ccevents [debug] Size of pubStates array: 0
+Sep 04 01:29:44 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Sep 04 01:31:29 com_ccevents [debug] 
+
+Sep 04 01:31:29 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Sep 04 01:31:29 com_ccevents [debug] ExhibitionAction::execute()
+Sep 04 01:31:29 com_ccevents [debug] ExhibitionAction::summary()
+Sep 04 01:31:29 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Sep 04 01:31:29 com_ccevents [debug] Size of pubStates array: 0
+Sep 04 01:31:29 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Sep 04 01:34:20 com_ccevents [debug] 
+
+Sep 04 01:34:20 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Sep 04 01:34:20 com_ccevents [debug] ExhibitionAction::execute()
+Sep 04 01:34:20 com_ccevents [debug] ExhibitionAction::summary()
+Sep 04 01:34:20 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Sep 04 01:34:20 com_ccevents [debug] Size of pubStates array: 0
+Sep 04 01:34:20 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Sep 04 01:38:36 com_ccevents [debug] 
+
+Sep 04 01:38:36 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Sep 04 01:38:36 com_ccevents [debug] ExhibitionAction::execute()
+Sep 04 01:38:36 com_ccevents [debug] ExhibitionAction::summary()
+Sep 04 01:38:36 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Sep 04 01:38:36 com_ccevents [debug] Size of pubStates array: 0
+Sep 04 01:38:36 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Sep 04 01:39:47 com_ccevents [debug] 
+
+Sep 04 01:39:47 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Sep 04 01:39:47 com_ccevents [debug] ExhibitionAction::execute()
+Sep 04 01:39:47 com_ccevents [debug] ExhibitionAction::summary()
+Sep 04 01:39:47 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Sep 04 01:39:47 com_ccevents [debug] Size of pubStates array: 0
+Sep 04 01:39:47 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )
+Sep 04 01:40:36 com_ccevents [debug] 
+
+Sep 04 01:40:36 com_ccevents [debug] action scope=exbt class=ExhibitionAction file=/Applications/MAMP/htdocs/scc/src/administrator/components/com_ccevents/WEB-INF/actions/ExhibitionAction.php
+Sep 04 01:40:36 com_ccevents [debug] ExhibitionAction::execute()
+Sep 04 01:40:36 com_ccevents [debug] ExhibitionAction::summary()
+Sep 04 01:40:36 com_ccevents [debug] ExhibitionAction::setSummaryModel()
+Sep 04 01:40:36 com_ccevents [debug] Size of pubStates array: 0
+Sep 04 01:40:36 com_ccevents [debug] EventService::getEventsByPubState(Exhibition, , )

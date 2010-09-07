@@ -1,0 +1,13 @@
+DROP TABLE IF EXISTS `#__cce_activity`;
+DROP TABLE IF EXISTS `#__cce_address`;
+DROP TABLE IF EXISTS `#__cce_announcement`;
+DROP TABLE IF EXISTS `#__cce_category`;
+DROP TABLE IF EXISTS `#__cce_course`;
+DROP TABLE IF EXISTS `#__cce_enumerated_value`;
+DROP TABLE IF EXISTS `#__cce_event`;
+DROP TABLE IF EXISTS `#__cce_exhibition`;
+DROP TABLE IF EXISTS `#__cce_homepage`;
+DROP TABLE IF EXISTS `#__cce_person`;
+DROP TABLE IF EXISTS `#__cce_program`;
+DROP TABLE IF EXISTS `#__cce_schedule`;
+DROP TABLE IF EXISTS `#__cce_venue`;
